@@ -5,7 +5,9 @@
 package ejb.session.singleton;
 
 import ejb.session.stateless.EmployeeSessionBeanLocal;
+import entity.Employee;
 import exception.EmployeeNotFoundException;
+import exception.EmployeeUsernameAlreadyExistException;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
@@ -34,8 +36,11 @@ public class DataInitSingleton {
             employeeSessionBeanLocal.getEmployees();
         } catch (EmployeeNotFoundException ex) {        
             System.out.println("Initialising Data");
-            
-            employeeSessionBeanLocal.createNewEmployee(new Employee("SystemAdmin","Admin",))
+            try {
+                employeeSessionBeanLocal.createNewEmployee(new Employee());
+            } catch (EmployeeUsernameAlreadyExistException ex1) {
+                System.out.println(ex1);
+            }
         }
 //        employeeSessionBeanLocal
     }

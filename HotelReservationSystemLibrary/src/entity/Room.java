@@ -10,8 +10,8 @@ import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+//import javax.persistence.EnumType;
+//import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,14 +34,14 @@ public class Room implements Serializable {
     
     private List<Date> bookedDates;
     
-    @Enumerated(EnumType.STRING)
+//    @Enumerated(EnumType.STRING)
     private RoomStatusEnum roomStatus;
    
     @Column(nullable = false,columnDefinition="default 'false'")
     private boolean isCheckedIn;
     
     @ManyToOne
-    private RoomType roomType;
+    private RoomType roomRmType;
     
     public Room() {
     }
@@ -86,12 +86,12 @@ public class Room implements Serializable {
         this.isCheckedIn = isCheckedIn;
     }
 
-    public RoomType getRoomType() {
-        return roomType;
+    public RoomType getRoomRmType() {
+        return roomRmType;
     }
 
-    public void setRoomType(RoomType roomType) {
-        this.roomType = roomType;
+    public void setRoomRmType(RoomType roomRmType) {
+        this.roomRmType = roomRmType;
     }
     
     

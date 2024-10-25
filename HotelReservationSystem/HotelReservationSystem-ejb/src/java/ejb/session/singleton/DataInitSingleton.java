@@ -33,6 +33,9 @@ public class DataInitSingleton {
     // "Insert Code > Add Business Method")
     @PostConstruct
     public void run(){
+        System.out.println("\n\n=========================");
+        System.out.println("DEPLOYED");
+        System.out.println("=========================\n\n");
         try{
             employeeSessionBeanLocal.getEmployees();
         } catch (EmployeeNotFoundException ex) {        

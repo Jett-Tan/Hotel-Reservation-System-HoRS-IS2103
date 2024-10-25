@@ -103,7 +103,7 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
     @Override
     public Room updateRoomType(Room room) throws RoomNotFoundException {
         Room emRoom = getRoomById(room.getRoomId());
-        emRoom.setRoomType(room.getRoomType());
+        emRoom.setRoomRmType(room.getRoomRmType());
         return emRoom;
     }
  

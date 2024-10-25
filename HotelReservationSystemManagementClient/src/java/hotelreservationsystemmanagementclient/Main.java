@@ -4,17 +4,41 @@
  */
 package hotelreservationsystemmanagementclient;
 
+import ejb.session.stateless.EmployeeSessionBeanRemote;
+import ejb.session.stateless.PartnerSessionBeanRemote;
+import ejb.session.stateless.RoomSessionBeanRemote;
+import javax.ejb.EJB;
+
 /**
  *
  * @author Tan Jian Feng
  */
 public class Main {
 
+    @EJB(name = "RoomSessionBeanRemote")
+    private static RoomSessionBeanRemote roomSessionBeanRemote;
+
+    @EJB(name = "PartnerSessionBeanRemote")
+    private static PartnerSessionBeanRemote partnerSessionBeanRemote;
+
+    @EJB(name = "EmployeeSessionBeanRemote")
+    private static EmployeeSessionBeanRemote employeeSessionBeanRemote;
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        MainApp app = new MainApp(
+                roomSessionBeanRemote,
+                partnerSessionBeanRemote,
+                employeeSessionBeanRemote
+        );
+        try{
+            app.run();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
     }
     
 }

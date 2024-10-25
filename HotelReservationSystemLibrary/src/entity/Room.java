@@ -29,8 +29,9 @@ public class Room implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomId;
     
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     private String roomNumber;
+    
     private List<Date> bookedDates;
     
     @Enumerated(EnumType.STRING)
@@ -83,6 +84,14 @@ public class Room implements Serializable {
 
     public void setIsCheckedIn(boolean isCheckedIn) {
         this.isCheckedIn = isCheckedIn;
+    }
+
+    public RoomType getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
     }
     
     

@@ -23,15 +23,15 @@ public interface EmployeeSessionBeanLocal {
     
     Employee getEmployeeById(Long EmployeeID) throws EmployeeNotFoundException;
     
-    Employee getEmployeeByUsername(Long EmployeeID) throws EmployeeNotFoundException;
+    Employee getEmployeeByUsername(String EmployeeUsername) throws EmployeeNotFoundException;
     
     Employee updateUsername(Employee employee) throws EmployeeNotFoundException, EmployeeUsernameAlreadyExistException;
     
-    Employee updateFirstName(Employee employee) throws EmployeeNotFoundException, EmployeeUsernameAlreadyExistException;
+    Employee updateFirstName(Employee employee) throws EmployeeNotFoundException;
     
-    Employee updateLastName(Employee employee) throws EmployeeNotFoundException, EmployeeUsernameAlreadyExistException;
+    Employee updateLastName(Employee employee) throws EmployeeNotFoundException;
     
-    Employee updatePassword(Employee employee) throws EmployeeNotFoundException, EmployeeUsernameAlreadyExistException;
+    Employee updatePassword(Employee employee) throws EmployeeNotFoundException;
     
     boolean deleteEmployee(Employee employee) throws EmployeeNotFoundException;
     

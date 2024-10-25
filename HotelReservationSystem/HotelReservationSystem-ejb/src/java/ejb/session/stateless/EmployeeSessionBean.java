@@ -46,42 +46,68 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     }
 
     @Override
-    public Employee getEmployeeById(Long EmployeeID) throws EmployeeNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Employee getEmployeeById(Long employeeId) throws EmployeeNotFoundException {
+        Employee employee = em.find(Employee.class,employeeId);
+        if (employee == null) {
+            throw new EmployeeNotFoundException("Employee with Id " + employeeId + " not found!");
+        }
+        return employee;
     }
 
     @Override
-    public Employee getEmployeeByUsername(Long EmployeeID) throws EmployeeNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Employee getEmployeeByUsername(String employeeUsername) throws EmployeeNotFoundException {
+        Query query = em.createQuery("SELECT e FROM Employee e WHERE e.username = :userName")
+                .setParameter("userName", employeeUsername);
+        Employee employee = (Employee) query.getSingleResult();
+        if (employee == null) {
+            throw new EmployeeNotFoundException("Employee with username " + employeeUsername + " not found!");
+        }
+        return employee;
     }
 
     @Override
     public Employee updateUsername(Employee employee) throws EmployeeNotFoundException, EmployeeUsernameAlreadyExistException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Employee emEmployee = getEmployeeById(employee.getEmployeeId());
+        try{
+            getEmployeeByUsername(employee.getUsername());
+        } catch ( EmployeeNotFoundException ex) {
+            emEmployee.setUsername(employee.getUsername());
+            return emEmployee;
+        }
+        throw new EmployeeUsernameAlreadyExistException("Employee with username " + employee.getUsername() + " already exist!");
     }
 
     @Override
-    public Employee updateFirstName(Employee employee) throws EmployeeNotFoundException, EmployeeUsernameAlreadyExistException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Employee updateFirstName(Employee employee) throws EmployeeNotFoundException {
+        Employee emEmployee = getEmployeeById(employee.getEmployeeId());
+        emEmployee.setFirstName(employee.getFirstName());
+        return emEmployee;
     }
 
     @Override
-    public Employee updateLastName(Employee employee) throws EmployeeNotFoundException, EmployeeUsernameAlreadyExistException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public Employee updateLastName(Employee employee) throws EmployeeNotFoundException {
+        Employee emEmployee = getEmployeeById(employee.getEmployeeId());
+        emEmployee.setLastName(employee.getLastName());
+        return emEmployee;}
 
     @Override
-    public Employee updatePassword(Employee employee) throws EmployeeNotFoundException, EmployeeUsernameAlreadyExistException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Employee updatePassword(Employee employee) throws EmployeeNotFoundException {
+        Employee emEmployee = getEmployeeById(employee.getEmployeeId());
+        emEmployee.setPassword(employee.getPassword());
+        return emEmployee;
     }
 
     @Override
     public boolean deleteEmployee(Employee employee) throws EmployeeNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Employee emEmployee = getEmployeeById(employee.getEmployeeId());
+        em.remove(emEmployee);
+        return true;
     }
 
     @Override
     public boolean deleteEmployeeById(Long employeeId) throws EmployeeNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Employee emEmployee = getEmployeeById(employeeId);
+        em.remove(emEmployee);
+        return true;
     }
 }

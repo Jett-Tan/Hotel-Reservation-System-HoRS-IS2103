@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
+import javax.ejb.Startup;
 
 /**
  *
@@ -20,6 +21,7 @@ import javax.ejb.LocalBean;
  */
 @Singleton
 @LocalBean
+@Startup
 public class DataInitSingleton {
 
     @EJB(name = "EmployeeSessionBeanLocal")

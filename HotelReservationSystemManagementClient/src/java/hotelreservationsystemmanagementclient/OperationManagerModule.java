@@ -10,7 +10,6 @@ import entity.RoomRate;
 import entity.RoomType;
 import enumeration.RoomRateTypeEnum;
 import enumeration.RoomStatusEnum;
-import exception.RoomTypeNumberAlreadyExistException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;

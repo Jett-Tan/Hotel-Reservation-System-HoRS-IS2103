@@ -38,6 +38,7 @@ public class MainApp {
         do {
             System.out.println("1. Login");
             System.out.println("2. Exit");
+            System.out.println(">");
             option = scanner.nextInt();
             scanner.nextLine();
             switch(option) {

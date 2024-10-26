@@ -25,21 +25,25 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
 
     @Override
     public Employee createNewEmployee(Employee employee) throws EmployeeUsernameAlreadyExistException {
-        Query query = em.createQuery("SELECT e FROM Employee e WHERE e.username = :username")
-                .setParameter("username", employee.getUsername());
-        if (query.getFirstResult() == 0) {
-            em.persist(employee);
-            em.flush();
-            return employee;
-        }else {
-            throw new EmployeeUsernameAlreadyExistException("Employee with username of " + employee.getUsername() + " already exist!");
-        }
+//        Query query = em.createQuery("SELECT e FROM Employee e WHERE e.username = :username")
+//                .setParameter("username", employee.getUsername());
+//        if (query.getFirstResult() == 0) {
+//            em.persist(employee);
+//            em.flush();
+//            return employee;
+//        }else {
+//            throw new EmployeeUsernameAlreadyExistException("Employee with username of " + employee.getUsername() + " already exist!");
+//        }
+        em.persist(employee);
+        em.flush();
+        return employee;
     }
+                
 
     @Override
     public List<Employee> getEmployees() throws EmployeeNotFoundException {
         List<Employee> list = em.createQuery("SELECT e FROM Employee e").getResultList();
-        if(list.isEmpty()) {
+        if (list.isEmpty()) {
             throw new EmployeeNotFoundException("There is no employee in the system");
         }
         return list;
@@ -47,7 +51,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
 
     @Override
     public Employee getEmployeeById(Long employeeId) throws EmployeeNotFoundException {
-        Employee employee = em.find(Employee.class,employeeId);
+        Employee employee = em.find(Employee.class, employeeId);
         if (employee == null) {
             throw new EmployeeNotFoundException("Employee with Id " + employeeId + " not found!");
         }
@@ -68,9 +72,9 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     @Override
     public Employee updateUsername(Employee employee) throws EmployeeNotFoundException, EmployeeUsernameAlreadyExistException {
         Employee emEmployee = getEmployeeById(employee.getEmployeeId());
-        try{
+        try {
             getEmployeeByUsername(employee.getUsername());
-        } catch ( EmployeeNotFoundException ex) {
+        } catch (EmployeeNotFoundException ex) {
             emEmployee.setUsername(employee.getUsername());
             return emEmployee;
         }

@@ -13,6 +13,9 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
+import javax.ejb.Startup;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 /**
  *
@@ -20,35 +23,46 @@ import javax.ejb.LocalBean;
  */
 @Singleton
 @LocalBean
+@Startup
 public class DataInitSingleton {
 
     @EJB(name = "EmployeeSessionBeanLocal")
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
-    
-    
-    public DataInitSingleton() {
-    }
-    
+
+    @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
+    private EntityManager em;
+
+//    public DataInitSingleton() {
+//    }
+
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
+    
     @PostConstruct
-    public void run(){
-        System.out.println("\n\n=========================");
-        System.out.println("DEPLOYED");
-        System.out.println("=========================\n\n");
-        try{
-            employeeSessionBeanLocal.getEmployees();
-        } catch (EmployeeNotFoundException ex) {        
-            System.out.println("Initialising Data");
-            try {
-                employeeSessionBeanLocal.createNewEmployee(new Employee("SYSTEMADMINISTRATOR","SYSTEMADMINISTRATOR", "admin", "password", EmployeeTypeEnum.SYSTEM_ADMINISTRATOR));
-                employeeSessionBeanLocal.createNewEmployee(new Employee("GUESTRELATIONOFFICER","GUESTRELATIONOFFICER", "officer", "password", EmployeeTypeEnum.GUEST_RELATION_OFFICER));
-                employeeSessionBeanLocal.createNewEmployee(new Employee("SALES","SALES", "sales", "password", EmployeeTypeEnum.SALES));
-                employeeSessionBeanLocal.createNewEmployee(new Employee("OPERATIONMANAGER","OPERATIONMANAGER", "manager", "password", EmployeeTypeEnum.OPERATION_MANAGER));
+    public void postConstruct() {
+//        System.out.println("\n\n=========================");
+//        System.out.println("DEPLOYED");
+//        System.out.println("=========================\n\n");
+//        try{
+//            employeeSessionBeanLocal.getEmployees();
+//        } catch (EmployeeNotFoundException ex) {        
+//            System.out.println("Initialising Data");
 
-            } catch (EmployeeUsernameAlreadyExistException ex1) {
+        if (em.find(Employee.class, 1l) == null) {
+            try {
+                employeeSessionBeanLocal.createNewEmployee(new Employee("SYSTEMADMINISTRATOR", "SYSTEMADMINISTRATOR", "admin", "password", EmployeeTypeEnum.SYSTEM_ADMINISTRATOR));
+                employeeSessionBeanLocal.createNewEmployee(new Employee("GUESTRELATIONOFFICER", "GUESTRELATIONOFFICER", "officer", "password", EmployeeTypeEnum.GUEST_RELATION_OFFICER));
+                employeeSessionBeanLocal.createNewEmployee(new Employee("SALES", "SALES", "sales", "password", EmployeeTypeEnum.SALES));
+                employeeSessionBeanLocal.createNewEmployee(new Employee("OPERATIONMANAGER", "OPERATIONMANAGER", "manager", "password", EmployeeTypeEnum.OPERATION_MANAGER));
+        } catch (EmployeeUsernameAlreadyExistException ex1) {
                 System.out.println(ex1);
             }
         }
     }
+//    }
+//    }
+
+//    public void persist(Object object) {
+//        em.persist(object);
+//    }
 }

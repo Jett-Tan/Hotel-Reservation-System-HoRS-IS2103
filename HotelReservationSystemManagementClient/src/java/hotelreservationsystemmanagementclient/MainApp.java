@@ -22,23 +22,28 @@ public class MainApp {
     private Employee currentEmployee;
     private Scanner scanner = new Scanner(System.in);
     
-    MainApp(RoomSessionBeanRemote roomSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote) {
+    MainApp(
+            RoomSessionBeanRemote roomSessionBeanRemote, 
+            PartnerSessionBeanRemote partnerSessionBeanRemote, 
+            EmployeeSessionBeanRemote employeeSessionBeanRemote
+    ) {
         this.roomSessionBeanRemote = roomSessionBeanRemote;
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
     }
 
     void run() {
-        System.out.println("Hotel Reservation System Management Client");
-        System.out.println("1. Login");
-        System.out.println("2. Exit");
+        System.out.println("==== Welcome to Hotel Reservation System Management Client ====");
         int option = 0;
         do {
+            System.out.println("1. Login");
+            System.out.println("2. Exit");
             option = scanner.nextInt();
             scanner.nextLine();
             switch(option) {
                 case 1: doLogin();
                         break;
+                default: System.out.println("\nInvalid input");
             }
             if(option > 2){
                 break;

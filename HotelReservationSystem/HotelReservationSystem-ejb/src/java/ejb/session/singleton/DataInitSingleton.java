@@ -41,16 +41,14 @@ public class DataInitSingleton {
         } catch (EmployeeNotFoundException ex) {        
             System.out.println("Initialising Data");
             try {
-                employeeSessionBeanLocal.createNewEmployee(new Employee("EMPLOYEE","EMPLOYEE", "employee", "password", EmployeeTypeEnum.EMPLOYEE));
-                employeeSessionBeanLocal.createNewEmployee(new Employee("SYSTEMADMINISTRATOR","SYSTEMADMINISTRATOR", "admin", "password", EmployeeTypeEnum.SYSTEMADMINISTRATOR));
-                employeeSessionBeanLocal.createNewEmployee(new Employee("GUESTRELATIONOFFICER","GUESTRELATIONOFFICER", "officer", "password", EmployeeTypeEnum.GUESTRELATIONOFFICER));
+                employeeSessionBeanLocal.createNewEmployee(new Employee("SYSTEMADMINISTRATOR","SYSTEMADMINISTRATOR", "admin", "password", EmployeeTypeEnum.SYSTEM_ADMINISTRATOR));
+                employeeSessionBeanLocal.createNewEmployee(new Employee("GUESTRELATIONOFFICER","GUESTRELATIONOFFICER", "officer", "password", EmployeeTypeEnum.GUEST_RELATION_OFFICER));
                 employeeSessionBeanLocal.createNewEmployee(new Employee("SALES","SALES", "sales", "password", EmployeeTypeEnum.SALES));
-                employeeSessionBeanLocal.createNewEmployee(new Employee("OPERATIONMANAGER","OPERATIONMANAGER", "manager", "password", EmployeeTypeEnum.OPERATIONMANAGER));
+                employeeSessionBeanLocal.createNewEmployee(new Employee("OPERATIONMANAGER","OPERATIONMANAGER", "manager", "password", EmployeeTypeEnum.OPERATION_MANAGER));
 
             } catch (EmployeeUsernameAlreadyExistException ex1) {
                 System.out.println(ex1);
             }
         }
-//        employeeSessionBeanLocal
     }
 }

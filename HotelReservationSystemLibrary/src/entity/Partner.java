@@ -8,8 +8,8 @@ import enumeration.PartnerEmployeeTypeEnum;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-//import javax.persistence.EnumType;
-//import javax.persistence.Enumerated;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,12 +34,22 @@ public class Partner implements Serializable {
     @Column(nullable = false)
     private String password;
     
-//    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private PartnerEmployeeTypeEnum employeeType;
 
     public Partner() {
     }
 
+    public Partner(Long PartnerId, String firstName, String lastName, String username, String password, PartnerEmployeeTypeEnum employeeType) {
+        this.PartnerId = PartnerId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.password = password;
+        this.employeeType = employeeType;
+    }
+
+    
     public Partner(String firstName, String lastName, String username, String password, PartnerEmployeeTypeEnum employeeType) {
         this.firstName = firstName;
         this.lastName = lastName;

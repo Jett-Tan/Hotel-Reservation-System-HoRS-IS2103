@@ -88,7 +88,8 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     public Employee updateLastName(Employee employee) throws EmployeeNotFoundException {
         Employee emEmployee = getEmployeeById(employee.getEmployeeId());
         emEmployee.setLastName(employee.getLastName());
-        return emEmployee;}
+        return emEmployee;
+    }
 
     @Override
     public Employee updatePassword(Employee employee) throws EmployeeNotFoundException {

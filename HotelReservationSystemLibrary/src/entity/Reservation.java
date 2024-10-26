@@ -7,10 +7,11 @@ package entity;
 import enumeration.ReservationTypeEnum;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-//import javax.persistence.EnumType;
-//import javax.persistence.Enumerated;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -37,10 +38,11 @@ public class Reservation implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date endDate;
     
-//    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private ReservationTypeEnum reservationTpy;
     
 //    private List<Room> room;
+    
     public Long getReservationId() {
         return reservationId;
     }

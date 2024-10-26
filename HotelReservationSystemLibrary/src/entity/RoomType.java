@@ -10,8 +10,8 @@ import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-//import javax.persistence.EnumType;
-//import javax.persistence.Enumerated;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -46,10 +46,10 @@ public class RoomType implements Serializable {
     
     private List<String> amenities;
     
-//    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private RoomStatusEnum statusType;
     
-//    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private RoomRateTypeEnum rateType;
     
     @OneToMany(mappedBy = "roomRmType")
@@ -71,6 +71,19 @@ public class RoomType implements Serializable {
         this.amenities = amenities;
         this.statusType = statusType;
         this.rooms = rooms;
+    }
+
+    public RoomType(String name, String description, Double size, String bed, Integer capacity, List<String> amenities, RoomStatusEnum statusType, RoomRateTypeEnum rateType, List<Room> rooms, List<RoomRate> roomRates) {
+        this.name = name;
+        this.description = description;
+        this.size = size;
+        this.bed = bed;
+        this.capacity = capacity;
+        this.amenities = amenities;
+        this.statusType = statusType;
+        this.rateType = rateType;
+        this.rooms = rooms;
+        this.roomRates = roomRates;
     }
 
     public String getName() {

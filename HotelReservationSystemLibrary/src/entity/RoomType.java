@@ -50,7 +50,7 @@ public class RoomType implements Serializable {
     private RoomStatusEnum statusType;
     
     @Enumerated(EnumType.STRING)
-    private RoomRateTypeEnum rateType;
+    private RoomRateType rateType;
     
     @OneToMany(mappedBy = "roomRmType")
     private List<Room> rooms;

@@ -7,6 +7,7 @@ package hotelreservationsystemmanagementclient;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
+import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import entity.Employee;
 import enumeration.EmployeeTypeEnum;
 import java.util.Scanner;
@@ -19,14 +20,22 @@ public class HotelOperationModule {
     private RoomSessionBeanRemote roomSessionBeanRemote;
     private PartnerSessionBeanRemote partnerSessionBeanRemote;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
+    private RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
     private Employee currentEmployee;
     private Scanner scanner = new Scanner(System.in);
 
-    public HotelOperationModule(RoomSessionBeanRemote roomSessionBeanRemote, PartnerSessionBeanRemote partnerSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, Employee currentEmployee) {
+    public HotelOperationModule(
+            RoomSessionBeanRemote roomSessionBeanRemote, 
+            PartnerSessionBeanRemote partnerSessionBeanRemote, 
+            EmployeeSessionBeanRemote employeeSessionBeanRemote, 
+            Employee currentEmployee, 
+            RoomTypeSessionBeanRemote roomTypeSessionBeanRemote
+    ) {
         this.roomSessionBeanRemote = roomSessionBeanRemote;
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.currentEmployee = currentEmployee;
+        this.roomTypeSessionBeanRemote = roomTypeSessionBeanRemote;
     }
     
     public void run() {
@@ -36,7 +45,8 @@ public class HotelOperationModule {
                 roomSessionBeanRemote,
                 partnerSessionBeanRemote,
                 employeeSessionBeanRemote,
-                currentEmployee
+                currentEmployee,
+                    roomTypeSessionBeanRemote
             );
             app.run();
         } else if(EmployeeTypeEnum.SALES.equals(currentEmployee.getEmployeeType())) {
@@ -47,6 +57,8 @@ public class HotelOperationModule {
                 currentEmployee
             );
             app.run();
+        } else if(EmployeeTypeEnum.GUEST_RELATION_OFFICER.equals(currentEmployee.getEmployeeType())) {
+            
         }
         
     }

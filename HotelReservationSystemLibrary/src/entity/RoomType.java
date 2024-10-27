@@ -4,8 +4,8 @@
  */
 package entity;
 
-import enumeration.RoomRateTypeEnum;
-import enumeration.RoomStatusEnum;
+import enumerations.RoomRateTypeEnum;
+import enumerations.RoomStatusEnum;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Column;

@@ -10,6 +10,7 @@ import exception.RoomNumberAlreadyExistException;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -40,11 +41,12 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
 
     @Override
     public List<Room> getRooms() throws RoomNotFoundException {
-        List<Room> list = em.createQuery("SELECT r FROM Room r").getResultList();
-        if(list.isEmpty()) {
+        try {
+            List<Room> list = em.createQuery("SELECT r FROM Room r").getResultList();
+            return list;
+        } catch (NoResultException ex) {
             throw new RoomNotFoundException("There is no room in the system");
         }
-        return list;
     }
 
     @Override
@@ -60,11 +62,12 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
     public Room getRoomByNumber(String roomNumber) throws RoomNotFoundException {
         Query query = em.createQuery("SELECT r FROM Room r WHERE r.roomNumber = :roomNumber")
                 .setParameter("roomNumber", roomNumber);
-        Room room = (Room) query.getSingleResult();
-        if (room == null) {
+        try {
+            Room room = (Room) query.getSingleResult();
+            return room;
+        } catch (NoResultException ex) {
             throw new RoomNotFoundException("Room with room number " + roomNumber + " not found!");
         }
-        return room;
     }
 
     @Override

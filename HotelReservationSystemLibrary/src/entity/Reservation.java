@@ -4,7 +4,7 @@
  */
 package entity;
 
-import enumeration.ReservationTypeEnum;
+import enumerations.ReservationTypeEnum;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;

@@ -4,7 +4,7 @@
  */
 package entity;
 
-import enumeration.PartnerEmployeeTypeEnum;
+import enumerations.PartnerEmployeeTypeEnum;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;

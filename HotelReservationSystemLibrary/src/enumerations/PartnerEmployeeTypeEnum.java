@@ -2,13 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Enum.java to edit this template
  */
-package enumeration;
+package enumerations;
 
 /**
  *
  * @author Tan Jian Feng
  */
-public enum RoomStatusEnum {
-    AVAILABLE,
-    UNAVAILABLE
+public enum PartnerEmployeeTypeEnum {
+    EMPLOYEE,
+    MANAGER
 }

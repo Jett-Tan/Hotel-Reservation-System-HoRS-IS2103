@@ -6,7 +6,7 @@ package ejb.session.singleton;
 
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import entity.Employee;
-import enumeration.EmployeeTypeEnum;
+import enumerations.EmployeeTypeEnum;
 import exception.EmployeeNotFoundException;
 import exception.EmployeeUsernameAlreadyExistException;
 import javax.annotation.PostConstruct;

@@ -49,7 +49,7 @@ public class MainApp {
             if(option > 2){
                 break;
             }
-        }while (true);
+        } while (true);
     }
 
     private void doLogin() {
@@ -64,7 +64,7 @@ public class MainApp {
             } else {
                 System.out.println("Invalid Credentials");
             }
-        }catch (EmployeeNotFoundException ex) {
+        } catch (EmployeeNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
     }

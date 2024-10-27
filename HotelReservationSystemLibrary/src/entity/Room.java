@@ -4,7 +4,7 @@
  */
 package entity;
 
-import enumeration.RoomStatusEnum;
+import enumerations.RoomStatusEnum;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;

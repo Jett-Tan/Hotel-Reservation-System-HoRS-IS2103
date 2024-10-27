@@ -8,7 +8,7 @@ import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import entity.Employee;
-import enumeration.EmployeeTypeEnum;
+import enumerations.EmployeeTypeEnum;
 import java.util.Scanner;
 
 /**

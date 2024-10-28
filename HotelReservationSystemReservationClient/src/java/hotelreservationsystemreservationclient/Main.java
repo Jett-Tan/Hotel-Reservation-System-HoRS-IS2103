@@ -7,6 +7,9 @@ package hotelreservationsystemreservationclient;
 import ejb.session.stateless.GuestSessionBeanRemote;
 import ejb.session.stateless.ReservationLineSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
+import exception.GuestNotFoundException;
+import exception.InvalidDataException;
+import exception.InvalidLoginCredentialsException;
 import javax.ejb.EJB;
 
 /**
@@ -25,7 +28,7 @@ public class Main {
     @EJB
     private static GuestSessionBeanRemote guestSessionBeanRemote;
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InvalidDataException, GuestNotFoundException, InvalidLoginCredentialsException {
          MainApp mainApp = new MainApp(reservationLineSessionBeanRemote, reservationSessionBeanRemote, guestSessionBeanRemote);
         mainApp.run();
     }

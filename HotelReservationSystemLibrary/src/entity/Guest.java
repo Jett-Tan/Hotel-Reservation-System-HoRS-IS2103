@@ -33,7 +33,7 @@ public class Guest implements Serializable {
     @Column(nullable = false, unique = true, length = 32)
     @NotNull
     @Size(min = 1, max = 32)
-    private String uniqueIdentifier;
+    private String username;
     
     @Column(nullable = false, length = 32)
     @NotNull
@@ -43,9 +43,9 @@ public class Guest implements Serializable {
     public Guest() {
     }
 
-    public Guest(String name, String uniqueIdentifier, String password) {
+    public Guest(String name, String username, String password) {
         this.name = name;
-        this.uniqueIdentifier = uniqueIdentifier;
+        this.username = username;
         this.password = password;
     }
     
@@ -97,17 +97,17 @@ public class Guest implements Serializable {
     }
 
     /**
-     * @return the uniqueIdentifier
+     * @return the username
      */
-    public String getUniqueIdentifier() {
-        return uniqueIdentifier;
+    public String getUsername() {
+        return username;
     }
 
     /**
-     * @param uniqueIdentifier the uniqueIdentifier to set
+     * @param username the username to set
      */
-    public void setUniqueIdentifier(String uniqueIdentifier) {
-        this.uniqueIdentifier = uniqueIdentifier;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     /**

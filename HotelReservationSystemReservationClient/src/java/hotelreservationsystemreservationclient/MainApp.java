@@ -4,14 +4,19 @@
  */
 package hotelreservationsystemreservationclient;
 
+import exception.InvalidDataException;
 import ejb.session.stateless.GuestSessionBeanRemote;
 import ejb.session.stateless.ReservationLineSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
-import entity.Employee;
 import entity.Guest;
-import exception.EmployeeNotFoundException;
 import exception.GuestNotFoundException;
+import exception.InvalidLoginCredentialsException;
 import java.util.Scanner;
+import java.util.Set;
+import javax.validation.Validator;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 
 /**
  *
@@ -24,14 +29,23 @@ public class MainApp {
     private GuestSessionBeanRemote guestSessionBeanRemote;
     private Guest currentGuest;
     private Scanner scanner = new Scanner(System.in);
+    private ValidatorFactory validatorFactory;
+    private Validator validator;
+
+    public MainApp() {
+        this.validatorFactory = Validation.buildDefaultValidatorFactory();
+        this.validator = validatorFactory.getValidator();
+    }
 
     public MainApp(ReservationLineSessionBeanRemote reservationLineSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, GuestSessionBeanRemote guestSessionBeanRemote) {
+        this();
+
         this.reservationLineSessionBeanRemote = reservationLineSessionBeanRemote;
         this.reservationSessionBeanRemote = reservationSessionBeanRemote;
         this.guestSessionBeanRemote = guestSessionBeanRemote;
     }
 
-    public void run() {
+    public void run() throws InvalidDataException, GuestNotFoundException, InvalidLoginCredentialsException {
         System.out.println("==== Welcome to Hotel Reservation System Client ====");
         int option = 0;
         do {
@@ -57,37 +71,24 @@ public class MainApp {
         } while (true);
     }
 
-    private void doLogin() {
+    private void doLogin() throws GuestNotFoundException, InvalidLoginCredentialsException {
         System.out.print("Username >> ");
         String username = scanner.nextLine();
+        System.out.print("Password >> ");
+        String password = scanner.nextLine();
 
-        // Check if the username exists before asking for a password
-        try {
-            if (!guestSessionBeanRemote.isUsernameExist(username)) {
-                System.out.println("No account found with that username. Please register first.");
-                return;
-            }
-        } catch (Exception e) {
-            System.out.println("Error checking username: " + e.getMessage());
+        // Check if the username exists
+        if (!guestSessionBeanRemote.isUsernameExist(username)) {
+            System.out.println("No account found with that username. Please register first.");
             return;
         }
 
-        System.out.print("Password >> ");
-        String password = scanner.nextLine();
-        try {
-            Guest guest = guestSessionBeanRemote.getGuestByUsername(username);
-            if (guest.getPassword().equals(password)) {
-                currentGuest = guest;
-                System.out.println("Login successful");
-            } else {
-                System.out.println("Invalid Credentials");
-            }
-        } catch (GuestNotFoundException ex) {
-            System.out.println(ex.getMessage());
-        }
+        currentGuest = guestSessionBeanRemote.loginGuest(username, password);
+        System.out.println("Login successful! Welcome to Merlion Hotel!");
+
     }
 
-    private void doRegister() {
+    private void doRegister() throws InvalidDataException {
         System.out.print("Name >> ");
         String name = scanner.nextLine();
         System.out.print("Username >> ");
@@ -95,28 +96,17 @@ public class MainApp {
         System.out.print("Password >> ");
         String password = scanner.nextLine();
 
-        // Check if the username already exists
-        try {
-            if (guestSessionBeanRemote.isUsernameExist(username)) {
-                System.out.println("Username is already taken. Please choose another one.");
-                return;
-            }
-        } catch (Exception e) {
-            System.out.println("Error checking username: " + e.getMessage());
-            return; // Exit if there's an error
-        }
-
         // Create a new Guest object
         Guest newGuest = new Guest(name, username, password);
 
-        // Register the guest using the session bean
-        try {
+        Set<ConstraintViolation<Guest>> errorList = this.validator.validate(newGuest);
+
+        if (errorList.isEmpty()) {
             guestSessionBeanRemote.registerGuest(newGuest);
             System.out.println("Registration successful! You can now log in as a guest.");
-        } catch (Exception e) {
-            System.out.println("Registration failed: " + e.getMessage());
+        } else {
+            System.out.println("Registration failed!");
         }
-
     }
 
 }

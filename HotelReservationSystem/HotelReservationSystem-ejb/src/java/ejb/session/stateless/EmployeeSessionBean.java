@@ -10,6 +10,7 @@ import exception.EmployeeUsernameAlreadyExistException;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -25,18 +26,14 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
 
     @Override
     public Employee createNewEmployee(Employee employee) throws EmployeeUsernameAlreadyExistException {
-//        Query query = em.createQuery("SELECT e FROM Employee e WHERE e.username = :username")
-//                .setParameter("username", employee.getUsername());
-//        if (query.getFirstResult() == 0) {
-//            em.persist(employee);
-//            em.flush();
-//            return employee;
-//        }else {
-//            throw new EmployeeUsernameAlreadyExistException("Employee with username of " + employee.getUsername() + " already exist!");
-//        }
-        em.persist(employee);
-        em.flush();
-        return employee;
+        try {
+            getEmployeeByUsername(employee.getUsername());
+            throw new EmployeeUsernameAlreadyExistException("Employee with username of " + employee.getUsername() + " already exist!");
+        } catch (EmployeeNotFoundException ex) {
+            em.persist(employee);
+            em.flush();
+            return employee;
+        }
     }
                 
 
@@ -62,13 +59,13 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     public Employee getEmployeeByUsername(String employeeUsername) throws EmployeeNotFoundException {
         Query query = em.createQuery("SELECT e FROM Employee e WHERE e.username = :userName")
                 .setParameter("userName", employeeUsername);
-        Employee employee = (Employee) query.getSingleResult();
-        if (employee == null) {
+        try{
+             return (Employee) query.getSingleResult();
+        } catch(NoResultException ex){
             throw new EmployeeNotFoundException("Employee with username " + employeeUsername + " not found!");
         }
-        return employee;
     }
-
+    
     @Override
     public Employee updateUsername(Employee employee) throws EmployeeNotFoundException, EmployeeUsernameAlreadyExistException {
         Employee emEmployee = getEmployeeById(employee.getEmployeeId());

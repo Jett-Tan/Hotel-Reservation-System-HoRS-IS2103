@@ -49,8 +49,6 @@ public class RoomType implements Serializable {
     @Enumerated(EnumType.STRING)
     private RoomStatusEnum statusType;
     
-    @Enumerated(EnumType.STRING)
-    private RoomRateTypeEnum rateType;
     
     @OneToMany(mappedBy = "roomRmType")
     private List<Room> rooms;
@@ -61,8 +59,7 @@ public class RoomType implements Serializable {
     public RoomType() {
     }
 
-    public RoomType(Long roomTypeId, String name, String description, Double size, String bed, Integer capacity, List<String> amenities, RoomStatusEnum statusType, List<Room> rooms) {
-        this.roomTypeId = roomTypeId;
+    public RoomType(String name, String description, Double size, String bed, Integer capacity, List<String> amenities, RoomStatusEnum statusType, List<Room> rooms, List<RoomRate> roomRates) {
         this.name = name;
         this.description = description;
         this.size = size;
@@ -70,18 +67,6 @@ public class RoomType implements Serializable {
         this.capacity = capacity;
         this.amenities = amenities;
         this.statusType = statusType;
-        this.rooms = rooms;
-    }
-
-    public RoomType(String name, String description, Double size, String bed, Integer capacity, List<String> amenities, RoomStatusEnum statusType, RoomRateTypeEnum rateType, List<Room> rooms, List<RoomRate> roomRates) {
-        this.name = name;
-        this.description = description;
-        this.size = size;
-        this.bed = bed;
-        this.capacity = capacity;
-        this.amenities = amenities;
-        this.statusType = statusType;
-        this.rateType = rateType;
         this.rooms = rooms;
         this.roomRates = roomRates;
     }
@@ -142,22 +127,15 @@ public class RoomType implements Serializable {
         this.statusType = statusType;
     }
 
-    public RoomRateTypeEnum getRateType() {
-        return rateType;
-    }
-
-    public void setRateType(RoomRateTypeEnum rateType) {
-        this.rateType = rateType;
-    }
-    
-    
-
     public List<Room> getRooms() {
         return rooms;
     }
 
     public void setRooms(List<Room> rooms) {
         this.rooms = rooms;
+    }
+    public void addRoom(Room room) {
+        this.rooms.add(room);
     }
 
     public List<RoomRate> getRoomRates() {
@@ -166,6 +144,10 @@ public class RoomType implements Serializable {
 
     public void setRoomRates(List<RoomRate> roomRates) {
         this.roomRates = roomRates;
+    }
+    
+    public void addRoomRates(RoomRate roomRate) {
+        this.roomRates.add(roomRate);
     }
 
     

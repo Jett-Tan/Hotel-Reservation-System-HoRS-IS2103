@@ -15,8 +15,16 @@ import exception.EmployeeNotFoundException;
 import exception.EmployeeUsernameAlreadyExistException;
 import exception.PartnerNotFoundException;
 import exception.PartnerUsernameAlreadyExistException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 /**
  *
@@ -27,12 +35,22 @@ public class SystemAdministrationModule {
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private Employee currentEmployee;
     private Scanner scanner = new Scanner(System.in);
+    
+    private ValidatorFactory validatorFactory;
+    private Validator validator;
 
+    public SystemAdministrationModule() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
+    }
+
+    
     public SystemAdministrationModule(
             PartnerSessionBeanRemote partnerSessionBeanRemote, 
             EmployeeSessionBeanRemote employeeSessionBeanRemote, 
             Employee currentEmployee
     ) {
+        this();
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.currentEmployee = currentEmployee;
@@ -75,6 +93,7 @@ public class SystemAdministrationModule {
                 }
                 default : {
                     System.out.println("\nInvalid input");
+                    input = 0;
                     break;
                 }
             }
@@ -120,12 +139,21 @@ public class SystemAdministrationModule {
             }
         }while(option > 4 || option < 1);
         Employee newEmployee = new Employee(firstname,lastname,username,password,employeeType);
-        System.out.println("");
-        try {
-            newEmployee = employeeSessionBeanRemote.createNewEmployee(newEmployee);
-            System.out.println("New employee created with username of " + newEmployee.getUsername() );
-        } catch (EmployeeUsernameAlreadyExistException ex) {
-            System.out.println(ex.getMessage());
+        Set<ConstraintViolation<Employee>> errorList = this.validator.validate(newEmployee);
+        if (errorList.isEmpty()) {
+            System.out.println("");
+            try {
+                newEmployee = employeeSessionBeanRemote.createNewEmployee(newEmployee);
+                System.out.println("New employee created with username of " + newEmployee.getUsername() );
+            } catch (EmployeeUsernameAlreadyExistException ex) {
+                System.out.println(ex.getMessage());
+            }
+        } else {
+            System.out.println("");
+            System.out.println("===============================================================");
+            System.out.println("====              Error Creating New Employee              ====");
+            errorList.forEach(x -> System.out.println(x.getPropertyPath() + " : " + x.getMessage().replace("size","input") + " length"));
+            System.out.println("===============================================================");
         }
     }
 
@@ -153,7 +181,7 @@ public class SystemAdministrationModule {
         System.out.println("====              System Administration Module             ====");        
         System.out.println("====                   Create New Partner                  ====");
         System.out.println("");
-        String username, firstname, lastname, password;
+        String username, firstname, lastname, password = "";
         PartnerEmployeeTypeEnum employeeType = PartnerEmployeeTypeEnum.EMPLOYEE;
         
         System.out.print("Enter first name >> ");
@@ -162,7 +190,7 @@ public class SystemAdministrationModule {
         lastname = scanner.nextLine();
         System.out.print("Enter username >> ");        
         username = scanner.nextLine();
-        System.out.print("Enter password >> ");       
+        System.out.print("Enter password >> ");
         password = scanner.nextLine();
         
         int option = 0;
@@ -181,11 +209,21 @@ public class SystemAdministrationModule {
             }
         }while(option > 2 || option < 1);
         Partner newPartner = new Partner(firstname,lastname,username,password,employeeType);
-        try {
-            newPartner = partnerSessionBeanRemote.createNewPartner(newPartner);
+        Set<ConstraintViolation<Partner>> errorList = this.validator.validate(newPartner);
+        if (errorList.isEmpty()) {
+            System.out.println("");
+            try {
+                newPartner = partnerSessionBeanRemote.createNewPartner(newPartner);
             System.out.println("New partner created with username of " + newPartner.getUsername() );
-        } catch (PartnerUsernameAlreadyExistException ex) {
-            System.out.println(ex.getMessage());
+            } catch (PartnerUsernameAlreadyExistException ex) {
+                System.out.println(ex.getMessage());
+            }
+        } else {
+            System.out.println("");
+            System.out.println("===============================================================");
+            System.out.println("====              Error Creating New Partner               ====");
+            errorList.forEach(x -> System.out.println(x.getPropertyPath() + " : " + x.getMessage().replace("size","input") + " length"));
+            System.out.println("===============================================================");
         }
     }
 
@@ -193,9 +231,9 @@ public class SystemAdministrationModule {
         System.out.println("");
         System.out.println("====              System Administration Module             ====");        
         System.out.println("====                    View All Partners                  ====");
+        System.out.println("===============================================================");
         try {
             List<Partner> partners = partnerSessionBeanRemote.getPartners();
-            System.out.println("===============================================================");
             System.out.println(String.format("No.%30s%30s" ,"Name", "Partner Employee Type"));
             
             for(int i = 1; i < partners.size()+1; i++) {

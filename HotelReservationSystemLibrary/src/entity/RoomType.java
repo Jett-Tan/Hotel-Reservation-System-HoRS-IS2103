@@ -50,7 +50,7 @@ public class RoomType implements Serializable {
     private RoomStatusEnum statusType;
     
     
-    @OneToMany(mappedBy = "roomRmType")
+    @OneToMany(mappedBy = "roomType")
     private List<Room> rooms;
     
     @OneToMany(mappedBy = "roomType")

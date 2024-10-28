@@ -7,6 +7,8 @@ package ejb.session.stateless;
 import entity.RoomType;
 import exception.RoomTypeNameAlreadyExistException;
 import exception.RoomTypeNotFoundException;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
 
@@ -16,8 +18,9 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface RoomTypeSessionBeanRemote {
-    public RoomType createNewRoomType(RoomType roomType) throws RoomTypeNameAlreadyExistException ;
-        
+
+    public RoomType createNewRoomType(RoomType roomType) throws RoomTypeNameAlreadyExistException;
+
     public List<RoomType> getRoomTypes() throws RoomTypeNotFoundException;
 
     public RoomType getRoomTypeById(Long roomTypeID) throws RoomTypeNotFoundException;
@@ -27,22 +30,27 @@ public interface RoomTypeSessionBeanRemote {
     public RoomType updateName(RoomType roomType) throws RoomTypeNotFoundException;
 
     public RoomType updateDescription(RoomType roomType) throws RoomTypeNotFoundException;
-    
+
     public RoomType updateSize(RoomType roomType) throws RoomTypeNotFoundException;
-    
+
     public RoomType updateBed(RoomType roomType) throws RoomTypeNotFoundException;
-    
+
     public RoomType updateCapacity(RoomType roomType) throws RoomTypeNotFoundException;
-    
+
     public RoomType updateAmenities(RoomType roomType) throws RoomTypeNotFoundException;
-    
+
     public RoomType updateStatusType(RoomType roomType) throws RoomTypeNotFoundException;
-    
+
     public RoomType updateRooms(RoomType roomType) throws RoomTypeNotFoundException;
-    
+
     public RoomType updateRoomRates(RoomType roomType) throws RoomTypeNotFoundException;
-    
+
     boolean deleteRoomType(RoomType roomType) throws RoomTypeNotFoundException;
 
     boolean deleteRoomTypeById(Long roomTypeId) throws RoomTypeNotFoundException;
+
+    public BigDecimal calculatePrice(Long id, Date checkInDate, Date checkOutDate, Boolean isWalkIn);
+
+    public BigDecimal calculateRoomsAvail(Long id, Date checkInDate, Date checkOutDate);
+
 }

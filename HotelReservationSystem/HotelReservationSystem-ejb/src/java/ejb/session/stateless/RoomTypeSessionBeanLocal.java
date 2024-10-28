@@ -8,6 +8,8 @@ import entity.RoomType;
 import exception.RoomNotFoundException;
 import exception.RoomTypeNameAlreadyExistException;
 import exception.RoomTypeNotFoundException;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -48,4 +50,8 @@ public interface RoomTypeSessionBeanLocal {
     boolean deleteRoomType(RoomType roomType) throws RoomTypeNotFoundException;
 
     boolean deleteRoomTypeById(Long roomTypeId) throws RoomTypeNotFoundException;
+
+    public BigDecimal calculatePrice(Long id, Date checkInDate, Date checkOutDate, Boolean isWalkIn);
+
+    public BigDecimal calculateRoomsAvail(Long id, Date checkInDate, Date checkOutDate);
 }

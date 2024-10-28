@@ -4,6 +4,9 @@
  */
 package ejb.session.stateless;
 
+import entity.Guest;
+import entity.Reservation;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -12,5 +15,9 @@ import javax.ejb.Local;
  */
 @Local
 public interface ReservationSessionBeanLocal {
+
+    public List<Reservation> retrieveAllMyReservations(Guest guest);
+
+    public Reservation retrieveReservationByReservationId(Guest guest, Long reservationId);
     
 }

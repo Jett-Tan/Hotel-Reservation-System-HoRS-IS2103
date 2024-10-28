@@ -5,11 +5,18 @@
 package ejb.session.stateless;
 
 import entity.Room;
+import entity.RoomRate;
 import entity.RoomType;
+import enumerations.RoomRateTypeEnum;
 import exception.RoomNotFoundException;
 import exception.RoomTypeNameAlreadyExistException;
 import exception.RoomTypeNotFoundException;
+import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -32,7 +39,6 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
-
     @Override
     public RoomType createNewRoomType(RoomType roomType) throws RoomTypeNameAlreadyExistException {
         Query query = em.createQuery("SELECT r FROM RoomType r WHERE r.name = :name")
@@ -41,7 +47,7 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
             em.persist(roomType);
             em.flush();
             return roomType;
-        }else {
+        } else {
             throw new RoomTypeNameAlreadyExistException("RoomType with roomType number of " + roomType.getName() + " already exist!");
         }
     }
@@ -58,7 +64,7 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
 
     @Override
     public RoomType getRoomTypeById(Long roomTypeId) throws RoomTypeNotFoundException {
-        RoomType roomType = em.find(RoomType.class,roomTypeId);
+        RoomType roomType = em.find(RoomType.class, roomTypeId);
         if (roomType == null) {
             throw new RoomTypeNotFoundException("RoomType with Id " + roomTypeId + " not found!");
         }
@@ -155,28 +161,73 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
     @Override
     public RoomType updateRoomType(RoomType roomType) throws RoomTypeNotFoundException, RoomNotFoundException, RoomTypeNameAlreadyExistException {
         RoomType oldRoomType = getRoomTypeById(roomType.getRoomTypeId());
-        
+
         try {
             getRoomTypeByName(roomType.getName());
             throw new RoomTypeNameAlreadyExistException("Room type with name of " + roomType.getName() + " already exist!");
-        } catch (RoomTypeNotFoundException ex){
+        } catch (RoomTypeNotFoundException ex) {
             oldRoomType.setName(roomType.getName());
         }
         oldRoomType.setDescription(roomType.getDescription());
-        oldRoomType.setSize(roomType.getSize());    
+        oldRoomType.setSize(roomType.getSize());
         oldRoomType.setBed(roomType.getBed());
         oldRoomType.setCapacity(roomType.getCapacity());
         oldRoomType.setAmenities(roomType.getAmenities());
         oldRoomType.setStatusType(roomType.getStatusType());
-    
-        
+
         List<Room> rooms = roomSessionBeanLocal.getRooms();
-        for(Room room : rooms) {
+        for (Room room : rooms) {
 //            if(room.getRoomId().equals(roomType.getRooms))
         }
         return oldRoomType;
-    
-    //List<RoomRate> roomRates;
+
+        //List<RoomRate> roomRates;
+    }
+
+    @Override
+    public BigDecimal calculatePrice(Long id, Date checkInDate, Date checkOutDate, Boolean isWalkIn) {
+        RoomType roomType = null;
+        try {
+            roomType = getRoomTypeById(id);
+        } catch (RoomTypeNotFoundException ex) {
+            Logger.getLogger(RoomTypeSessionBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        BigDecimal roomRate = BigDecimal.ZERO;
+
+        Calendar checkIn = Calendar.getInstance();
+        checkIn.setTime(checkInDate);
+        Calendar checkOut = Calendar.getInstance();
+        checkOut.setTime(checkInDate);
+
+        while (checkIn.before(checkOut)) {
+            Date date = checkIn.getTime();
+
+            if (isWalkIn) {
+                roomRate = getRoomRate(roomType, RoomRateTypeEnum.PUBLISHED);
+                totalPrice = totalPrice.add(roomRate);
+            } else {
+                
+            }
+
+            checkIn.add(Calendar.DATE, 1);
+        }
+
+        return totalPrice;
+    }
+
+    private BigDecimal getRoomRate(RoomType roomType, RoomRateTypeEnum roomRateType) {
+        for (RoomRate roomRate : roomType.getRoomRates()) {
+            if (roomRate.getRateStatus().equals(roomRateType)) {
+                return roomRate.getRate();
+            }
+        }
+        return BigDecimal.ZERO;
+    }
+
+    public BigDecimal calculateRoomsAvail(Long id, Date checkInDate, Date checkOutDate) {
+        return BigDecimal.ZERO;
     }
 
 }

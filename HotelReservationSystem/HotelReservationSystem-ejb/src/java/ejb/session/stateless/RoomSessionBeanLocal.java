@@ -5,9 +5,9 @@
 package ejb.session.stateless;
 
 import entity.Room;
-import entity.RoomType;
 import exception.RoomNotFoundException;
 import exception.RoomNumberAlreadyExistException;
+import exception.RoomTypeNotFoundException;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -34,6 +34,8 @@ public interface RoomSessionBeanLocal {
     Room updateIsCheckIn(Room room) throws RoomNotFoundException;
     
     Room updateRoomType(Room room) throws RoomNotFoundException;
+    
+    Room updateRoom(Room room) throws RoomNotFoundException, RoomNumberAlreadyExistException, RoomTypeNotFoundException;
     
     boolean deleteRoom(Room room) throws RoomNotFoundException;
 

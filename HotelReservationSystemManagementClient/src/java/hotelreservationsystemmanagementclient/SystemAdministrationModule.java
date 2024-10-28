@@ -9,8 +9,8 @@ import ejb.session.stateless.PartnerSessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import entity.Employee;
 import entity.Partner;
-import enumeration.EmployeeTypeEnum;
-import enumeration.PartnerEmployeeTypeEnum;
+import enumerations.EmployeeTypeEnum;
+import enumerations.PartnerEmployeeTypeEnum;
 import exception.EmployeeNotFoundException;
 import exception.EmployeeUsernameAlreadyExistException;
 import exception.PartnerNotFoundException;
@@ -39,11 +39,12 @@ public class SystemAdministrationModule {
     }
     
     public void run(){
-        
+        System.out.println("");
         System.out.println("==== Welcome to Hotel Reservation System Management Client ====");
         System.out.println("====              System Administration Module             ====");
         int input = 0;
         do {
+            System.out.println("");
             System.out.println("1. Create new Employee");
             System.out.println("2. View all employees");
             System.out.println("3. Create new Partner");
@@ -81,8 +82,10 @@ public class SystemAdministrationModule {
     }
 
     private void doCreateNewEmployee() {
+        System.out.println("");
         System.out.println("====              System Administration Module             ====");        
         System.out.println("====                  Create New Employee                  ====");
+        System.out.println("");
         String username, firstname, lastname, password;
         EmployeeTypeEnum employeeType = EmployeeTypeEnum.SALES;
         
@@ -97,7 +100,7 @@ public class SystemAdministrationModule {
         
         int option = 0;
         do{
-            System.out.println("\nSelect Employee Type");
+            System.out.println("Select Employee Type : ");
             System.out.println("1. Sales");
             System.out.println("2. System Administrator");
             System.out.println("3. Operation Manager");
@@ -117,6 +120,7 @@ public class SystemAdministrationModule {
             }
         }while(option > 4 || option < 1);
         Employee newEmployee = new Employee(firstname,lastname,username,password,employeeType);
+        System.out.println("");
         try {
             newEmployee = employeeSessionBeanRemote.createNewEmployee(newEmployee);
             System.out.println("New employee created with username of " + newEmployee.getUsername() );
@@ -126,23 +130,29 @@ public class SystemAdministrationModule {
     }
 
     private void doViewAllEmployee() {
+        System.out.println("");
         System.out.println("====              System Administration Module             ====");        
         System.out.println("====                   View All Employees                  ====");
         try {
             List<Employee> employees = employeeSessionBeanRemote.getEmployees();
-            System.out.println("=======================================");
+            System.out.println("===============================================================");
+            System.out.println(String.format("No.%30s%30s" ,"Name", "Employee Type"));
             for(int i = 1; i < employees.size()+1; i++) {
                 Employee employee = employees.get(i-1);
-                System.out.println(String.format("%2d.%10s%10s ",i ,employee.getFirstName() + employee.getLastName(), employee.getEmployeeType()));
+                System.out.println(String.format("%d.%31s%30s",i ,employee.getFirstName() +" "+ employee.getLastName(), employee.getEmployeeType()));
             }
+            System.out.println("===============================================================");
+            System.out.println("");
         } catch (EmployeeNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
     }
 
     private void doCreateNewPartner() {
+        System.out.println("");
         System.out.println("====              System Administration Module             ====");        
         System.out.println("====                   Create New Partner                  ====");
+        System.out.println("");
         String username, firstname, lastname, password;
         PartnerEmployeeTypeEnum employeeType = PartnerEmployeeTypeEnum.EMPLOYEE;
         
@@ -180,15 +190,19 @@ public class SystemAdministrationModule {
     }
 
     private void doViewAllPartners() { 
+        System.out.println("");
         System.out.println("====              System Administration Module             ====");        
         System.out.println("====                    View All Partners                  ====");
         try {
             List<Partner> partners = partnerSessionBeanRemote.getPartners();
-            System.out.println("=======================================");
+            System.out.println("===============================================================");
+            System.out.println(String.format("No.%30s%30s" ,"Name", "Partner Employee Type"));
+            
             for(int i = 1; i < partners.size()+1; i++) {
                 Partner partner = partners.get(i-1);
-                System.out.println(String.format("%2d.%10s%10s ",i ,partner.getFirstName() + partner.getLastName(), partner.getEmployeeType()));
+                System.out.println(String.format("%d.%31s%30s",i ,partner.getFirstName() +" "+ partner.getLastName(), partner.getEmployeeType()));
             }
+            System.out.println("===============================================================");
         } catch (PartnerNotFoundException ex) {
             System.out.println(ex.getMessage());
         }

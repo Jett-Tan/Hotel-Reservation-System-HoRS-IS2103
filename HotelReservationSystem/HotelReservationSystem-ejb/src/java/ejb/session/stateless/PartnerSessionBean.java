@@ -10,6 +10,7 @@ import exception.PartnerUsernameAlreadyExistException;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -26,14 +27,13 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     
     @Override
     public Partner createNewPartner(Partner partner) throws PartnerUsernameAlreadyExistException {
-        Query query = em.createQuery("SELECT e FROM Partner e WHERE e.username = :username")
-                .setParameter("username", partner.getUsername());
-        if (query.getFirstResult() == 0) {
+        try{
+            getPartnerByUsername(partner.getUsername());
+            throw new PartnerUsernameAlreadyExistException("Partner with username of " + partner.getUsername() + " already exist!");
+        } catch (PartnerNotFoundException ex) {
             em.persist(partner);
             em.flush();
             return partner;
-        }else {
-            throw new PartnerUsernameAlreadyExistException("Partner with username of " + partner.getUsername() + " already exist!");
         }
     }
 
@@ -59,11 +59,12 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     public Partner getPartnerByUsername(String partnerUsername) throws PartnerNotFoundException {
         Query query = em.createQuery("SELECT e FROM Partner e WHERE e.username = :userName")
                 .setParameter("userName", partnerUsername);
-        Partner partner = (Partner) query.getSingleResult();
-        if (partner == null) {
+        try{
+             return (Partner) query.getSingleResult();
+        } catch(NoResultException ex){
             throw new PartnerNotFoundException("Partner with username " + partnerUsername + " not found!");
         }
-        return partner;
+        
     }
 
     @Override

@@ -6,6 +6,7 @@ package hotelreservationsystemmanagementclient;
 
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
+import ejb.session.stateless.RoomRateSessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import entity.Employee;
@@ -23,18 +24,21 @@ public class MainApp {
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private Employee currentEmployee;
     private RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
+    private RoomRateSessionBeanRemote roomRateSessionBeanRemote;
     private Scanner scanner = new Scanner(System.in);
     
     MainApp(
             RoomSessionBeanRemote roomSessionBeanRemote, 
             PartnerSessionBeanRemote partnerSessionBeanRemote, 
             EmployeeSessionBeanRemote employeeSessionBeanRemote,
-            RoomTypeSessionBeanRemote roomTypeSessionBeanRemote
+            RoomTypeSessionBeanRemote roomTypeSessionBeanRemote,
+            RoomRateSessionBeanRemote roomRateSessionBeanRemote
     ) {
         this.roomSessionBeanRemote = roomSessionBeanRemote;
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.roomTypeSessionBeanRemote = roomTypeSessionBeanRemote;
+        this.roomRateSessionBeanRemote = roomRateSessionBeanRemote;
     }
 
     void run() {
@@ -90,7 +94,8 @@ public class MainApp {
                                     partnerSessionBeanRemote,
                                     employeeSessionBeanRemote,
                                     currentEmployee,
-                                    roomTypeSessionBeanRemote
+                                    roomTypeSessionBeanRemote,
+                                    roomRateSessionBeanRemote
                             );      app.run();
                             break;
                         }

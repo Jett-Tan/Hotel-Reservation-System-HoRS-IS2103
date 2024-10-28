@@ -6,6 +6,7 @@ package hotelreservationsystemmanagementclient;
 
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
+import ejb.session.stateless.RoomRateSessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import entity.Employee;
@@ -21,6 +22,7 @@ public class HotelOperationModule {
     private PartnerSessionBeanRemote partnerSessionBeanRemote;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
+    private RoomRateSessionBeanRemote roomRateSessionBeanRemote;
     private Employee currentEmployee;
     private Scanner scanner = new Scanner(System.in);
 
@@ -29,13 +31,15 @@ public class HotelOperationModule {
             PartnerSessionBeanRemote partnerSessionBeanRemote, 
             EmployeeSessionBeanRemote employeeSessionBeanRemote, 
             Employee currentEmployee, 
-            RoomTypeSessionBeanRemote roomTypeSessionBeanRemote
+            RoomTypeSessionBeanRemote roomTypeSessionBeanRemote,
+            RoomRateSessionBeanRemote roomRateSessionBeanRemote
     ) {
         this.roomSessionBeanRemote = roomSessionBeanRemote;
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.currentEmployee = currentEmployee;
         this.roomTypeSessionBeanRemote = roomTypeSessionBeanRemote;
+        this.roomRateSessionBeanRemote = roomRateSessionBeanRemote;
     }
     
     public void run() {
@@ -46,7 +50,8 @@ public class HotelOperationModule {
                 partnerSessionBeanRemote,
                 employeeSessionBeanRemote,
                 currentEmployee,
-                    roomTypeSessionBeanRemote
+                roomTypeSessionBeanRemote,
+                roomRateSessionBeanRemote
             );
             app.run();
         } else if(EmployeeTypeEnum.SALES.equals(currentEmployee.getEmployeeType())) {

@@ -2,6 +2,7 @@ package hotelreservationsystemmanagementclient;
 
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
+import ejb.session.stateless.RoomRateSessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import entity.Employee;
@@ -11,10 +12,19 @@ import entity.RoomType;
 import enumerations.RoomRateTypeEnum;
 import enumerations.RoomStatusEnum;
 import exception.RoomNotFoundException;
+import exception.RoomRateNotFoundException;
+import exception.RoomTypeNameAlreadyExistException;
 import exception.RoomTypeNotFoundException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.validation.Validator;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -30,27 +40,39 @@ public class OperationManagerModule {
     private PartnerSessionBeanRemote partnerSessionBeanRemote;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
+    private RoomRateSessionBeanRemote roomRateSessionBeanRemote;
     private Employee currentEmployee;
     private Scanner scanner = new Scanner(System.in);
+    private ValidatorFactory validatorFactory;
+    private Validator validator;
 
+    public OperationManagerModule() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
+    }
+    
+    
     public OperationManagerModule(
             RoomSessionBeanRemote roomSessionBeanRemote, 
             PartnerSessionBeanRemote partnerSessionBeanRemote, 
             EmployeeSessionBeanRemote employeeSessionBeanRemote, 
             Employee currentEmployee,
-            RoomTypeSessionBeanRemote roomTypeSessionBeanRemote
+            RoomTypeSessionBeanRemote roomTypeSessionBeanRemote,
+            RoomRateSessionBeanRemote roomRateSessionBeanRemote
     ) {
+        this();
         this.roomSessionBeanRemote = roomSessionBeanRemote;
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.currentEmployee = currentEmployee;
         this.roomTypeSessionBeanRemote = roomTypeSessionBeanRemote;
+        this.roomRateSessionBeanRemote = roomRateSessionBeanRemote;
     }
     
     public void run() {
         System.out.println("");
         System.out.println("==== Welcome to Hotel Reservation System Management Client ====");
-        System.out.println("====                 Hotel Operation Module                ====");
+        System.out.println("====                Operation Manager Module               ====");
         System.out.println("");
         int input = 0;
         do {
@@ -97,7 +119,7 @@ public class OperationManagerModule {
 
     private void doCreateNewRoomType() {
         System.out.println("");
-        System.out.println("====                 Hotel Operation Module                ====");        
+        System.out.println("====                Operation Manager Module               ====");        
         System.out.println("====                  Create New Room Type                 ====");
         System.out.println("");
         RoomType roomType = new RoomType();
@@ -112,11 +134,10 @@ public class OperationManagerModule {
         roomType.setDescription(scanner.nextLine().trim());
         System.out.print("Enter bed >> ");
         roomType.setBed(scanner.nextLine().trim());
-        System.out.print("Enter size >> ");
-        roomType.setSize(scanner.nextDouble());
-//        scanner.nextLine(); // Not sure if there is a need for nextLine()
-        System.out.print("Enter capacity >> ");
-        roomType.setCapacity(scanner.nextInt());
+        System.out.print("Enter size (double) >> ");
+        roomType.setSize(new BigDecimal(scanner.nextLine().trim()));
+        System.out.print("Enter capacity (integer)>> ");
+        roomType.setCapacity(new BigDecimal(scanner.nextLine().trim()));
         scanner.nextLine();
         
         boolean isDone = false;
@@ -135,7 +156,7 @@ public class OperationManagerModule {
             System.out.println("Select Room Status");
             System.out.println("1. Available");
             System.out.println("2. Unavailable");
-            System.out.print("Enter room status (1 - 2)");
+            System.out.print("Enter room status (1 - 2) >> ");
             option = scanner.nextInt();
             scanner.nextLine();
             if(option == 1) {
@@ -145,35 +166,28 @@ public class OperationManagerModule {
             }
         }while (option > 2 || option < 1);
         option = 0;
-//        do{
-//            System.out.println("Select Room Rate Types");
-//            System.out.println("1. Normal");
-//            System.out.println("2. Peak");
-//            System.out.println("3. Promotion");
-//            System.out.println("4. Published");
-//            System.out.print("Enter room rate types (1 - 4)");
-//            option = scanner.nextInt();
-//            scanner.nextLine();
-//            switch (option) {
-//                case 1:
-//                    roomType.setRateType(RoomRateTypeEnum.NORMAL);
-//                    break;
-//                case 2:
-//                    roomType.setRateType(RoomRateTypeEnum.PEAK);
-//                    break;
-//                case 3:
-//                    roomType.set(RoomRateTypeEnum.PROMOTION);
-//                    break;
-//                case 4:
-//                    roomType.setRateType(RoomRateTypeEnum.PUBLISHED);
-//                    break;
-//                default:
-//                    break;
-//            }
-//        }while (option > 4 || option < 1);
+        try {
+            List<RoomRate> roomRatesList = roomRateSessionBeanRemote.getRoomRates();
+            System.out.println(String.format("%s%11s%10s%10s%10s%10s","No.","Name","Rate","Start Date","End Date","Rate Status"));
+            for(int i = 1; i< roomRatesList.size() + 1; i++) {
+                RoomRate roomrate = roomRatesList.get(i - 1);
+                System.out.println(String.format("%d.%10s%10s%10s%10s%10s",i,roomrate.getName(),roomrate.getRate(),roomrate.getStartDate(),roomrate.getEndDate(),roomrate.getRateStatus()));
+            }
+            do{
+                if (option < roomRatesList.size() + 1) {
+                    roomRates.add(roomRatesList.get(option - 1));
+                }
+            }while(option < roomRatesList.size() + 1);
+        } catch (RoomRateNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        try {
+            roomTypeSessionBeanRemote.createNewRoomType(roomType);
+        } catch (RoomTypeNameAlreadyExistException ex) {
+            System.out.println(ex.getMessage());
+        }
         
-                
-//       roomTypeSessionBeanRemote.createNewRoomType(roomType);
     
     }
 
@@ -205,7 +219,7 @@ public class OperationManagerModule {
                 if(option == 4) {
                     break;
                 }
-                System.out.print("Select room type >>");
+                System.out.print("Select room type >> ");
                 RoomType roomType = roomTypes.get(scanner.nextInt() -1);
                 switch(option) {
                     case 1: {
@@ -251,7 +265,7 @@ public class OperationManagerModule {
                 if(option == 4) {
                     break;
                 }
-                System.out.print("Select room type >>");
+                System.out.print("Select room type >> ");
                 Room room = rooms.get(scanner.nextInt() -1);
                 switch(option) {
                     case 1: {
@@ -305,7 +319,7 @@ public class OperationManagerModule {
 //            System.out.println("Room rate: " + roomRate.getName() + " Room start date: " + roomRate.getStartDate());
         }
         
-        System.out.println("Enter to exit >>");
+        System.out.println("Enter to exit >> ");
         String exit = scanner.nextLine();
     }
 

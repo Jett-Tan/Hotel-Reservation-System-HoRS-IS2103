@@ -17,6 +17,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotEmpty;
 
 /**
  *
@@ -32,21 +34,28 @@ public class Reservation implements Serializable {
     
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
+    @Future
     private Date startDate;
     
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
+    @Future
     private Date endDate;
     
     @Enumerated(EnumType.STRING)
-    private ReservationTypeEnum reservationTpy;
+    private ReservationTypeEnum reservationTpye;
+
+    @NotEmpty(message = "Input list should not be empty")
+    private List<Room> roomList;
     
-//    private List<Room> room;
+    @Column(nullable = false,  columnDefinition = "default 'false'")
+    private Boolean allocated;
     
     public Long getReservationId() {
         return reservationId;
     }
 
+    
 
     @Override
     public int hashCode() {

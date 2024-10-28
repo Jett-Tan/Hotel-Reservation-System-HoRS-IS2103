@@ -21,6 +21,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -35,25 +38,29 @@ public class RoomRate implements Serializable {
     private Long roomRateId;
     
     @Column(nullable = false)
+    @NotNull
+    @Size(min = 1, max = 20)
     private String name;
     
     @Column(nullable = false, scale = 2)
+    @NotNull
+    @Digits(integer = 4, fraction = 2)
     private BigDecimal rate;
     
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
+    @NotNull
     private Date startDate;
     
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
+    @NotNull
     private Date endDate;
     
     @Enumerated(EnumType.STRING)
+    @NotNull
     private RoomStatusEnum rateStatus;
 
-    @ManyToOne(optional = false,cascade = {}, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
-    private RoomType roomType;
     
     public RoomRate() {
     }
@@ -106,16 +113,6 @@ public class RoomRate implements Serializable {
     public void setRateStatus(RoomStatusEnum rateStatus) {
         this.rateStatus = rateStatus;
     }
-
-    public RoomType getRoomType() {
-        return roomType;
-    }
-
-    public void setRoomType(RoomType roomType) {
-        this.roomType = roomType;
-    }
-    
-    
     
     public Long getRoomRateId() {
         return roomRateId;

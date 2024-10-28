@@ -13,6 +13,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -25,16 +27,29 @@ public class Employee implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long employeeId;
+    
     @Column(nullable = false)
+    @Size(min = 1, max = 10)
+    @NotNull
     private String firstName;
+    
     @Column(nullable = false)
+    @Size(min = 1, max = 10)
+    @NotNull
     private String lastName;
+    
     @Column(nullable = false,unique = true)
+    @Size(min = 1, max = 10)
+    @NotNull
     private String username;
+    
     @Column(nullable = false)
+    @Size(min = 8)
+    @NotNull
     private String password;
     
     @Enumerated(value=EnumType.STRING)
+    @NotNull
     private EmployeeTypeEnum employeeType;
     
     public Employee() {

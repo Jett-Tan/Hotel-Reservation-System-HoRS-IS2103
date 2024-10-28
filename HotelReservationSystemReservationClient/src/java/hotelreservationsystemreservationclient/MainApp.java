@@ -63,18 +63,46 @@ public class MainApp {
                         doLogin();
                         isLoggedIn = true;
                     } else {
-                        System.out.println("You are already logged in.");
+                        System.out.println("**** You have successfully logged in. Welcome back " + this.currentGuest.getName() + "! ****\n");
                     }
                     break;
                 case 2:
                     doRegister();
                     break;
                 case 3:
+                    break;
+                default:
+                    System.out.println("\nInvalid input");
+            }
+
+            while (isLoggedIn) {
+                System.out.println("**** You have successfully logged in. Welcome back " + this.currentGuest.getName() + "! ****\n");
+                
+                System.out.println("Please select an option.");
+                System.out.println("1: Search Hotel Room");
+                System.out.println("2: View Reservation Details");
+                System.out.println("3: View All Reservations");
+                System.out.println("4: Logout\n");
+                System.out.print("> ");
+                
+                int response = scanner.nextInt();
+                switch (option) {
+                case 1:
+                    doSearchHotelRoom();
+                    break;
+                case 2:
+                    doViewReservation();
+                    break;
+                case 3:
+                    doViewAllReservations();
+                    break;
+                case 4:
                     isLoggedIn = false;
                     run();
                     break;
                 default:
                     System.out.println("\nInvalid input");
+            }
             }
         }
     }
@@ -115,6 +143,18 @@ public class MainApp {
         } else {
             System.out.println("Registration failed!");
         }
+    }
+    
+    private void doSearchHotelRoom() {
+        
+    }
+    
+    private void doViewReservation() {
+        
+    }
+    
+    private void doViewAllReservations() {
+        
     }
 
 }

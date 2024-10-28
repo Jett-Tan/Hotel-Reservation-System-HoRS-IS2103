@@ -5,9 +5,13 @@
 package ejb.session.stateless;
 
 import entity.Room;
+import entity.RoomType;
+import enumerations.RoomStatusEnum;
 import exception.RoomNotFoundException;
 import exception.RoomNumberAlreadyExistException;
+import exception.RoomTypeNotFoundException;
 import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -20,6 +24,9 @@ import javax.persistence.Query;
  */
 @Stateless
 public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLocal {
+
+    @EJB(name = "RoomTypeSessionBeanLocal")
+    private RoomTypeSessionBeanLocal roomTypeSessionBeanLocal;
 
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
@@ -123,6 +130,29 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
         Room emRoom = getRoomById(roomId);
         em.remove(emRoom);
         return true;
+    }
+
+    @Override
+    public Room updateRoom(Room room) throws RoomNotFoundException, RoomNumberAlreadyExistException, RoomTypeNotFoundException {
+        Room oldRoom = getRoomById(room.getRoomId());
+        try {
+            getRoomByNumber(room.getRoomNumber());
+            throw new RoomNumberAlreadyExistException("Room with room number " + room.getRoomNumber() + " already exist!");
+        } catch (RoomNotFoundException ex){
+            oldRoom.setRoomNumber(room.getRoomNumber());
+        }
+        
+        oldRoom.setBookedDates(room.getBookedDates());
+        oldRoom.setRoomStatus(room.getRoomStatus());
+        oldRoom.setRoomRmType(room.getRoomRmType());
+        RoomType roomtype = roomTypeSessionBeanLocal.getRoomTypeByName(room.getRoomRmType().getName());
+        for (Room room1 : roomtype.getRooms()) {
+            if (room1.getRoomId().equals(oldRoom.getRoomId())) {
+                return oldRoom;
+            }
+        }
+        roomtype.addRoom(oldRoom);
+        return oldRoom;
     }
 
     

@@ -4,10 +4,13 @@
  */
 package ejb.session.stateless;
 
+import entity.Room;
 import entity.RoomType;
+import exception.RoomNotFoundException;
 import exception.RoomTypeNameAlreadyExistException;
 import exception.RoomTypeNotFoundException;
 import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -20,6 +23,9 @@ import javax.persistence.Query;
  */
 @Stateless
 public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeSessionBeanLocal {
+
+    @EJB(name = "RoomSessionBeanLocal")
+    private RoomSessionBeanLocal roomSessionBeanLocal;
 
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
@@ -144,6 +150,33 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
         RoomType emRoomType = getRoomTypeById(roomType.getRoomTypeId());
         emRoomType.setRoomRates(roomType.getRoomRates());
         return emRoomType;
+    }
+
+    @Override
+    public RoomType updateRoomType(RoomType roomType) throws RoomTypeNotFoundException, RoomNotFoundException, RoomTypeNameAlreadyExistException {
+        RoomType oldRoomType = getRoomTypeById(roomType.getRoomTypeId());
+        
+        try {
+            getRoomTypeByName(roomType.getName());
+            throw new RoomTypeNameAlreadyExistException("Room type with name of " + roomType.getName() + " already exist!");
+        } catch (RoomTypeNotFoundException ex){
+            oldRoomType.setName(roomType.getName());
+        }
+        oldRoomType.setDescription(roomType.getDescription());
+        oldRoomType.setSize(roomType.getSize());    
+        oldRoomType.setBed(roomType.getBed());
+        oldRoomType.setCapacity(roomType.getCapacity());
+        oldRoomType.setAmenities(roomType.getAmenities());
+        oldRoomType.setStatusType(roomType.getStatusType());
+    
+        
+        List<Room> rooms = roomSessionBeanLocal.getRooms();
+        for(Room room : rooms) {
+//            if(room.getRoomId().equals(roomType.getRooms))
+        }
+        return oldRoomType;
+    
+    //List<RoomRate> roomRates;
     }
 
 }

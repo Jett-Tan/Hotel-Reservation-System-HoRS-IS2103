@@ -48,7 +48,9 @@ public class MainApp {
     public void run() throws InvalidDataException, GuestNotFoundException, InvalidLoginCredentialsException {
         System.out.println("==== Welcome to Hotel Reservation System Client ====");
         int option = 0;
-        do {
+        Boolean isLoggedIn = false;
+        while (true) {
+
             System.out.println("1. Guest Login");
             System.out.println("2. Register as Guest");
             System.out.println("3. Exit");
@@ -57,18 +59,24 @@ public class MainApp {
             scanner.nextLine();
             switch (option) {
                 case 1:
-                    doLogin();
+                    if (!isLoggedIn) {
+                        doLogin();
+                        isLoggedIn = true;
+                    } else {
+                        System.out.println("You are already logged in.");
+                    }
                     break;
                 case 2:
                     doRegister();
                     break;
+                case 3:
+                    isLoggedIn = false;
+                    run();
+                    break;
                 default:
                     System.out.println("\nInvalid input");
             }
-            if (option > 2) {
-                break;
-            }
-        } while (true);
+        }
     }
 
     private void doLogin() throws GuestNotFoundException, InvalidLoginCredentialsException {

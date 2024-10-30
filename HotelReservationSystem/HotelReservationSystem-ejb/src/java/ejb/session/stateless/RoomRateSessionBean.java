@@ -32,7 +32,7 @@ public class RoomRateSessionBean implements RoomRateSessionBeanRemote, RoomRateS
             RoomRate roomrate = (RoomRate) query.getSingleResult();
             return roomrate;
         } catch (NoResultException ex){
-            throw new RoomRateNotFoundException("Room rate with id of " + roomRate.getName());
+            throw new RoomRateNotFoundException("Room rate with id of " + roomRate.getName() + " do not exist!");
         }
     }
 
@@ -40,31 +40,75 @@ public class RoomRateSessionBean implements RoomRateSessionBeanRemote, RoomRateS
     public RoomRate getRoomRateById(Long roomRateId) throws RoomRateNotFoundException {
         try{
             RoomRate roomRate = em.find(RoomRate.class,roomRateId);
-            return roomRate;
+            if(roomRate != null){
+                return roomRate;
+            }
+            throw new RoomRateNotFoundException("Room rate with id of " + roomRateId + " do not exist!");
         } catch (NoResultException ex){
-            throw new RoomRateNotFoundException("Room rate with id of " + roomRateId);
+            throw new RoomRateNotFoundException("Room rate with id of " + roomRateId + " do not exist!");
         }
     }
 
     @Override
     public List<RoomRate> getRoomRates() throws RoomRateNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try{
+            Query query = em.createQuery("SELECT rr FROM RoomRate rr");
+            List<RoomRate> roomrates = query.getResultList();
+            return roomrates;
+        } catch (NoResultException ex){
+            throw new RoomRateNotFoundException("There is no room rates in the system" );
+        }
     }
 
     @Override
-    public RoomRate updateRoomRate() throws RoomRateNotFoundException, RoomRateNameAlreadyExistException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public RoomRate updateRoomRate(RoomRate roomRate) throws RoomRateNotFoundException, RoomRateNameAlreadyExistException {
+        RoomRate managedRoomRate = getRoomRateById(roomRate.getRoomRateId());
+        try {
+            getRoomRateByName(roomRate);
+            throw new RoomRateNameAlreadyExistException("Room rate with name of " + roomRate.getName() + " already exists!");
+        } catch (RoomRateNotFoundException ex) {
+            managedRoomRate.setName(roomRate.getName());
+            managedRoomRate.setRate(roomRate.getRate());
+            managedRoomRate.setRateStatus(roomRate.getRateStatus());
+            managedRoomRate.setStartDate(roomRate.getStartDate());
+            managedRoomRate.setEndDate(roomRate.getEndDate());
+            return managedRoomRate;
+        }
+        
+    }
+
+
+    @Override
+    public boolean deleteRoomRate(RoomRate roomRate) throws RoomRateNotFoundException {
+        RoomRate oldRoomRate = getRoomRateByName(roomRate);
+        em.remove(oldRoomRate);
+        em.flush();
+        return true;
+    }  
+
+    @Override
+    public boolean deleteRoomRateById(Long roomRateId) throws RoomRateNotFoundException {
+        try {
+            RoomRate roomRate = em.find(RoomRate.class,roomRateId);
+            em.remove(roomRate);
+            em.flush();
+            return true;
+        }catch(NoResultException ex) {
+            throw new RoomRateNotFoundException("Room rate with id of " + roomRateId + " do not exist!");
+        }
     }
 
     @Override
-    public boolean deleteRoomRate() throws RoomRateNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public RoomRate createNewRoomRate(RoomRate roomRate) throws RoomRateNameAlreadyExistException {
+        try {
+            getRoomRateByName(roomRate);
+            throw new RoomRateNameAlreadyExistException("Room rate with name of " + roomRate.getName() + " already exist!");
+        } catch (RoomRateNotFoundException ex) {
+            em.persist(roomRate);
+            em.flush();
+            return roomRate;
+        }
     }
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
 
-    public void persist(Object object) {
-        em.persist(object);
-    }
 }

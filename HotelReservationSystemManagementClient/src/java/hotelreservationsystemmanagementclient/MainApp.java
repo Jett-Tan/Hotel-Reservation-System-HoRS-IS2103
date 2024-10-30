@@ -68,7 +68,7 @@ public class MainApp {
         String password = scanner.nextLine();
         try {
             Employee employee = employeeSessionBeanRemote.getEmployeeByUsername(username);
-            System.out.println(employee);
+//            System.out.println(employee);
             if(employee.getPassword().equals(password)) {
                 currentEmployee = employee;
                 switch (employee.getEmployeeType()) {

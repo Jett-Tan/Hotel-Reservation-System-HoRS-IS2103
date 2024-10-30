@@ -57,7 +57,7 @@ public class MainApp {
             if(option > 1){
                 break;
             }
-        }while (true);
+        } while (true);
     }
 
     private void doLogin() {

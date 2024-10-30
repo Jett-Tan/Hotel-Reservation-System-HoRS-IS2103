@@ -28,32 +28,41 @@ public class DataInitSingleton {
 
     @EJB(name = "EmployeeSessionBeanLocal")
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
+
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
-    
-    
-    public DataInitSingleton() {
-    }
-    
+
+    // public DataInitSingleton() {
+    // }
+
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
+
     @PostConstruct
-    public void run(){
+    public void run() {
         System.out.println("\n\n=========================");
         System.out.println("DEPLOYED");
         System.out.println("=========================\n\n");
-        Employee employee = em.find(Employee.class, 1L);
-        if(employee == null) {
-            System.out.println("Initialising Data");
-            try {
-                employeeSessionBeanLocal.createNewEmployee(new Employee("System","Admin", "admin", "password", EmployeeTypeEnum.SYSTEM_ADMINISTRATOR));
-                employeeSessionBeanLocal.createNewEmployee(new Employee("Guest","Officer", "officer", "password", EmployeeTypeEnum.GUEST_RELATION_OFFICER));
-                employeeSessionBeanLocal.createNewEmployee(new Employee("Sales","Sales", "sales", "password", EmployeeTypeEnum.SALES));
-                employeeSessionBeanLocal.createNewEmployee(new Employee("Operation","Manager", "manager", "password", EmployeeTypeEnum.OPERATION_MANAGER));
 
+        if (em.find(Employee.class, 1l) == null) {
+            try {
+                employeeSessionBeanLocal.createNewEmployee(
+                        new Employee("System", "Admin", "admin", "password", EmployeeTypeEnum.SYSTEM_ADMINISTRATOR));
+                employeeSessionBeanLocal.createNewEmployee(new Employee("Guest", "Officer", "officer", "password",
+                        EmployeeTypeEnum.GUEST_RELATION_OFFICER));
+                employeeSessionBeanLocal
+                        .createNewEmployee(new Employee("Sales", "Sales", "sales", "password", EmployeeTypeEnum.SALES));
+                employeeSessionBeanLocal.createNewEmployee(new Employee("Operation", "Manager", "manager", "password",
+                        EmployeeTypeEnum.OPERATION_MANAGER));
             } catch (EmployeeUsernameAlreadyExistException ex1) {
                 System.out.println(ex1);
             }
         }
     }
+    // }
+    // }
+
+    // public void persist(Object object) {
+    // em.persist(object);
+    // }
 }

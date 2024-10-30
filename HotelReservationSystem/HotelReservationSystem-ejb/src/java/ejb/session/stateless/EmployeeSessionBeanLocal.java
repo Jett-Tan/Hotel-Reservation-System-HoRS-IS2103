@@ -36,4 +36,5 @@ public interface EmployeeSessionBeanLocal {
     boolean deleteEmployee(Employee employee) throws EmployeeNotFoundException;
     
     boolean deleteEmployeeById(Long employeeId) throws EmployeeNotFoundException;
+
 }

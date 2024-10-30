@@ -7,11 +7,15 @@ package ejb.session.stateless;
 import entity.Room;
 import entity.RoomRate;
 import entity.RoomType;
+import enumerations.RoomRateTypeEnum;
 import exception.RoomNotFoundException;
 import exception.RoomRateNotFoundException;
 import exception.RoomTypeNameAlreadyExistException;
 import exception.RoomTypeNotFoundException;
 import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +41,6 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
-
     @Override
     public RoomType createNewRoomType(RoomType roomType) throws RoomTypeNameAlreadyExistException {
         Query query = em.createQuery("SELECT r FROM RoomType r WHERE r.name = :name")
@@ -46,8 +49,9 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
             em.persist(roomType);
             em.flush();
             return roomType;
-        }else {
-            throw new RoomTypeNameAlreadyExistException("RoomType with roomType number of " + roomType.getName() + " already exist!");
+        } else {
+            throw new RoomTypeNameAlreadyExistException(
+                    "RoomType with roomType number of " + roomType.getName() + " already exist!");
         }
     }
 
@@ -63,7 +67,7 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
 
     @Override
     public RoomType getRoomTypeById(Long roomTypeId) throws RoomTypeNotFoundException {
-        RoomType roomType = em.find(RoomType.class,roomTypeId);
+        RoomType roomType = em.find(RoomType.class, roomTypeId);
         if (roomType == null) {
             throw new RoomTypeNotFoundException("RoomType with Id " + roomTypeId + " not found!");
         }
@@ -105,7 +109,8 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
 
     @Override
     public RoomType updateName(RoomType roomType) throws RoomTypeNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     @Override
@@ -158,42 +163,91 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
     }
 
     @Override
-    public RoomType updateRoomType(RoomType roomType) throws RoomTypeNotFoundException, RoomNotFoundException,RoomRateNotFoundException, RoomTypeNameAlreadyExistException {
+    public RoomType updateRoomType(RoomType roomType) throws RoomTypeNotFoundException, RoomNotFoundException,
+            RoomRateNotFoundException, RoomTypeNameAlreadyExistException {
         RoomType oldRoomType = getRoomTypeById(roomType.getRoomTypeId());
-        
+
         try {
             getRoomTypeByName(roomType.getName());
-            throw new RoomTypeNameAlreadyExistException("Room type with name of " + roomType.getName() + " already exist!");
-        } catch (RoomTypeNotFoundException ex){
+            throw new RoomTypeNameAlreadyExistException(
+                    "Room type with name of " + roomType.getName() + " already exist!");
+        } catch (RoomTypeNotFoundException ex) {
             oldRoomType.setName(roomType.getName());
         }
         oldRoomType.setDescription(roomType.getDescription());
-        oldRoomType.setSize(roomType.getSize());    
+        oldRoomType.setSize(roomType.getSize());
         oldRoomType.setBed(roomType.getBed());
         oldRoomType.setCapacity(roomType.getCapacity());
         oldRoomType.setAmenities(roomType.getAmenities());
         oldRoomType.setStatusType(roomType.getStatusType());
-        
+
         oldRoomType.setRoomRates(roomType.getRoomRates());
         List<Room> oldRooms = oldRoomType.getRooms();
-        
+
         oldRooms.forEach(x -> x.setRoomRmType(null));
         ArrayList<Room> rooms = new ArrayList<>();
         roomType.getRooms().forEach(x -> rooms.add(x));
-        for(Room room : roomType.getRooms()) {
+        for (Room room : roomType.getRooms()) {
             Room managedRoom = roomSessionBeanLocal.getRoomByNumber(room.getRoomNumber());
             managedRoom.setRoomRmType(oldRoomType);
             rooms.add(managedRoom);
         }
         oldRoomType.setRooms(roomType.getRooms());
-        
+
         return oldRoomType;
-    
-    //List<RoomRate> roomRates;
+
+        // List<RoomRate> roomRates;
     }
 
     @Override
-    public RoomType getLoadedRoomType(RoomType roomType) throws RoomTypeNotFoundException, RoomTypeNameAlreadyExistException, RoomNotFoundException, RoomRateNotFoundException {
+    public BigDecimal calculatePrice(Long id, Date checkInDate, Date checkOutDate, Boolean isWalkIn) {
+        RoomType roomType = null;
+        try {
+            roomType = getRoomTypeById(id);
+        } catch (RoomTypeNotFoundException ex) {
+            Logger.getLogger(RoomTypeSessionBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        BigDecimal roomRate = BigDecimal.ZERO;
+
+        Calendar checkIn = Calendar.getInstance();
+        checkIn.setTime(checkInDate);
+        Calendar checkOut = Calendar.getInstance();
+        checkOut.setTime(checkInDate);
+
+        while (checkIn.before(checkOut)) {
+            Date date = checkIn.getTime();
+
+            if (isWalkIn) {
+                roomRate = getRoomRate(roomType, RoomRateTypeEnum.PUBLISHED);
+                totalPrice = totalPrice.add(roomRate);
+            } else {
+
+            }
+
+            checkIn.add(Calendar.DATE, 1);
+        }
+
+        return totalPrice;
+    }
+
+    private BigDecimal getRoomRate(RoomType roomType, RoomRateTypeEnum roomRateType) {
+        for (RoomRate roomRate : roomType.getRoomRates()) {
+            if (roomRate.getRateStatus().equals(roomRateType)) {
+                return roomRate.getRate();
+            }
+        }
+        return BigDecimal.ZERO;
+    }
+
+    public BigDecimal calculateRoomsAvail(Long id, Date checkInDate, Date checkOutDate) {
+        return BigDecimal.ZERO;
+    }
+
+    @Override
+    public RoomType getLoadedRoomType(RoomType roomType) throws RoomTypeNotFoundException,
+            RoomTypeNameAlreadyExistException, RoomNotFoundException, RoomRateNotFoundException {
         RoomType returnRoomType = getRoomTypeByName(roomType.getName());
         returnRoomType.getRoomRates().size();
         returnRoomType.getRooms().size();

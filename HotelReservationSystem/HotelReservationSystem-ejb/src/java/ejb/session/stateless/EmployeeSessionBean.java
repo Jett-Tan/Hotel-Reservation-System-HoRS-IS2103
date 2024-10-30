@@ -35,11 +35,12 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
             return employee;
         }
     }
+                
 
     @Override
     public List<Employee> getEmployees() throws EmployeeNotFoundException {
         List<Employee> list = em.createQuery("SELECT e FROM Employee e").getResultList();
-        if(list.isEmpty()) {
+        if (list.isEmpty()) {
             throw new EmployeeNotFoundException("There is no employee in the system");
         }
         return list;
@@ -47,7 +48,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
 
     @Override
     public Employee getEmployeeById(Long employeeId) throws EmployeeNotFoundException {
-        Employee employee = em.find(Employee.class,employeeId);
+        Employee employee = em.find(Employee.class, employeeId);
         if (employee == null) {
             throw new EmployeeNotFoundException("Employee with Id " + employeeId + " not found!");
         }
@@ -68,9 +69,9 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     @Override
     public Employee updateUsername(Employee employee) throws EmployeeNotFoundException, EmployeeUsernameAlreadyExistException {
         Employee emEmployee = getEmployeeById(employee.getEmployeeId());
-        try{
+        try {
             getEmployeeByUsername(employee.getUsername());
-        } catch ( EmployeeNotFoundException ex) {
+        } catch (EmployeeNotFoundException ex) {
             emEmployee.setUsername(employee.getUsername());
             return emEmployee;
         }

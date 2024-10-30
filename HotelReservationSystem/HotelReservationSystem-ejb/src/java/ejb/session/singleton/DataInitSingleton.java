@@ -14,6 +14,8 @@ import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
 import javax.ejb.Startup;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 /**
  *
@@ -26,6 +28,8 @@ public class DataInitSingleton {
 
     @EJB(name = "EmployeeSessionBeanLocal")
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
+    @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
+    private EntityManager em;
     
     
     public DataInitSingleton() {
@@ -38,13 +42,12 @@ public class DataInitSingleton {
         System.out.println("\n\n=========================");
         System.out.println("DEPLOYED");
         System.out.println("=========================\n\n");
-        try{
-            employeeSessionBeanLocal.getEmployees();
-        } catch (EmployeeNotFoundException ex) {        
+        Employee employee = em.find(Employee.class, 1L);
+        if(employee == null) {
             System.out.println("Initialising Data");
             try {
                 employeeSessionBeanLocal.createNewEmployee(new Employee("System","Admin", "admin", "password", EmployeeTypeEnum.SYSTEM_ADMINISTRATOR));
-                employeeSessionBeanLocal.createNewEmployee(new Employee("Guest","relation officer", "officer", "password", EmployeeTypeEnum.GUEST_RELATION_OFFICER));
+                employeeSessionBeanLocal.createNewEmployee(new Employee("Guest","Officer", "officer", "password", EmployeeTypeEnum.GUEST_RELATION_OFFICER));
                 employeeSessionBeanLocal.createNewEmployee(new Employee("Sales","Sales", "sales", "password", EmployeeTypeEnum.SALES));
                 employeeSessionBeanLocal.createNewEmployee(new Employee("Operation","Manager", "manager", "password", EmployeeTypeEnum.OPERATION_MANAGER));
 

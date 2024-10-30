@@ -44,28 +44,33 @@ public class HotelOperationModule {
     
     public void run() {
         
-        if (EmployeeTypeEnum.OPERATION_MANAGER.equals(currentEmployee.getEmployeeType())) {
-            OperationManagerModule app = new OperationManagerModule(
-                roomSessionBeanRemote,
-                partnerSessionBeanRemote,
-                employeeSessionBeanRemote,
-                currentEmployee,
-                roomTypeSessionBeanRemote,
-                roomRateSessionBeanRemote
-            );
-            app.run();
-        } else if(EmployeeTypeEnum.SALES.equals(currentEmployee.getEmployeeType())) {
-            SalesManagerModule app = new SalesManagerModule(
-                roomSessionBeanRemote,
-                partnerSessionBeanRemote,
-                employeeSessionBeanRemote,
-                currentEmployee
-            );
-            app.run();
-        } else if(EmployeeTypeEnum.GUEST_RELATION_OFFICER.equals(currentEmployee.getEmployeeType())) {
-            
+        if (null != currentEmployee.getEmployeeType()) {
+            switch (currentEmployee.getEmployeeType()) {
+                case OPERATION_MANAGER:{
+                    OperationManagerModule app = new OperationManagerModule(
+                            roomSessionBeanRemote,
+                            partnerSessionBeanRemote,
+                            employeeSessionBeanRemote,
+                            currentEmployee,
+                            roomTypeSessionBeanRemote,
+                            roomRateSessionBeanRemote
+                    );      app.run();
+                        break;
+                    }
+                case SALES:{
+                    SalesManagerModule app = new SalesManagerModule(
+                            employeeSessionBeanRemote,
+                            currentEmployee,
+                            roomRateSessionBeanRemote
+                    );      app.run();
+                        break;
+                    }
+                case GUEST_RELATION_OFFICER:
+                    break;
+                default:
+                    break;
+            }
         }
-        
     }
     
 }

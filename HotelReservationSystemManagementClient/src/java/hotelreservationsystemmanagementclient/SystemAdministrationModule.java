@@ -15,12 +15,9 @@ import exception.EmployeeNotFoundException;
 import exception.EmployeeUsernameAlreadyExistException;
 import exception.PartnerNotFoundException;
 import exception.PartnerUsernameAlreadyExistException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -57,11 +54,12 @@ public class SystemAdministrationModule {
     }
     
     public void run(){
-        System.out.println("");
-        System.out.println("==== Welcome to Hotel Reservation System Management Client ====");
-        System.out.println("====              System Administration Module             ====");
         int input = 0;
         do {
+            System.out.println("===============================================================");
+            System.out.println("==== Welcome to Hotel Reservation System Management Client ====");
+            System.out.println("====              System Administration Module             ====");
+            System.out.println("===============================================================");
             System.out.println("");
             System.out.println("1. Create new Employee");
             System.out.println("2. View all employees");
@@ -101,10 +99,11 @@ public class SystemAdministrationModule {
     }
 
     private void doCreateNewEmployee() {
-        System.out.println("");
+        
+        System.out.println("===============================================================");
         System.out.println("====              System Administration Module             ====");        
         System.out.println("====                  Create New Employee                  ====");
-        System.out.println("");
+        System.out.println("===============================================================");
         String username, firstname, lastname, password;
         EmployeeTypeEnum employeeType = EmployeeTypeEnum.SALES;
         
@@ -158,12 +157,12 @@ public class SystemAdministrationModule {
     }
 
     private void doViewAllEmployee() {
-        System.out.println("");
+        System.out.println("===============================================================");
         System.out.println("====              System Administration Module             ====");        
-        System.out.println("====                   View All Employees                  ====");
+        System.out.println("====                   View All Employees                  ====");        
+        System.out.println("===============================================================");
         try {
             List<Employee> employees = employeeSessionBeanRemote.getEmployees();
-            System.out.println("===============================================================");
             System.out.println(String.format("No.%30s%30s" ,"Name", "Employee Type"));
             for(int i = 1; i < employees.size()+1; i++) {
                 Employee employee = employees.get(i-1);
@@ -177,10 +176,10 @@ public class SystemAdministrationModule {
     }
 
     private void doCreateNewPartner() {
-        System.out.println("");
+        System.out.println("===============================================================");
         System.out.println("====              System Administration Module             ====");        
         System.out.println("====                   Create New Partner                  ====");
-        System.out.println("");
+        System.out.println("===============================================================");
         String username, firstname, lastname, password = "";
         PartnerEmployeeTypeEnum employeeType = PartnerEmployeeTypeEnum.EMPLOYEE;
         
@@ -195,7 +194,7 @@ public class SystemAdministrationModule {
         
         int option = 0;
         do{
-            System.out.println("\nSelect Partner Employee Type");
+            System.out.println("Select Partner Employee Type : ");
             System.out.println("1. Employee");
             System.out.println("2. Manager");
             System.out.print("Enter Employee Type (1 - 2) >> ");
@@ -228,7 +227,7 @@ public class SystemAdministrationModule {
     }
 
     private void doViewAllPartners() { 
-        System.out.println("");
+        System.out.println("===============================================================");
         System.out.println("====              System Administration Module             ====");        
         System.out.println("====                    View All Partners                  ====");
         System.out.println("===============================================================");

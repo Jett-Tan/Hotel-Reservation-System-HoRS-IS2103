@@ -16,9 +16,12 @@ import javax.ejb.Local;
  */
 @Local
 public interface RoomRateSessionBeanLocal {
+    public RoomRate createNewRoomRate(RoomRate roomRate) throws RoomRateNameAlreadyExistException;
     public RoomRate getRoomRateByName(RoomRate roomRate) throws RoomRateNotFoundException;
-    public RoomRate getRoomRateById(Long roomRate) throws RoomRateNotFoundException;
+    public RoomRate getRoomRateById(Long roomRateId) throws RoomRateNotFoundException;
     public List<RoomRate> getRoomRates() throws RoomRateNotFoundException;
-    public RoomRate updateRoomRate() throws RoomRateNotFoundException, RoomRateNameAlreadyExistException;
-    public boolean deleteRoomRate() throws RoomRateNotFoundException;
+    public RoomRate updateRoomRate(RoomRate roomRate) throws RoomRateNotFoundException, RoomRateNameAlreadyExistException;
+    public boolean deleteRoomRate(RoomRate roomRate) throws RoomRateNotFoundException;
+    public boolean deleteRoomRateById(Long roomRateId) throws RoomRateNotFoundException;
+
 }

@@ -17,7 +17,7 @@ import javax.ejb.Local;
  */
 @Local
 public interface RoomSessionBeanLocal {
-    Room createNewRoom(Room room) throws RoomNumberAlreadyExistException;
+    Room createNewRoom(Room room) throws RoomNumberAlreadyExistException, RoomTypeNotFoundException;
         
     List<Room> getRooms() throws RoomNotFoundException;
 

@@ -34,11 +34,14 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
     @Override
-    public Room createNewRoom(Room room) throws RoomNumberAlreadyExistException {
+    public Room createNewRoom(Room room) throws RoomNumberAlreadyExistException, RoomTypeNotFoundException {
         Query query = em.createQuery("SELECT r FROM Room r WHERE r.roomNumber = :roomNumber")
                 .setParameter("roomNumber", room.getRoomNumber());
         if (query.getFirstResult() == 0) {
             em.persist(room);
+            RoomType roomType = room.getRoomRmType();
+            roomType = roomTypeSessionBeanLocal.getRoomTypeByName(roomType.getName());
+            roomType.addRoom(room);
             em.flush();
             return room;
         }else {
@@ -133,6 +136,7 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
     }
 
     @Override
+    
     public Room updateRoom(Room room) throws RoomNotFoundException, RoomNumberAlreadyExistException, RoomTypeNotFoundException {
         Room oldRoom = getRoomById(room.getRoomId());
         try {
@@ -155,6 +159,14 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
         return oldRoom;
     }
 
+    @Override
+    public Room getLoadedRoom(Room room) throws RoomTypeNotFoundException, RoomNumberAlreadyExistException, RoomNotFoundException {
+        Room oldRoom = getRoomByNumber(room.getRoomNumber());
+        oldRoom.getRoomRmType().getRoomRates();
+        return oldRoom;
+    }
+    
+    
     
 
 }

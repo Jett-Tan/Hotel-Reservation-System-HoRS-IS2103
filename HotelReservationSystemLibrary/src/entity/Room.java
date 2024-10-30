@@ -15,6 +15,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
@@ -43,11 +44,12 @@ public class Room implements Serializable {
     @NotNull
     private RoomStatusEnum roomStatus;
    
-    @Column(nullable = false, columnDefinition="default 'false'")
+    @Column(nullable = false)
     @NotNull
     private boolean isCheckedIn;
     
     @ManyToOne
+    @JoinColumn(name = "room_roomtype")
     private RoomType roomRmType;
     
     public Room() {

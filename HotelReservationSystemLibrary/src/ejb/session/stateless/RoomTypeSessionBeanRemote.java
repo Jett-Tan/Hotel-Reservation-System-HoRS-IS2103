@@ -5,6 +5,8 @@
 package ejb.session.stateless;
 
 import entity.RoomType;
+import exception.RoomNotFoundException;
+import exception.RoomRateNotFoundException;
 import exception.RoomTypeNameAlreadyExistException;
 import exception.RoomTypeNotFoundException;
 import java.util.List;
@@ -24,23 +26,27 @@ public interface RoomTypeSessionBeanRemote {
 
     public RoomType getRoomTypeByName(String roomTypeName) throws RoomTypeNotFoundException;
 
-    public RoomType updateName(RoomType roomType) throws RoomTypeNotFoundException;
+//    public RoomType updateName(RoomType roomType) throws RoomTypeNotFoundException;
+//
+//    public RoomType updateDescription(RoomType roomType) throws RoomTypeNotFoundException;
+//    
+//    public RoomType updateSize(RoomType roomType) throws RoomTypeNotFoundException;
+//    
+//    public RoomType updateBed(RoomType roomType) throws RoomTypeNotFoundException;
+//    
+//    public RoomType updateCapacity(RoomType roomType) throws RoomTypeNotFoundException;
+//    
+//    public RoomType updateAmenities(RoomType roomType) throws RoomTypeNotFoundException;
+//    
+//    public RoomType updateStatusType(RoomType roomType) throws RoomTypeNotFoundException;
+//    
+//    public RoomType updateRooms(RoomType roomType) throws RoomTypeNotFoundException;
+//    
+//    public RoomType updateRoomRates(RoomType roomType) throws RoomTypeNotFoundException;
 
-    public RoomType updateDescription(RoomType roomType) throws RoomTypeNotFoundException;
+    public RoomType updateRoomType(RoomType roomType) throws RoomTypeNotFoundException, RoomTypeNameAlreadyExistException,RoomNotFoundException, RoomRateNotFoundException;
     
-    public RoomType updateSize(RoomType roomType) throws RoomTypeNotFoundException;
-    
-    public RoomType updateBed(RoomType roomType) throws RoomTypeNotFoundException;
-    
-    public RoomType updateCapacity(RoomType roomType) throws RoomTypeNotFoundException;
-    
-    public RoomType updateAmenities(RoomType roomType) throws RoomTypeNotFoundException;
-    
-    public RoomType updateStatusType(RoomType roomType) throws RoomTypeNotFoundException;
-    
-    public RoomType updateRooms(RoomType roomType) throws RoomTypeNotFoundException;
-    
-    public RoomType updateRoomRates(RoomType roomType) throws RoomTypeNotFoundException;
+    public RoomType getLoadedRoomType(RoomType roomType) throws RoomTypeNotFoundException, RoomTypeNameAlreadyExistException,RoomNotFoundException, RoomRateNotFoundException;
     
     boolean deleteRoomType(RoomType roomType) throws RoomTypeNotFoundException;
 

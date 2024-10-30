@@ -108,20 +108,24 @@ public class SalesManagerModule {
         newRoomRate.setName(scanner.nextLine());
         System.out.print("Enter rate >> ");    
         newRoomRate.setRate(new BigDecimal(scanner.nextLine().trim()));
-        System.out.print("Enter startDate (dd-mm-yyyy)>> ");
-        try {
-            newRoomRate.setStartDate(sdf.parse(scanner.nextLine().trim()));
-        } catch (ParseException ex) {
-            System.out.println("Wrong date format");
-            return;
-        }
-        System.out.print("Enter endDate (dd-mm-yyyy)>> ");  
-        try {
-            newRoomRate.setEndDate(sdf.parse(scanner.nextLine().trim()));
-        } catch (ParseException ex) {
-            System.out.println("Wrong date format");
-            return;
-        }
+        do {
+            System.out.print("Enter startDate (dd-mm-yyyy)>> ");
+            try {
+                newRoomRate.setStartDate(sdf.parse(scanner.nextLine().trim()));
+                break;
+            } catch (ParseException ex) {
+                System.out.println("Wrong date format");
+            }            
+        } while(true);
+        do {
+            System.out.print("Enter endDate (dd-mm-yyyy)>> ");  
+            try {
+                newRoomRate.setEndDate(sdf.parse(scanner.nextLine().trim()));
+                break;
+            } catch (ParseException ex) {
+                System.out.println("Wrong date format!");
+            }
+        } while(true);
         int option = 0;
         do{
             System.out.println("Select Rate Status");

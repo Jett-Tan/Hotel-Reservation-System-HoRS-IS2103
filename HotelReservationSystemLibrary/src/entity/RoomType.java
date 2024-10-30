@@ -19,7 +19,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Digits;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -66,8 +65,6 @@ public class RoomType implements Serializable {
     @Enumerated(EnumType.STRING)
     @NotNull
     private RoomStatusEnum statusType;
-    
-    
     
     @OneToMany(mappedBy = "roomRmType")
     private List<Room> rooms;

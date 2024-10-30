@@ -12,9 +12,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Future;
@@ -46,13 +49,65 @@ public class Reservation implements Serializable {
     private ReservationTypeEnum reservationTpye;
 
     @NotEmpty(message = "Input list should not be empty")
+    @OneToMany(fetch = FetchType.LAZY)
     private List<Room> roomList;
     
-    @Column(nullable = false,  columnDefinition = "default 'false'")
+    @Column(nullable = false)
     private Boolean allocated;
     
     public Long getReservationId() {
         return reservationId;
+    }
+
+    public Reservation() {
+    }
+
+    public Reservation(Date startDate, Date endDate, ReservationTypeEnum reservationTpye, List<Room> roomList, Boolean allocated) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.reservationTpye = reservationTpye;
+        this.roomList = roomList;
+        this.allocated = allocated;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public ReservationTypeEnum getReservationTpye() {
+        return reservationTpye;
+    }
+
+    public void setReservationTpye(ReservationTypeEnum reservationTpye) {
+        this.reservationTpye = reservationTpye;
+    }
+
+    public List<Room> getRoomList() {
+        return roomList;
+    }
+
+    public void setRoomList(List<Room> roomList) {
+        this.roomList = roomList;
+    }
+
+    public Boolean getAllocated() {
+        return allocated;
+    }
+
+    public void setAllocated(Boolean allocated) {
+        this.allocated = allocated;
     }
 
     

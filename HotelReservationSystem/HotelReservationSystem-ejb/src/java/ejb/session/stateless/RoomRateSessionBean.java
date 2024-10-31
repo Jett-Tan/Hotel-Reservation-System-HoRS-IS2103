@@ -64,7 +64,14 @@ public class RoomRateSessionBean implements RoomRateSessionBeanRemote, RoomRateS
     public RoomRate updateRoomRate(RoomRate roomRate) throws RoomRateNotFoundException, RoomRateNameAlreadyExistException {
         RoomRate managedRoomRate = getRoomRateById(roomRate.getRoomRateId());
         try {
-            getRoomRateByName(roomRate);
+            RoomRate ifExist = getRoomRateByName(roomRate);
+            if(managedRoomRate.getRoomRateId() == ifExist.getRoomRateId()) {
+                managedRoomRate.setRate(roomRate.getRate());
+                managedRoomRate.setRateStatus(roomRate.getRateStatus());
+                managedRoomRate.setStartDate(roomRate.getStartDate());
+                managedRoomRate.setEndDate(roomRate.getEndDate());
+                return managedRoomRate;
+            }
             throw new RoomRateNameAlreadyExistException("Room rate with name of " + roomRate.getName() + " already exists!");
         } catch (RoomRateNotFoundException ex) {
             managedRoomRate.setName(roomRate.getName());

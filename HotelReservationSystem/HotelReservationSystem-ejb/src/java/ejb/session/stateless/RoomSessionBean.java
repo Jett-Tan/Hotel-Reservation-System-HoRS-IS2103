@@ -138,25 +138,38 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
     @Override
     
     public Room updateRoom(Room room) throws RoomNotFoundException, RoomNumberAlreadyExistException, RoomTypeNotFoundException {
-        Room oldRoom = getRoomById(room.getRoomId());
+        Room managedRoom = getRoomById(room.getRoomId());
         try {
-            getRoomByNumber(room.getRoomNumber());
+            Room ifExist = getRoomByNumber(room.getRoomNumber());
+            if(managedRoom.getRoomId() == ifExist.getRoomId()) {
+                managedRoom.setBookedDates(room.getBookedDates());
+                managedRoom.setRoomStatus(room.getRoomStatus());
+                managedRoom.setRoomRmType(room.getRoomRmType());
+                RoomType roomtype = roomTypeSessionBeanLocal.getRoomTypeByName(room.getRoomRmType().getName());
+                for (Room room1 : roomtype.getRooms()) {
+                    if (room1.getRoomId().equals(managedRoom.getRoomId())) {
+                        return managedRoom;
+                    }
+                }
+                roomtype.addRoom(managedRoom);
+                return managedRoom;
+            }
             throw new RoomNumberAlreadyExistException("Room with room number " + room.getRoomNumber() + " already exist!");
         } catch (RoomNotFoundException ex){
-            oldRoom.setRoomNumber(room.getRoomNumber());
+            managedRoom.setRoomNumber(room.getRoomNumber());
+            managedRoom.setBookedDates(room.getBookedDates());
+            managedRoom.setRoomStatus(room.getRoomStatus());
+            managedRoom.setRoomRmType(room.getRoomRmType());
+            RoomType roomtype = roomTypeSessionBeanLocal.getRoomTypeByName(room.getRoomRmType().getName());
+            for (Room room1 : roomtype.getRooms()) {
+                if (room1.getRoomId().equals(managedRoom.getRoomId())) {
+                    return managedRoom;
+                }
+            }
+            roomtype.addRoom(managedRoom);
+            return managedRoom;
         }
         
-        oldRoom.setBookedDates(room.getBookedDates());
-        oldRoom.setRoomStatus(room.getRoomStatus());
-        oldRoom.setRoomRmType(room.getRoomRmType());
-        RoomType roomtype = roomTypeSessionBeanLocal.getRoomTypeByName(room.getRoomRmType().getName());
-        for (Room room1 : roomtype.getRooms()) {
-            if (room1.getRoomId().equals(oldRoom.getRoomId())) {
-                return oldRoom;
-            }
-        }
-        roomtype.addRoom(oldRoom);
-        return oldRoom;
     }
 
     @Override

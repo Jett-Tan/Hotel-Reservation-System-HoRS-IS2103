@@ -165,36 +165,62 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
     @Override
     public RoomType updateRoomType(RoomType roomType) throws RoomTypeNotFoundException, RoomNotFoundException,
             RoomRateNotFoundException, RoomTypeNameAlreadyExistException {
-        RoomType oldRoomType = getRoomTypeById(roomType.getRoomTypeId());
+        RoomType managedRoomType = getRoomTypeById(roomType.getRoomTypeId());
 
         try {
-            getRoomTypeByName(roomType.getName());
+            
+            RoomType ifExist = getRoomTypeByName(roomType.getName());
+            if(managedRoomType.getRoomTypeId() == ifExist.getRoomTypeId()) {
+                managedRoomType.setDescription(roomType.getDescription());
+                managedRoomType.setSize(roomType.getSize());
+                managedRoomType.setBed(roomType.getBed());
+                managedRoomType.setCapacity(roomType.getCapacity());
+                managedRoomType.setAmenities(roomType.getAmenities());
+                managedRoomType.setStatusType(roomType.getStatusType());
+
+                managedRoomType.setRoomRates(roomType.getRoomRates());
+                List<Room> oldRooms = managedRoomType.getRooms();
+
+                oldRooms.forEach(x -> x.setRoomRmType(null));
+                ArrayList<Room> rooms = new ArrayList<>();
+                roomType.getRooms().forEach(x -> rooms.add(x));
+                for (Room room : roomType.getRooms()) {
+                    Room managedRoom = roomSessionBeanLocal.getRoomByNumber(room.getRoomNumber());
+                    managedRoom.setRoomRmType(managedRoomType);
+                    rooms.add(managedRoom);
+                }
+                managedRoomType.setRooms(roomType.getRooms());
+
+                return managedRoomType;
+            }
             throw new RoomTypeNameAlreadyExistException(
                     "Room type with name of " + roomType.getName() + " already exist!");
         } catch (RoomTypeNotFoundException ex) {
-            oldRoomType.setName(roomType.getName());
+            managedRoomType.setName(roomType.getName());
+            managedRoomType.setDescription(roomType.getDescription());
+            managedRoomType.setSize(roomType.getSize());
+            managedRoomType.setBed(roomType.getBed());
+            managedRoomType.setCapacity(roomType.getCapacity());
+            managedRoomType.setAmenities(roomType.getAmenities());
+            managedRoomType.setStatusType(roomType.getStatusType());
+
+            managedRoomType.setRoomRates(roomType.getRoomRates());
+            List<Room> oldRooms = managedRoomType.getRooms();
+
+            oldRooms.forEach(x -> x.setRoomRmType(null));
+            ArrayList<Room> rooms = new ArrayList<>();
+            roomType.getRooms().forEach(x -> rooms.add(x));
+            for (Room room : roomType.getRooms()) {
+                Room managedRoom = roomSessionBeanLocal.getRoomByNumber(room.getRoomNumber());
+                managedRoom.setRoomRmType(managedRoomType);
+                rooms.add(managedRoom);
+            }
+            managedRoomType.setRooms(roomType.getRooms());
+
+            return managedRoomType;
         }
-        oldRoomType.setDescription(roomType.getDescription());
-        oldRoomType.setSize(roomType.getSize());
-        oldRoomType.setBed(roomType.getBed());
-        oldRoomType.setCapacity(roomType.getCapacity());
-        oldRoomType.setAmenities(roomType.getAmenities());
-        oldRoomType.setStatusType(roomType.getStatusType());
 
-        oldRoomType.setRoomRates(roomType.getRoomRates());
-        List<Room> oldRooms = oldRoomType.getRooms();
-
-        oldRooms.forEach(x -> x.setRoomRmType(null));
-        ArrayList<Room> rooms = new ArrayList<>();
-        roomType.getRooms().forEach(x -> rooms.add(x));
-        for (Room room : roomType.getRooms()) {
-            Room managedRoom = roomSessionBeanLocal.getRoomByNumber(room.getRoomNumber());
-            managedRoom.setRoomRmType(oldRoomType);
-            rooms.add(managedRoom);
-        }
-        oldRoomType.setRooms(roomType.getRooms());
-
-        return oldRoomType;
+        // List<RoomRate> roomRates;
 
         // List<RoomRate> roomRates;
     }

@@ -55,14 +55,6 @@ public class Room implements Serializable {
     public Room() {
     }
 
-    public Room(Long roomId, String roomNumber, List<Date> bookedDates, RoomStatusEnum roomStatus, boolean isCheckedIn) {
-        this.roomId = roomId;
-        this.roomNumber = roomNumber;
-        this.bookedDates = bookedDates;
-        this.roomStatus = roomStatus;
-        this.isCheckedIn = isCheckedIn;
-    }
-
     public Room(String roomNumber, List<Date> bookedDates, RoomStatusEnum roomStatus, boolean isCheckedIn, RoomType roomRmType) {
         this.roomNumber = roomNumber;
         this.bookedDates = bookedDates;

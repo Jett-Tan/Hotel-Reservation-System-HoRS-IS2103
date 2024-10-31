@@ -18,6 +18,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -53,7 +54,7 @@ public class Reservation implements Serializable {
     private BigDecimal numOfRooms;
 
     @Enumerated(EnumType.STRING)
-    private ReservationTypeEnum reservationTpye;
+    private ReservationTypeEnum reservationType;
 
     @NotEmpty(message = "Input list should not be empty")
     @OneToMany(fetch = FetchType.LAZY)
@@ -62,16 +63,10 @@ public class Reservation implements Serializable {
     @Column(nullable = false)
     private Boolean allocated;
     // private List<Room> room;
-
-    public Reservation(BigDecimal totalAmount, Date startDate, Date endDate, BigDecimal numOfRooms,
-            ReservationTypeEnum reservationTpy) {
-        this.totalAmount = totalAmount;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.numOfRooms = numOfRooms;
-        this.reservationTpy = reservationTpy;
-    }
-
+    
+    @ManyToOne
+    private RoomType roomType;
+    
     public Long getReservationId() {
         return reservationId;
     }
@@ -79,21 +74,31 @@ public class Reservation implements Serializable {
     public Reservation() {
     }
 
-    public Reservation(Date startDate, Date endDate, ReservationTypeEnum reservationTpye, List<Room> roomList,
-            Boolean allocated) {
+    public Reservation(BigDecimal totalAmount, Date startDate, Date endDate, BigDecimal numOfRooms, ReservationTypeEnum reservationType, List<Room> roomList, Boolean allocated, RoomType roomType) {
+        this.totalAmount = totalAmount;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.reservationTpye = reservationTpye;
+        this.numOfRooms = numOfRooms;
+        this.reservationType = reservationType;
         this.roomList = roomList;
         this.allocated = allocated;
+        this.roomType = roomType;
     }
 
-    public ReservationTypeEnum getReservationTpye() {
-        return reservationTpye;
+    public RoomType getRoomType() {
+        return roomType;
     }
 
-    public void setReservationTpye(ReservationTypeEnum reservationTpye) {
-        this.reservationTpye = reservationTpye;
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
+    }
+
+    public ReservationTypeEnum getReservationType() {
+        return reservationType;
+    }
+
+    public void setReservationType(ReservationTypeEnum reservationType) {
+        this.reservationType = reservationType;
     }
 
     public List<Room> getRoomList() {
@@ -187,21 +192,7 @@ public class Reservation implements Serializable {
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
-
-    /**
-     * @return the reservationTpy
-     */
-    public ReservationTypeEnum getReservationTpy() {
-        return reservationTpy;
-    }
-
-    /**
-     * @param reservationTpy the reservationTpy to set
-     */
-    public void setReservationTpy(ReservationTypeEnum reservationTpy) {
-        this.reservationTpy = reservationTpy;
-    }
-
+    
     /**
      * @return the numOfRooms
      */

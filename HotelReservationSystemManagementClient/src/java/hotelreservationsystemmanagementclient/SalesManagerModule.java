@@ -10,6 +10,7 @@ import ejb.session.stateless.RoomRateSessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import entity.Employee;
 import entity.RoomRate;
+import enumerations.RoomRateTypeEnum;
 import enumerations.RoomStatusEnum;
 import exception.RoomRateNameAlreadyExistException;
 import exception.RoomRateNotFoundException;
@@ -140,6 +141,24 @@ public class SalesManagerModule {
                 newRoomRate.setRateStatus(RoomStatusEnum.UNAVAILABLE);
             }
         }while (option > 2 || option < 1);
+        do{
+            System.out.println("Select Rate Type");
+            System.out.println("1. Published");
+            System.out.println("2. Normal");
+            System.out.println("3. Peak");
+            System.out.println("4. Promotion");
+            option = scanner.nextInt();
+            scanner.nextLine();
+            if(option == 1) {
+                newRoomRate.setRoomRateType(RoomRateTypeEnum.PUBLISHED);
+            } else if (option == 2) {
+                newRoomRate.setRoomRateType(RoomRateTypeEnum.NORMAL);
+            } else if (option == 3) {
+                newRoomRate.setRoomRateType(RoomRateTypeEnum.PEAK);
+            } else if (option == 4) {
+                newRoomRate.setRoomRateType(RoomRateTypeEnum.PROMOTION);
+            }
+        }while(option > 4 || option < 1);
         Set<ConstraintViolation<RoomRate>> errorList = this.validator.validate(newRoomRate);
         if (errorList.isEmpty()) {
             System.out.println("");

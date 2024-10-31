@@ -4,6 +4,7 @@
  */
 package entity;
 
+import enumerations.RoomRateTypeEnum;
 import enumerations.RoomStatusEnum;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -61,19 +62,30 @@ public class RoomRate implements Serializable {
     @NotNull
     private RoomStatusEnum rateStatus;
 
+    @Enumerated(EnumType.ORDINAL)
+    @NotNull
+    private RoomRateTypeEnum roomRateType;
     
     public RoomRate() {
     }
 
-    public RoomRate(Long roomRateId, String name, BigDecimal rate, Date startDate, Date endDate, RoomStatusEnum rateStatus) {
-        this.roomRateId = roomRateId;
+    public RoomRate(String name, BigDecimal rate, Date startDate, Date endDate, RoomStatusEnum rateStatus, RoomRateTypeEnum roomRateTypeEnum) {
         this.name = name;
         this.rate = rate;
         this.startDate = startDate;
         this.endDate = endDate;
         this.rateStatus = rateStatus;
+        this.roomRateType = roomRateTypeEnum;
     }
 
+    public RoomRateTypeEnum getRoomRateType() {
+        return roomRateType;
+    }
+
+    public void setRoomRateType(RoomRateTypeEnum roomRateType) {
+        this.roomRateType = roomRateType;
+    }
+    
     public String getName() {
         return name;
     }

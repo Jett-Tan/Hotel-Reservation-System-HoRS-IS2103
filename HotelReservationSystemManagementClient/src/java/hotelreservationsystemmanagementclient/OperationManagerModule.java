@@ -716,10 +716,19 @@ public class OperationManagerModule {
             room.setRoomNumber(input);
         }
         do {
-            System.out.println("RoomRmType: " + room.getRoomRmType());
+            RoomType roomTypeTemp = new RoomType();
+            roomTypeTemp.setName("NONE");
+            if(room.getRoomRmType() != null) {
+                try {
+                    roomTypeTemp = roomTypeSessionBeanRemote.getLoadedRoomType(room.getRoomRmType());
+                } catch (RoomTypeNotFoundException | RoomTypeNameAlreadyExistException | RoomNotFoundException | RoomRateNotFoundException ex) {
+                    Logger.getLogger(OperationManagerModule.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            System.out.println("RoomRmType: " + roomTypeTemp.getName());
             System.out.println("1. Change");
             System.out.println("2. Skip");
-            System.out.print("Enter (Leave blank to skip) >> ");
+            System.out.print("Enter >> ");
             inputInt = scanner.nextInt();
             scanner.nextLine();
             if(inputInt == 1) {
@@ -784,7 +793,7 @@ public class OperationManagerModule {
             scanner.nextLine();
             if(inputInt == 1) {
                 do {
-                    System.out.print("Enter date (yyyy-MM-dd) >> ");
+                    System.out.print("Enter date (dd-MM-yyyy) >> ");
                     input = scanner.nextLine();
                     if(!"".equals(input)) {
                         try {
@@ -831,6 +840,23 @@ public class OperationManagerModule {
                 break;
             }
         } while (true);
+        
+        
+        Set<ConstraintViolation<Room>> errorList = this.validator.validate(room);
+        if (errorList.isEmpty()) {
+            System.out.println("");
+            try {
+                room = roomSessionBeanRemote.updateRoom(room);
+            } catch (RoomNumberAlreadyExistException | RoomNotFoundException | RoomTypeNotFoundException ex) {
+                System.out.println(ex.getMessage());
+            } 
+        } else {
+            System.out.println("");
+            System.out.println("===============================================================");
+            System.out.println("====             Error Creating New Room Type              ====");
+            errorList.forEach(x -> System.out.println(x.getPropertyPath() + " : " + x.getMessage().replace("size","input") + " length"));
+            System.out.println("===============================================================");
+        }
     }
 
     private void doDeleteRoom(Room room) {

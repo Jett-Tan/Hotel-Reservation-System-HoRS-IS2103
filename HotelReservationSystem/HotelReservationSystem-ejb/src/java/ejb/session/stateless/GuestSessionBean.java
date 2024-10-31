@@ -5,9 +5,11 @@
 package ejb.session.stateless;
 
 import entity.Guest;
+import entity.Reservation;
 import exception.GuestNotFoundException;
 import exception.InvalidDataException;
 import exception.InvalidLoginCredentialsException;
+import exception.ReservationNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -113,4 +115,11 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
+
+    @Override
+    public Guest addReservation(Guest guest,Reservation reservation) throws GuestNotFoundException, ReservationNotFoundException {
+        Guest managedGuest = getGuestById(guest.getGuestId());
+        managedGuest.getReservationList().add(reservation);
+        return managedGuest;
+    }
 }

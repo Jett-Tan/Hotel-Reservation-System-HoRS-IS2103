@@ -5,9 +5,11 @@
 package ejb.session.stateless;
 
 import entity.Guest;
+import entity.Reservation;
 import exception.GuestNotFoundException;
 import exception.InvalidDataException;
 import exception.InvalidLoginCredentialsException;
+import exception.ReservationNotFoundException;
 import java.util.List;
 import javax.ejb.Remote;
 
@@ -30,4 +32,5 @@ public interface GuestSessionBeanRemote {
 
     public Guest loginGuest(String username, String password) throws GuestNotFoundException, InvalidLoginCredentialsException;
 
+    public Guest addReservation(Guest guest,Reservation reservation) throws GuestNotFoundException, ReservationNotFoundException;
 }

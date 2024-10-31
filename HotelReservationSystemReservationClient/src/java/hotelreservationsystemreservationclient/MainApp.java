@@ -151,7 +151,7 @@ public class MainApp {
         String password = scanner.nextLine();
 
         // Create a new Guest object
-        Guest newGuest = new Guest(name, username, password);
+        Guest newGuest = new Guest(name, username, password,new ArrayList<>());
 
         Set<ConstraintViolation<Guest>> errorList = this.validator.validate(newGuest);
 

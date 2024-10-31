@@ -28,4 +28,5 @@ public interface SearchRoomSessionBeanRemote {
     public List<Reservation> convertSearchToReservation (List<Room> rooms, Date checkIndate,Date checkOutDate) throws RoomNotFoundException, RoomTypeNotFoundException;
     
     public List<Reservation> generateReservation(Date checkInDate,Date checkOutDate) throws RoomNotFoundException;
+    
 }

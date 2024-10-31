@@ -103,13 +103,13 @@ public class DataInitSingleton {
                 RoomRate roomRate4 = roomRateSessionBeanLocal.createNewRoomRate(
                         new RoomRate("PROMOTION-SINGLE",new BigDecimal("100.00"),sdf.parse("10-10-2020"),sdf.parse("10-10-2030"),RoomStatusEnum.AVAILABLE,RoomRateTypeEnum.PROMOTION));
                 RoomRate roomRate5 = roomRateSessionBeanLocal.createNewRoomRate(
-                        new RoomRate("WALKIN-DOUBLE", new BigDecimal("100.00"), sdf.parse("10-10-2020"), sdf.parse("10-10-2030"), RoomStatusEnum.AVAILABLE, RoomRateTypeEnum.PUBLISHED));
+                        new RoomRate("WALKIN-DOUBLE", new BigDecimal("200.00"), sdf.parse("10-10-2020"), sdf.parse("10-10-2030"), RoomStatusEnum.AVAILABLE, RoomRateTypeEnum.PUBLISHED));
                 RoomRate roomRate6 = roomRateSessionBeanLocal.createNewRoomRate(
-                        new RoomRate("NORMAL-DOUBLE", new BigDecimal("100.00"), sdf.parse("10-10-2020"), sdf.parse("10-10-2030"), RoomStatusEnum.AVAILABLE, RoomRateTypeEnum.NORMAL));
+                        new RoomRate("NORMAL-DOUBLE", new BigDecimal("200.00"), sdf.parse("10-10-2020"), sdf.parse("10-10-2030"), RoomStatusEnum.AVAILABLE, RoomRateTypeEnum.NORMAL));
                 RoomRate roomRate7 = roomRateSessionBeanLocal.createNewRoomRate(
-                        new RoomRate("PEAK-DOUBLE", new BigDecimal("100.00"), sdf.parse("10-10-2020"), sdf.parse("10-10-2030"), RoomStatusEnum.AVAILABLE, RoomRateTypeEnum.PEAK));
+                        new RoomRate("PEAK-DOUBLE", new BigDecimal("200.00"), sdf.parse("10-10-2020"), sdf.parse("10-10-2030"), RoomStatusEnum.AVAILABLE, RoomRateTypeEnum.PEAK));
                 RoomRate roomRate8 = roomRateSessionBeanLocal.createNewRoomRate(
-                        new RoomRate("PROMOTION-DOUBLE", new BigDecimal("100.00"), sdf.parse("10-10-2020"), sdf.parse("10-10-2030"), RoomStatusEnum.AVAILABLE, RoomRateTypeEnum.PROMOTION));
+                        new RoomRate("PROMOTION-DOUBLE", new BigDecimal("200.00"), sdf.parse("10-10-2020"), sdf.parse("10-10-2030"), RoomStatusEnum.AVAILABLE, RoomRateTypeEnum.PROMOTION));
 
                 List<String> anemities = new ArrayList();
                 anemities.add("SOAP");

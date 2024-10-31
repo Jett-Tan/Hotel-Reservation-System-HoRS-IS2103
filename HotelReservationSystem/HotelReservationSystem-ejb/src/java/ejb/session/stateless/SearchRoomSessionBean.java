@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,6 +40,9 @@ import javax.persistence.Query;
 @Stateless
 public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, SearchRoomSessionBeanLocal {
 
+    @EJB(name = "ReservationSessionBeanLocal")
+    private ReservationSessionBeanLocal reservationSessionBeanLocal;
+
     @EJB(name = "RoomSessionBeanLocal")
     private RoomSessionBeanLocal roomSessionBeanLocal;
 
@@ -48,24 +52,24 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
     @Override
     public List<Room> searchRoomsByDate(Date checkIndate, Date checkOutDate) throws RoomNotFoundException {
         List<Room> rooms = roomSessionBeanLocal.getRooms();
-        rooms.removeIf(x -> x.getRoomStatus().equals(RoomStatusEnum.UNAVAILABLE));
-        rooms.removeIf(x -> {
-            boolean free = false;
-            List<Date> bookedDates = x.getBookedDates();
-            Date checkin = checkIndate;
-            Date checkout = checkOutDate;
-            do {
-                for(Date bookedDate : bookedDates) {
-                    if(bookedDate.getYear() == (checkin.getYear()) &&
-                       bookedDate.getMonth()== (checkin.getMonth()) &&
-                       bookedDate.getDate()== (checkin.getDate()) ) {
-                        return true;
-                    }
-                }
-                checkin = addDays(checkin,1);
-            } while (checkin.before(checkout) || checkin.equals(checkout));
-            return free;
-        });
+//        rooms.removeIf(x -> x.getRoomStatus().equals(RoomStatusEnum.UNAVAILABLE));
+//        rooms.removeIf(x -> {
+//            boolean free = false;
+//            List<Date> bookedDates = x.getBookedDates();
+//            Date checkin = checkIndate;
+//            Date checkout = checkOutDate;
+//            do {
+//                for(Date bookedDate : bookedDates) {
+//                    if(bookedDate.getYear() == (checkin.getYear()) &&
+//                       bookedDate.getMonth()== (checkin.getMonth()) &&
+//                       bookedDate.getDate()== (checkin.getDate()) ) {
+//                        return true;
+//                    }
+//                }
+//                checkin = addDays(checkin,1);
+//            } while (checkin.before(checkout) || checkin.equals(checkout));
+//            return free;
+//        });
         return rooms;
     }
     
@@ -107,54 +111,64 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
         return cal.getTime();
     }
     
-    public int getNumberOfAvailableRoom(Date date) throws RoomNotFoundException {
+    public int getNumberOfAvailableRoom(Date checkInDate, Date checkOutDate,RoomType roomType) throws RoomNotFoundException {
         List<Room> rooms = roomSessionBeanLocal.getRooms();
         rooms.removeIf(x -> x.getRoomStatus().equals(RoomStatusEnum.UNAVAILABLE));
+        rooms.removeIf(x -> x.getRoomRmType().getName().equals(roomType.getName()));
         rooms.removeIf(x -> {
+            boolean free = false;
             List<Date> bookedDates = x.getBookedDates();
-            for(Date bookedDate : bookedDates) {
-                if(bookedDate.getYear() == (date.getYear()) &&
-                   bookedDate.getMonth()== (date.getMonth()) &&
-                   bookedDate.getDate()== (date.getDate()) ) {
-                    return true;
+            Date checkin = checkInDate;
+            Date checkout = checkOutDate;
+            do {
+                for(Date bookedDate : bookedDates) {
+                    if(bookedDate.getYear() == (checkin.getYear()) &&
+                       bookedDate.getMonth()== (checkin.getMonth()) &&
+                       bookedDate.getDate()== (checkin.getDate()) ) {
+                        return true;
+                    }
                 }
-            }
-            return false;
+                checkin = addDays(checkin,1);
+            } while (checkin.before(checkout) || checkin.equals(checkout));
+            return free;
         });
-        return rooms.size();
+        
+        List<Reservation> reservations = reservationSessionBeanLocal.retrieveAllReservationWithinDates(checkInDate, checkOutDate,roomType);
+        int numOfRooms = reservations.stream().map(x -> x.getNumOfRooms()).reduce((x,y)->x.add(y)).orElse(BigDecimal.ZERO).intValue();
+        return numOfRooms - rooms.size();
     }
 
     @Override
     public List<Reservation> convertSearchToReservation(List<Room> rooms, Date checkInDate, Date checkOutDate) throws RoomNotFoundException, RoomTypeNotFoundException {
         List<Reservation> reservations = new ArrayList<>();
-        List<RoomType> roomTypesAvailable = rooms.stream().map(x -> x.getRoomRmType()).distinct().collect(Collectors.toList());
-        rooms.replaceAll(x -> {
-            try {
-                return roomSessionBeanLocal.getRoomByNumber(x.getRoomNumber());
-            } catch (RoomNotFoundException ex) {
-                Logger.getLogger(SearchRoomSessionBean.class.getName()).log(Level.SEVERE, null, ex);
-                return null;
-            }
-        });
-        for(Room room : rooms) {
-            Reservation current = new Reservation();
-            current.setStartDate(checkInDate);
-            current.setEndDate(checkOutDate);
-            current.setNumOfRooms(BigDecimal.ONE);
-            current.setAllocated(Boolean.FALSE);
-            current.setReservationType(ReservationTypeEnum.WALK_IN);
-            List<RoomRate> roomRates = room.getRoomRmType().getRoomRates();
-            roomRates.removeIf(x -> !x.getRoomRateType().equals(RoomRateTypeEnum.PUBLISHED));
-            roomRates.removeIf(x -> !x.getStartDate().before(checkInDate));
-            roomRates.removeIf(x -> !x.getEndDate().after(checkOutDate));   
-            roomRates.forEach(x -> System.out.println(x.getName()));
-            BigDecimal totalAmount = BigDecimal.ZERO;
-            roomRates.forEach(x -> {
-                 totalAmount.add(x.getRate());
-            });
-            current.setTotalAmount(totalAmount);
-            reservations.add(current);
-        }
+//        List<RoomType> roomTypesAvailable = rooms.stream().map(x -> x.getRoomRmType()).distinct().collect(Collectors.toList());
+//        rooms.replaceAll(x -> {
+//            try {
+//                return roomSessionBeanLocal.getRoomByNumber(x.getRoomNumber());
+//            } catch (RoomNotFoundException ex) {
+//                Logger.getLogger(SearchRoomSessionBean.class.getName()).log(Level.SEVERE, null, ex);
+//                return null;
+//            }
+//        });
+//        for(Room room : rooms) {
+//            Reservation current = new Reservation();
+//            current.setStartDate(checkInDate);
+//            current.setEndDate(checkOutDate);
+//            current.setNumOfRooms(BigDecimal.ONE);
+//            current.setAllocated(Boolean.FALSE);
+//            current.setReservationType(ReservationTypeEnum.WALK_IN);
+//            List<RoomRate> roomRates = room.getRoomRmType().getRoomRates();
+//            roomRates.removeIf(x -> !x.getRoomRateType().equals(RoomRateTypeEnum.PUBLISHED));
+//            roomRates.removeIf(x -> !x.getStartDate().before(checkInDate));
+//            roomRates.removeIf(x -> !x.getEndDate().after(checkOutDate));   
+//            roomRates.forEach(x -> System.out.println(x.getName()));
+//            BigDecimal totalAmount = BigDecimal.ZERO;
+//            roomRates.forEach(x -> {
+//                 totalAmount.add(x.getRate());
+//            });
+//            current.setTotalAmount(totalAmount);
+//            reservations.add(current);
+//        }
         return reservations;
     }
     
@@ -163,6 +177,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
         List<Reservation> reservations = new ArrayList<>();
         List<Room> allRooms = roomSessionBeanLocal.getRooms();
         HashMap<RoomType, Integer> hashMap = new HashMap<>();
+        //maybe need add in a way to add reservations and check if got enuf rooms
         allRooms.removeIf(x -> x.getRoomStatus().equals(RoomStatusEnum.UNAVAILABLE));
         allRooms.removeIf(x -> {
             boolean free = false;
@@ -188,7 +203,15 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
                 hashMap.put(x.getRoomRmType(), 1);
             }
         });
-        List<RoomType> allRoomTypes = allRooms.stream().map(x -> x.getRoomRmType()).distinct().collect(Collectors.toList());
+        List<RoomType> allRoomTypes = allRooms.stream().map(x -> x.getRoomRmType()).distinct()
+                .filter(x -> {
+                    try {
+                        return getNumberOfAvailableRoom(checkInDate,checkOutDate,x) > 0;
+                    } catch (RoomNotFoundException ex) {
+                        return false;
+                    }
+                })
+                .collect(Collectors.toList());
         List<Room> distinctRooms = new ArrayList<Room>();
         for(Room room : allRooms) {
             boolean add = true;

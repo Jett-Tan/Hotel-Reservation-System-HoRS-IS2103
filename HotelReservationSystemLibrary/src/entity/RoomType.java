@@ -16,7 +16,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
@@ -71,6 +73,10 @@ public class RoomType implements Serializable {
 
     @OneToMany
     private List<RoomRate> roomRates;
+    
+//    @Column(nullable = true)
+    @JoinColumn()
+    private RoomType parentRoomType;
 
     public RoomType() {
     }
@@ -96,6 +102,14 @@ public class RoomType implements Serializable {
         this.name = name;
     }
 
+    public RoomType getParentRoomType() {
+        return parentRoomType;
+    }
+
+    public void setParentRoomType(RoomType parentRoomType) {
+        this.parentRoomType = parentRoomType;
+    }
+    
     public String getDescription() {
         return description;
     }

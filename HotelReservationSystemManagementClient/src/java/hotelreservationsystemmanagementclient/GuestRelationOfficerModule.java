@@ -144,10 +144,10 @@ public class GuestRelationOfficerModule {
             List<Reservation> reservations = searchRoomSessionBeanRemote.generateReservation(checkin, checkout);
             do {
                 System.out.println("===============================================================");
-                System.out.println(String.format("No.%20s%20s","Total Amount","Room Type"));
+                System.out.println(String.format("No.%20s%20s","Total Amount Per Room","Room Type"));
                 for(int i = 1; i < reservations.size() + 1; i++) {
                     Reservation reservation = reservations.get(i - 1);
-                    System.out.println(String.format("%d.%20s%20s",i,"$ "+reservation.getTotalAmount(),reservation.getRoomType().getName()));
+                    System.out.println(String.format("%d.%20s%20s",i,"$ "+reservation.getAmountPerRoom(),reservation.getRoomType().getName()));
                 }
                 System.out.println("===============================================================");
                 System.out.print("Enter >> ");
@@ -268,14 +268,32 @@ public class GuestRelationOfficerModule {
             if (continueOn) {
                 Set<ConstraintViolation<Reservation>> errorList = this.validator.validate(reservation);
                 if (errorList.isEmpty()) {
-                    reservation = reservationSessionBeanRemote.createNewReservation(reservation);
-                    try {
-                        guest = guestSessionBeanRemote.addReservation(guest, reservation);
-                        System.out.println("Successfully create reservation!");
-                    } catch (GuestNotFoundException | ReservationNotFoundException ex) {
-                        Logger.getLogger(GuestRelationOfficerModule.class.getName()).log(Level.SEVERE, null, ex);
+                    boolean continueWith = true;
+                    do {
+                        System.out.println("Total amount: "+ reservation.getNumOfRooms().multiply(reservation.getAmountPerRoom()));
+                        System.out.print("Enter confirmation (Y/N): ");
+                        input = scanner.nextLine().trim();
+                        if("Y".equalsIgnoreCase(input)){
+                            reservation = reservationSessionBeanRemote.createNewReservation(reservation);
+                            break;
+                        } else if ("N".equalsIgnoreCase(input)){
+                            continueWith = false;
+                            break;
+                        }                        
+                    } while(true);
+                    if(continueWith) {
+                        try {
+                            guest = guestSessionBeanRemote.addReservation(guest, reservation);
+                            System.out.println("Successfully create reservation!");
+//                            Room allocatedRoom = roomSessionBeanRemote
+                        } catch (GuestNotFoundException | ReservationNotFoundException ex) {
+                            Logger.getLogger(GuestRelationOfficerModule.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        break;
+                    }else {
+                        System.out.println("CANCELLED");
+                        break;
                     }
-                    break;
                 } else {
                     System.out.println("");
                     System.out.println("===============================================================");

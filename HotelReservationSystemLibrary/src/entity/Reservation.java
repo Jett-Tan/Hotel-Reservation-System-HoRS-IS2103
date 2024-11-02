@@ -38,7 +38,7 @@ public class Reservation implements Serializable {
     private Long reservationId;
 
     @Column(nullable = false)
-    private BigDecimal totalAmount;
+    private BigDecimal amountPerRoom;
 
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
@@ -73,7 +73,7 @@ public class Reservation implements Serializable {
     }
 
     public Reservation(BigDecimal totalAmount, Date startDate, Date endDate, BigDecimal numOfRooms, ReservationTypeEnum reservationType, List<Room> roomList, Boolean allocated, RoomType roomType) {
-        this.totalAmount = totalAmount;
+        this.amountPerRoom = totalAmount;
         this.startDate = startDate;
         this.endDate = endDate;
         this.numOfRooms = numOfRooms;
@@ -143,17 +143,17 @@ public class Reservation implements Serializable {
     }
 
     /**
-     * @return the totalAmount
+     * @return the amountPerRoom
      */
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
+    public BigDecimal getAmountPerRoom() {
+        return amountPerRoom;
     }
 
     /**
-     * @param totalAmount the totalAmount to set
+     * @param amountPerRoom the amountPerRoom to set
      */
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
+    public void setAmountPerRoom(BigDecimal amountPerRoom) {
+        this.amountPerRoom = amountPerRoom;
     }
 
     /**

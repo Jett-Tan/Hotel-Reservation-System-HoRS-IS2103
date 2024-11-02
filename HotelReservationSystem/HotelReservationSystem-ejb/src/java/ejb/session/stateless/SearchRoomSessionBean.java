@@ -245,7 +245,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
                 totalAmount = totalAmount.add(x.getRate().multiply(numOfDays));
             }
             
-            current.setTotalAmount(totalAmount);
+            current.setAmountPerRoom(totalAmount);
             reservations.add(current);
         }
         

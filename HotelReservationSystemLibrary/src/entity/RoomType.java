@@ -82,7 +82,8 @@ public class RoomType implements Serializable {
     }
 
     public RoomType(String name, String description, BigDecimal size, String bed, BigDecimal capacity,
-            List<String> amenities, RoomStatusEnum statusType, List<Room> rooms, List<RoomRate> roomRates) {
+            List<String> amenities, RoomStatusEnum statusType, List<Room> rooms, List<RoomRate> roomRates,
+            RoomType parentRoomType) {
         this.name = name;
         this.description = description;
         this.size = size;
@@ -92,6 +93,7 @@ public class RoomType implements Serializable {
         this.statusType = statusType;
         this.rooms = rooms;
         this.roomRates = roomRates;
+        this.parentRoomType = parentRoomType;
     }
 
     public String getName() {

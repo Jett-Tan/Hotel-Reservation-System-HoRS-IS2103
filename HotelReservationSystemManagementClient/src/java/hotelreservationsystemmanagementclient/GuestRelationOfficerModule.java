@@ -205,6 +205,7 @@ public class GuestRelationOfficerModule {
         } while(true);
         Guest guest = new Guest();
         String name,username,password;
+        boolean continueOn = false;
         do {
             System.out.println("1. Registered guest");
             System.out.println("2. Unregiistered guest");
@@ -213,17 +214,27 @@ public class GuestRelationOfficerModule {
             scanner.nextLine();
             if(inputInt == 1) {
                 do {
-                    System.out.print("Enter username >> ");
-                    username = scanner.nextLine().trim();
-                    System.out.print("Enter password >> ");
-                    password = scanner.nextLine().trim();
-                    try {
-                        guest = guestSessionBeanRemote.loginGuest(username, password);
+                    System.out.println("1. Login");
+                    System.out.println("2. Exit");
+                    System.out.print("Enter >> ");
+                    inputInt = scanner.nextInt();
+                    scanner.nextLine();
+                    if (inputInt == 1) {
+                        System.out.print("Enter username >> ");
+                        username = scanner.nextLine().trim();
+                        System.out.print("Enter password >> ");
+                        password = scanner.nextLine().trim();
+                        try {
+                            guest = guestSessionBeanRemote.loginGuest(username, password);
+                            continueOn = true;
+                            break;
+                        } catch (InvalidLoginCredentialsException ex) {
+                            System.out.println("Invalid Credentials");
+                        } catch (GuestNotFoundException ex) {
+                            System.out.println("Guest not found");
+                        }
+                    } else if(inputInt == 2) {
                         break;
-                    } catch (InvalidLoginCredentialsException ex) {
-                        System.out.println("Invalid Credentials");
-                    } catch (GuestNotFoundException ex) {
-                        System.out.println("Guest not found");
                     }
                 } while(true);
             }else if(inputInt == 2) {
@@ -239,22 +250,40 @@ public class GuestRelationOfficerModule {
                         Set<ConstraintViolation<Guest>> errorList = this.validator.validate(newGuest);
                         if (errorList.isEmpty()) {
                             guest = guestSessionBeanRemote.registerGuest(newGuest);
+                            System.out.println("Registration successful!");
+                            continueOn = true;
                             break;
                         } else {
                             System.out.println("Registration failed!");
+                            System.out.println("===============================================================");
+                            System.out.println("====                 Error Creating Guest                  ====");
+                            errorList.forEach(x -> System.out.println(x.getPropertyPath() + " : " + x.getMessage().replace("size", "input") + " length"));
+                            System.out.println("===============================================================");
                         }
                     } catch (InvalidDataException ex) {
                         Logger.getLogger(GuestRelationOfficerModule.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 } while(true);
             }
-            reservation = reservationSessionBeanRemote.createNewReservation(reservation);
-            try {
-                guest = guestSessionBeanRemote.addReservation(guest, reservation);
-            } catch (GuestNotFoundException ex) {
-                Logger.getLogger(GuestRelationOfficerModule.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ReservationNotFoundException ex) {
-                Logger.getLogger(GuestRelationOfficerModule.class.getName()).log(Level.SEVERE, null, ex);
+            if (continueOn) {
+                Set<ConstraintViolation<Reservation>> errorList = this.validator.validate(reservation);
+                if (errorList.isEmpty()) {
+                    reservation = reservationSessionBeanRemote.createNewReservation(reservation);
+                    try {
+                        guest = guestSessionBeanRemote.addReservation(guest, reservation);
+                        System.out.println("Successfully create reservation!");
+                    } catch (GuestNotFoundException | ReservationNotFoundException ex) {
+                        Logger.getLogger(GuestRelationOfficerModule.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    break;
+                } else {
+                    System.out.println("");
+                    System.out.println("===============================================================");
+                    System.out.println("====              Error Creating Reservation               ====");
+                    errorList.forEach(x -> System.out.println(x.getPropertyPath() + " : " + x.getMessage().replace("size", "input") + " length"));
+                    System.out.println("===============================================================");
+                    break;
+                }
             }
         }while (true);
     }

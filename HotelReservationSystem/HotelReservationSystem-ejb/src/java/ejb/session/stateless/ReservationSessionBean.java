@@ -90,8 +90,11 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
     @Override
     public List<Reservation> retrieveAllReservationWithinDates(Date checkInDate, Date checkOutDate, RoomType roomType) {
-        Query query =  em.createQuery("SELECT r FROM Reservation r WHERE r.roomType == :roomType")
-                .setParameter("roomType", roomType);
-        return query.getResultList();
+        Query query =  em.createQuery("SELECT r FROM Reservation r");
+        List<Reservation> list =  query.getResultList();
+        list.removeIf(x -> x.getStartDate().after(checkInDate));
+        list.removeIf(x -> x.getEndDate().before(checkOutDate));
+        list.removeIf(x -> x.getRoomType().getName() != roomType.getName());
+        return list;
     }
 }

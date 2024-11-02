@@ -42,12 +42,10 @@ public class Reservation implements Serializable {
 
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
-    @Future
     private Date startDate;
 
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
-    @Future
     private Date endDate;
 
     @Column(nullable = false)
@@ -56,7 +54,6 @@ public class Reservation implements Serializable {
     @Enumerated(EnumType.STRING)
     private ReservationTypeEnum reservationType;
 
-    @NotEmpty(message = "Input list should not be empty")
     @OneToMany(fetch = FetchType.LAZY)
     private List<Room> roomList;
 
@@ -65,6 +62,7 @@ public class Reservation implements Serializable {
     // private List<Room> room;
     
     @ManyToOne
+    @JoinColumn()
     private RoomType roomType;
     
     public Long getReservationId() {

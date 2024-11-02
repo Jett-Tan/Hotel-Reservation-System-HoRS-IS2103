@@ -44,7 +44,7 @@ public class Guest implements Serializable {
     
     
     @OneToMany
-    private List<@NotNull Reservation> reservationList;
+    private List<Reservation> reservationList;
     public Guest() {
     }
 

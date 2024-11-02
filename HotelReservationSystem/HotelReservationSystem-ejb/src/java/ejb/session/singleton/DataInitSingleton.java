@@ -126,10 +126,10 @@ public class DataInitSingleton {
                 roomRateDouble.add(roomRate7);
                 roomRateDouble.add(roomRate8);
 
-                RoomType roomTypeSingle = roomTypeSessionBeanLocal.createNewRoomType(
-                        new RoomType("SINGLE","SINGLE",new BigDecimal("120"),"SINGLE",new BigDecimal("1"),anemities,RoomStatusEnum.AVAILABLE,new ArrayList(),roomRateSingle));
                 RoomType roomTypeDouble = roomTypeSessionBeanLocal.createNewRoomType(
-                        new RoomType("DOUBLE","DOUBLE",new BigDecimal("240"),"DOUBLE",new BigDecimal("2"),anemities,RoomStatusEnum.AVAILABLE,new ArrayList(),roomRateDouble));
+                        new RoomType("DOUBLE","DOUBLE",new BigDecimal("240"),"DOUBLE",new BigDecimal("2"),anemities,RoomStatusEnum.AVAILABLE,new ArrayList(),roomRateDouble,null));
+                RoomType roomTypeSingle = roomTypeSessionBeanLocal.createNewRoomType(
+                        new RoomType("SINGLE","SINGLE",new BigDecimal("120"),"SINGLE",new BigDecimal("1"),anemities,RoomStatusEnum.AVAILABLE,new ArrayList(),roomRateSingle,roomTypeDouble));
 
                 Room room0101 = roomSessionBeanLocal.createNewRoom(
                         new Room("0101",new ArrayList(),RoomStatusEnum.AVAILABLE,false,roomTypeSingle));

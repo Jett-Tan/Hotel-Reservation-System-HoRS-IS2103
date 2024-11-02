@@ -134,7 +134,7 @@ public class OperationManagerModule {
         List<Room> rooms = new ArrayList<Room>();
         List<RoomRate> roomRates = new ArrayList<RoomRate>();
         
-        int option = 0;
+        int inputInt = 0;
         System.out.print("Enter name >> ");
         roomType.setName(scanner.nextLine().trim());
         System.out.print("Enter description >> ");
@@ -163,15 +163,15 @@ public class OperationManagerModule {
             System.out.println("1. Available");
             System.out.println("2. Unavailable");
             System.out.print("Enter room status (1 - 2) >> ");
-            option = scanner.nextInt();
+            inputInt = scanner.nextInt();
             scanner.nextLine();
-            if(option == 1) {
+            if(inputInt == 1) {
                 roomType.setStatusType(RoomStatusEnum.AVAILABLE);
-            } else if (option == 2) {
+            } else if (inputInt == 2) {
                 roomType.setStatusType(RoomStatusEnum.UNAVAILABLE);
             }
-        }while (option > 2 || option < 1);
-        option = 0;
+        }while (inputInt > 2 || inputInt < 1);
+        inputInt = 0;
         try {
             List<RoomRate> roomRatesList = roomRateSessionBeanRemote.getRoomRates();
             System.out.println(String.format("%s%11s%15s%15s%15s%15s","No.","Name","Rate","Start Date","End Date","Rate Status"));
@@ -189,17 +189,40 @@ public class OperationManagerModule {
             System.out.println(roomRatesList.size() + 1 + ". Exit");
             do{
                 System.out.print("Enter (Enter "+(roomRatesList.size() + 1) +" to exit)>> ");
-                option = scanner.nextInt();
+                inputInt = scanner.nextInt();
                 scanner.nextLine();
-                if (option < roomRatesList.size() + 1 && option > 0) {
-                    roomRates.add(roomRatesList.get(option - 1));
-                } else if (roomRatesList.size() + 1 == option) {
+                if (inputInt < roomRatesList.size() + 1 && inputInt > 0) {
+                    roomRates.add(roomRatesList.get(inputInt - 1));
+                } else if (roomRatesList.size() + 1 == inputInt) {
                     break;
                 }
             }while(true);
         } catch (RoomRateNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
+        
+        do{
+            try{
+                List<RoomType> roomTypes = roomTypeSessionBeanRemote.getRoomTypes();
+                System.out.println("Select parent room type");
+                int i = 1;
+                for(RoomType roomtype : roomTypes) {
+                    System.out.println(String.format("%d.%20s",i++,roomtype.getName()));
+                }
+                System.out.println(String.format("%d.%20s",i++,"Exit"));
+                inputInt = scanner.nextInt();
+                scanner.nextLine();
+                if(inputInt == roomTypes.size() + 1){
+                    break;
+                }
+                if(inputInt > 0 && inputInt < roomTypes.size() + 1) {
+                    roomType.setParentRoomType(roomTypes.get(inputInt - 1));
+                    break;
+                }
+            } catch(RoomTypeNotFoundException ex){
+                break;
+            }
+        }while (true);
         roomType.setRoomRates(roomRates);
         Set<ConstraintViolation<RoomType>> errorList = this.validator.validate(roomType);
         if (errorList.isEmpty()) {

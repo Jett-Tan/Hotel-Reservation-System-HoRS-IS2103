@@ -1,10 +1,12 @@
 package hotelreservationsystemmanagementclient;
 
+import ejb.session.stateless.AllocationReportSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
 import ejb.session.stateless.RoomRateSessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
+import entity.AllocationReport;
 import entity.Employee;
 import entity.Room;
 import entity.RoomRate;
@@ -47,6 +49,7 @@ public class OperationManagerModule {
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
     private RoomRateSessionBeanRemote roomRateSessionBeanRemote;
+    private AllocationReportSessionBeanRemote allocationReportSessionBeanRemote;
     private Employee currentEmployee;
     private Scanner scanner = new Scanner(System.in);
     private ValidatorFactory validatorFactory;
@@ -64,7 +67,8 @@ public class OperationManagerModule {
             EmployeeSessionBeanRemote employeeSessionBeanRemote, 
             Employee currentEmployee,
             RoomTypeSessionBeanRemote roomTypeSessionBeanRemote,
-            RoomRateSessionBeanRemote roomRateSessionBeanRemote
+            RoomRateSessionBeanRemote roomRateSessionBeanRemote,
+            AllocationReportSessionBeanRemote allocationReportSessionBeanRemote
     ) {
         this();
         this.roomSessionBeanRemote = roomSessionBeanRemote;
@@ -73,6 +77,7 @@ public class OperationManagerModule {
         this.currentEmployee = currentEmployee;
         this.roomTypeSessionBeanRemote = roomTypeSessionBeanRemote;
         this.roomRateSessionBeanRemote = roomRateSessionBeanRemote;
+        this.allocationReportSessionBeanRemote = allocationReportSessionBeanRemote;
     }
     
     public void run() {
@@ -450,7 +455,17 @@ public class OperationManagerModule {
     }
 
     private void doViewRoomAllocationExceptionReport() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("===============================================================");
+        System.out.println("====                 Hotel Operation Module                ====");        
+        System.out.println("====              View Room Allocation Report              ====");
+        System.out.println("===============================================================");
+        List<AllocationReport> reports = allocationReportSessionBeanRemote.getAllAllocationReports();
+        reports.removeIf(x -> x.isIsSettled());
+        for(int i = 1; i < reports.size() + 1; i++) {
+            AllocationReport temp = reports.get(i-1);
+            System.out.println(String.format("%d.%s",i,temp.getType()));
+        }
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }    
 
     private void doViewRoomType(RoomType roomType) {

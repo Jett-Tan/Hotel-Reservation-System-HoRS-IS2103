@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -24,13 +25,51 @@ public class AllocationReport implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long allocationReportId;
 
+    @NotNull
     private AllocationTypeEnum type;
     
     @OneToOne
     private Reservation reservation;
     
+    @NotNull
+    private boolean isSettled; 
     
     public AllocationReport() {
+    }
+
+    public AllocationReport(Long allocationReportId, AllocationTypeEnum type, Reservation reservation, boolean isSettled) {
+        this.allocationReportId = allocationReportId;
+        this.type = type;
+        this.reservation = reservation;
+        this.isSettled = isSettled;
+    }
+
+    public boolean isIsSettled() {
+        return isSettled;
+    }
+
+    public void setIsSettled(boolean isSettled) {
+        this.isSettled = isSettled;
+    }
+
+    
+
+    
+    
+    public AllocationTypeEnum getType() {
+        return type;
+    }
+
+    public void setType(AllocationTypeEnum type) {
+        this.type = type;
+    }
+
+    public Reservation getReservation() {
+        return reservation;
+    }
+
+    public void setReservation(Reservation reservation) {
+        this.reservation = reservation;
     }
 
     

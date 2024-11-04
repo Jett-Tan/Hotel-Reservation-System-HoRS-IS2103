@@ -5,18 +5,21 @@
 package ejb.session.singleton;
 
 import ejb.session.stateless.EmployeeSessionBeanLocal;
+import ejb.session.stateless.GuestSessionBeanLocal;
 import ejb.session.stateless.RoomRateSessionBeanLocal;
 import ejb.session.stateless.RoomSessionBeanLocal;
 import ejb.session.stateless.RoomTypeSessionBeanLocal;
 import entity.Employee;
+import entity.Guest;
 import entity.Room;
 import entity.RoomRate;
 import entity.RoomType;
 import enumerations.EmployeeTypeEnum;
 import enumerations.RoomRateTypeEnum;
 import enumerations.RoomStatusEnum;
-import exception.EmployeeNotFoundException;
 import exception.EmployeeUsernameAlreadyExistException;
+import exception.GuestUsernameAlreadyExistException;
+import exception.InvalidDataException;
 import exception.RoomNumberAlreadyExistException;
 import exception.RoomRateNameAlreadyExistException;
 import exception.RoomTypeNameAlreadyExistException;
@@ -44,6 +47,9 @@ import javax.persistence.PersistenceContext;
 @LocalBean
 @Startup
 public class DataInitSingleton {
+
+    @EJB(name = "GuestSessionBeanLocal")
+    private GuestSessionBeanLocal guestSessionBeanLocal;
 
     @EJB(name = "RoomSessionBeanLocal")
     private RoomSessionBeanLocal roomSessionBeanLocal;
@@ -88,6 +94,7 @@ public class DataInitSingleton {
             }
         }
         loadRoomRateType();
+        loadGuest();
     }
     public void loadRoomRateType() {
         if (em.find(RoomRate.class, 1l) == null && em.find(RoomType.class, 1l) == null && em.find(Room.class, 1l) == null ) {
@@ -148,6 +155,26 @@ public class DataInitSingleton {
                 Room room0204 = roomSessionBeanLocal.createNewRoom(
                         new Room("0204",new ArrayList(),RoomStatusEnum.AVAILABLE,false,roomTypeDouble));
             } catch (ParseException | RoomRateNameAlreadyExistException | RoomTypeNameAlreadyExistException | RoomNumberAlreadyExistException | RoomTypeNotFoundException ex) {
+                Logger.getLogger(DataInitSingleton.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    
+    public void loadGuest(){
+        if (em.find(Guest.class, 1l) == null ) {
+            try {
+                guestSessionBeanLocal.registerGuest(
+                    new Guest("Guest1","guest1","password","T01234561A",new ArrayList<>()));
+                guestSessionBeanLocal.registerGuest(
+                    new Guest("Guest2","guest2","password","T01234562A",new ArrayList<>()));
+                guestSessionBeanLocal.registerGuest(
+                    new Guest("Guest3","guest3","password","T01234563A",new ArrayList<>()));
+                guestSessionBeanLocal.registerGuest(
+                    new Guest("Guest4","guest4","password","T01234564A",new ArrayList<>()));
+            } catch (InvalidDataException ex) {
+                Logger.getLogger(DataInitSingleton.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (GuestUsernameAlreadyExistException ex) {
                 Logger.getLogger(DataInitSingleton.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

@@ -7,6 +7,7 @@ package ejb.session.stateless;
 import entity.Guest;
 import entity.Reservation;
 import entity.RoomType;
+import exception.ReservationNotFoundException;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
@@ -23,5 +24,8 @@ public interface ReservationSessionBeanLocal {
     public Reservation retrieveReservationByReservationId(Guest guest, Long reservationId);
     
     public List<Reservation> retrieveAllReservationWithinDates(Date checkInDate,Date checkOutDate, RoomType roomType);
+
+    public Reservation getLoadedReservation(Reservation reservation) throws ReservationNotFoundException;
     
+    public List<Reservation> retrieveAllReseravtions();
 }

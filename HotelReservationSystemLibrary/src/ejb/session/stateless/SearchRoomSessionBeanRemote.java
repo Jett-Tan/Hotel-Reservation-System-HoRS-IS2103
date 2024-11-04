@@ -19,13 +19,8 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface SearchRoomSessionBeanRemote {
-    public List<Room> searchRoomsByDate(Date checkIndate,Date checkOutDate) throws RoomNotFoundException;
-    
-    public List<Room> searchRoomsByType(RoomType roomType) throws RoomNotFoundException, RoomTypeNotFoundException;
     
     public List<Room> searchRooms(Date checkIndate,Date checkOutDate, RoomType roomType) throws RoomNotFoundException, RoomTypeNotFoundException;
-    
-    public List<Reservation> convertSearchToReservation (List<Room> rooms, Date checkIndate,Date checkOutDate) throws RoomNotFoundException, RoomTypeNotFoundException;
     
     public List<Reservation> generateReservation(Date checkInDate,Date checkOutDate) throws RoomNotFoundException;
     

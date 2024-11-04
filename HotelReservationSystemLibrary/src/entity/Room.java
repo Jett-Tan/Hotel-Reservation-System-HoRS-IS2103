@@ -15,7 +15,11 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -30,28 +34,25 @@ public class Room implements Serializable {
     private Long roomId;
     
     @Column(nullable = false,unique = true)
+    @NotNull
+    @Size(min = 1, max = 6)
     private String roomNumber;
     
     private List<Date> bookedDates;
     
     @Enumerated(EnumType.STRING)
+    @NotNull
     private RoomStatusEnum roomStatus;
    
-    @Column(nullable = false,columnDefinition="default 'false'")
+    @Column(nullable = false)
+    @NotNull
     private boolean isCheckedIn;
     
     @ManyToOne
+    @JoinColumn(name = "room_roomtype")
     private RoomType roomRmType;
     
     public Room() {
-    }
-
-    public Room(Long roomId, String roomNumber, List<Date> bookedDates, RoomStatusEnum roomStatus, boolean isCheckedIn) {
-        this.roomId = roomId;
-        this.roomNumber = roomNumber;
-        this.bookedDates = bookedDates;
-        this.roomStatus = roomStatus;
-        this.isCheckedIn = isCheckedIn;
     }
 
     public Room(String roomNumber, List<Date> bookedDates, RoomStatusEnum roomStatus, boolean isCheckedIn, RoomType roomRmType) {

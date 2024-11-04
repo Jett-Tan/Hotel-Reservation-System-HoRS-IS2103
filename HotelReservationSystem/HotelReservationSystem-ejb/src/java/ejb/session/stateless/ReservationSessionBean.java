@@ -4,13 +4,26 @@
  */
 package ejb.session.stateless;
 
+import entity.AllocationReport;
 import entity.Guest;
 import entity.Reservation;
+import entity.Room;
+import entity.RoomType;
+import exception.ReservationNotFoundException;
+import exception.RoomNotFoundException;
+import exception.RoomTypeNotFoundException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -18,6 +31,12 @@ import javax.persistence.Query;
  */
 @Stateless
 public class ReservationSessionBean implements ReservationSessionBeanRemote, ReservationSessionBeanLocal {
+
+    @EJB(name = "RoomSessionBeanLocal")
+    private RoomSessionBeanLocal roomSessionBeanLocal;
+
+    @EJB(name = "SearchRoomSessionBeanLocal")
+    private SearchRoomSessionBeanLocal searchRoomSessionBeanLocal;
 
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
@@ -40,4 +59,42 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
+
+    @Override
+    public Reservation createNewReservation(Reservation reservation) {
+        em.persist(reservation);
+        em.flush();
+        return reservation;
+    }
+    @Override
+    public Reservation allocateReservation(Reservation reservation) throws ReservationNotFoundException {
+        try {
+            AllocationReport report = new AllocationReport();
+            BigDecimal numOfRooms = reservation.getNumOfRooms();
+            List<Room> rooms = searchRoomSessionBeanLocal.searchRooms(reservation.getStartDate(), reservation.getEndDate(), reservation.getRoomType());
+            if (rooms.isEmpty()) {
+                
+            }
+            Date startDate = reservation.getStartDate();
+            Date endDate = reservation.getEndDate();
+            do {
+                startDate = searchRoomSessionBeanLocal.addDays(startDate, 1);
+            } while(startDate.before(endDate) || startDate.equals(endDate));
+        } catch (RoomNotFoundException ex) {
+            //create exceptionReport
+        } catch (RoomTypeNotFoundException ex) {
+            Logger.getLogger(ReservationSessionBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return reservation;
+    }
+
+    @Override
+    public List<Reservation> retrieveAllReservationWithinDates(Date checkInDate, Date checkOutDate, RoomType roomType) {
+        Query query =  em.createQuery("SELECT r FROM Reservation r");
+        List<Reservation> list =  query.getResultList();
+        list.removeIf(x -> x.getStartDate().after(checkInDate));
+        list.removeIf(x -> x.getEndDate().before(checkOutDate));
+        list.removeIf(x -> x.getRoomType().getName() != roomType.getName());
+        return list;
+    }
 }

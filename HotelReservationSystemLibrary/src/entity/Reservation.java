@@ -13,11 +13,17 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotEmpty;
 
 /**
  *
@@ -30,40 +36,84 @@ public class Reservation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reservationId;
-    
+
     @Column(nullable = false)
-    private BigDecimal totalAmount;
-    
+    private BigDecimal amountPerRoom;
+
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
     private Date startDate;
-    
+
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
     private Date endDate;
-    
-     @Column(nullable = false)
-    private BigDecimal numOfRooms;
-    
-    @Enumerated(EnumType.STRING)
-    private ReservationTypeEnum reservationTpy;
-    
-//    private List<Room> room;
 
-    public Reservation(BigDecimal totalAmount, Date startDate, Date endDate, BigDecimal numOfRooms, ReservationTypeEnum reservationTpy) {
-        this.totalAmount = totalAmount;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.numOfRooms = numOfRooms;
-        this.reservationTpy = reservationTpy;
-    }
+    @Column(nullable = false)
+    private BigDecimal numOfRooms;
+
+    @Enumerated(EnumType.STRING)
+    private ReservationTypeEnum reservationType;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Room> roomList;
+
+    @Column(nullable = false)
+    private Boolean allocated;
+    // private List<Room> room;
     
-    
+    @ManyToOne
+    @JoinColumn()
+    private RoomType roomType;
     
     public Long getReservationId() {
         return reservationId;
     }
 
+    public Reservation() {
+    }
+
+    public Reservation(BigDecimal totalAmount, Date startDate, Date endDate, BigDecimal numOfRooms, ReservationTypeEnum reservationType, List<Room> roomList, Boolean allocated, RoomType roomType) {
+        this.amountPerRoom = totalAmount;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.numOfRooms = numOfRooms;
+        this.reservationType = reservationType;
+        this.roomList = roomList;
+        this.allocated = allocated;
+        this.roomType = roomType;
+    }
+
+    public RoomType getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
+    }
+
+    public ReservationTypeEnum getReservationType() {
+        return reservationType;
+    }
+
+    public void setReservationType(ReservationTypeEnum reservationType) {
+        this.reservationType = reservationType;
+    }
+
+    public List<Room> getRoomList() {
+        return roomList;
+    }
+
+    public void setRoomList(List<Room> roomList) {
+        this.roomList = roomList;
+    }
+
+    public Boolean getAllocated() {
+        return allocated;
+    }
+
+    public void setAllocated(Boolean allocated) {
+        this.allocated = allocated;
+    }
 
     @Override
     public int hashCode() {
@@ -74,12 +124,14 @@ public class Reservation implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the reservationId fields are not set
+        // TODO: Warning - this method won't work in the case the reservationId fields
+        // are not set
         if (!(object instanceof Reservation)) {
             return false;
         }
         Reservation other = (Reservation) object;
-        if ((this.reservationId == null && other.reservationId != null) || (this.reservationId != null && !this.reservationId.equals(other.reservationId))) {
+        if ((this.reservationId == null && other.reservationId != null)
+                || (this.reservationId != null && !this.reservationId.equals(other.reservationId))) {
             return false;
         }
         return true;
@@ -91,17 +143,17 @@ public class Reservation implements Serializable {
     }
 
     /**
-     * @return the totalAmount
+     * @return the amountPerRoom
      */
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
+    public BigDecimal getAmountPerRoom() {
+        return amountPerRoom;
     }
 
     /**
-     * @param totalAmount the totalAmount to set
+     * @param amountPerRoom the amountPerRoom to set
      */
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
+    public void setAmountPerRoom(BigDecimal amountPerRoom) {
+        this.amountPerRoom = amountPerRoom;
     }
 
     /**
@@ -138,21 +190,7 @@ public class Reservation implements Serializable {
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
-
-    /**
-     * @return the reservationTpy
-     */
-    public ReservationTypeEnum getReservationTpy() {
-        return reservationTpy;
-    }
-
-    /**
-     * @param reservationTpy the reservationTpy to set
-     */
-    public void setReservationTpy(ReservationTypeEnum reservationTpy) {
-        this.reservationTpy = reservationTpy;
-    }
-
+    
     /**
      * @return the numOfRooms
      */
@@ -166,5 +204,5 @@ public class Reservation implements Serializable {
     public void setNumOfRooms(BigDecimal numOfRooms) {
         this.numOfRooms = numOfRooms;
     }
-    
+
 }

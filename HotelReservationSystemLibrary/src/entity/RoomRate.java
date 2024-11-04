@@ -4,6 +4,7 @@
  */
 package entity;
 
+import enumerations.RoomRateTypeEnum;
 import enumerations.RoomStatusEnum;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -21,6 +22,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -35,38 +39,53 @@ public class RoomRate implements Serializable {
     private Long roomRateId;
     
     @Column(nullable = false)
+    @NotNull
+    @Size(min = 1, max = 20)
     private String name;
     
     @Column(nullable = false, scale = 2)
+    @NotNull
+    @Digits(integer = 4, fraction = 2)
     private BigDecimal rate;
     
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
+    @NotNull
     private Date startDate;
     
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
+    @NotNull
     private Date endDate;
     
     @Enumerated(EnumType.STRING)
+    @NotNull
     private RoomStatusEnum rateStatus;
 
-    @ManyToOne(optional = false,cascade = {}, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
-    private RoomType roomType;
+    @Enumerated(EnumType.ORDINAL)
+    @NotNull
+    private RoomRateTypeEnum roomRateType;
     
     public RoomRate() {
     }
 
-    public RoomRate(Long roomRateId, String name, BigDecimal rate, Date startDate, Date endDate, RoomStatusEnum rateStatus) {
-        this.roomRateId = roomRateId;
+    public RoomRate(String name, BigDecimal rate, Date startDate, Date endDate, RoomStatusEnum rateStatus, RoomRateTypeEnum roomRateTypeEnum) {
         this.name = name;
         this.rate = rate;
         this.startDate = startDate;
         this.endDate = endDate;
         this.rateStatus = rateStatus;
+        this.roomRateType = roomRateTypeEnum;
     }
 
+    public RoomRateTypeEnum getRoomRateType() {
+        return roomRateType;
+    }
+
+    public void setRoomRateType(RoomRateTypeEnum roomRateType) {
+        this.roomRateType = roomRateType;
+    }
+    
     public String getName() {
         return name;
     }
@@ -106,16 +125,6 @@ public class RoomRate implements Serializable {
     public void setRateStatus(RoomStatusEnum rateStatus) {
         this.rateStatus = rateStatus;
     }
-
-    public RoomType getRoomType() {
-        return roomType;
-    }
-
-    public void setRoomType(RoomType roomType) {
-        this.roomType = roomType;
-    }
-    
-    
     
     public Long getRoomRateId() {
         return roomRateId;

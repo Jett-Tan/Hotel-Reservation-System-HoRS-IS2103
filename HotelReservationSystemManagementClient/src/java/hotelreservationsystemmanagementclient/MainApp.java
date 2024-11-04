@@ -5,9 +5,13 @@
 package hotelreservationsystemmanagementclient;
 
 import ejb.session.stateless.EmployeeSessionBeanRemote;
+import ejb.session.stateless.GuestSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
+import ejb.session.stateless.ReservationSessionBeanRemote;
+import ejb.session.stateless.RoomRateSessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
+import ejb.session.stateless.SearchRoomSessionBeanRemote;
 import entity.Employee;
 import enumerations.EmployeeTypeEnum;
 import exception.EmployeeNotFoundException;
@@ -23,18 +27,30 @@ public class MainApp {
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private Employee currentEmployee;
     private RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
+    private RoomRateSessionBeanRemote roomRateSessionBeanRemote;
+    ReservationSessionBeanRemote reservationSessionBeanRemote;
+    GuestSessionBeanRemote guestSessionBeanRemote;
+    SearchRoomSessionBeanRemote searchRoomSessionBeanRemote;
     private Scanner scanner = new Scanner(System.in);
     
     MainApp(
             RoomSessionBeanRemote roomSessionBeanRemote, 
             PartnerSessionBeanRemote partnerSessionBeanRemote, 
             EmployeeSessionBeanRemote employeeSessionBeanRemote,
-            RoomTypeSessionBeanRemote roomTypeSessionBeanRemote
+            RoomTypeSessionBeanRemote roomTypeSessionBeanRemote,
+            RoomRateSessionBeanRemote roomRateSessionBeanRemote,
+            ReservationSessionBeanRemote reservationSessionBeanRemote,
+            GuestSessionBeanRemote guestSessionBeanRemote,
+            SearchRoomSessionBeanRemote searchRoomSessionBeanRemote
     ) {
         this.roomSessionBeanRemote = roomSessionBeanRemote;
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.roomTypeSessionBeanRemote = roomTypeSessionBeanRemote;
+        this.roomRateSessionBeanRemote = roomRateSessionBeanRemote;
+        this.reservationSessionBeanRemote = reservationSessionBeanRemote;
+        this.guestSessionBeanRemote = guestSessionBeanRemote;
+        this.searchRoomSessionBeanRemote = searchRoomSessionBeanRemote;
     }
 
     void run() {
@@ -64,7 +80,7 @@ public class MainApp {
         String password = scanner.nextLine();
         try {
             Employee employee = employeeSessionBeanRemote.getEmployeeByUsername(username);
-            System.out.println(employee);
+//            System.out.println(employee);
             if(employee.getPassword().equals(password)) {
                 currentEmployee = employee;
                 switch (employee.getEmployeeType()) {
@@ -79,7 +95,17 @@ public class MainApp {
                         }
                     case GUEST_RELATION_OFFICER:
                         {
-
+                            GuestRelationOfficerModule app = new GuestRelationOfficerModule(
+                                    employeeSessionBeanRemote, 
+                                    currentEmployee,
+                                    roomRateSessionBeanRemote,
+                                    roomTypeSessionBeanRemote,
+                                    roomSessionBeanRemote,
+                                    reservationSessionBeanRemote,
+                                    guestSessionBeanRemote,
+                                    searchRoomSessionBeanRemote
+                            );
+                            app.run();
                             break;
                         }
                     case OPERATION_MANAGER:
@@ -90,7 +116,8 @@ public class MainApp {
                                     partnerSessionBeanRemote,
                                     employeeSessionBeanRemote,
                                     currentEmployee,
-                                    roomTypeSessionBeanRemote
+                                    roomTypeSessionBeanRemote,
+                                    roomRateSessionBeanRemote
                             );      app.run();
                             break;
                         }

@@ -13,6 +13,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -23,18 +25,31 @@ public class Partner implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long PartnerId;
+    
     @Column(nullable = false)
+    @Size(min = 1, max = 10)
+    @NotNull
     private String firstName;
+    
     @Column(nullable = false)
+    @Size(min = 1, max = 10)
+    @NotNull
     private String lastName;
+    
     @Column(nullable = false,unique = true)
+    @Size(min = 1, max = 10)
+    @NotNull
     private String username;
+    
     @Column(nullable = false)
+    @Size(min = 8)
+    @NotNull
     private String password;
     
     @Enumerated(EnumType.STRING)
+    @NotNull
     private PartnerEmployeeTypeEnum employeeType;
 
     public Partner() {

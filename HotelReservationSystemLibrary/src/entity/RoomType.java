@@ -7,6 +7,7 @@ package entity;
 import enumerations.RoomRateTypeEnum;
 import enumerations.RoomStatusEnum;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,7 +16,14 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -30,36 +38,52 @@ public class RoomType implements Serializable {
     private Long roomTypeId;
 
     @Column(nullable = false)
+    @NotNull
     private String name;
-    
+
     @Column(nullable = false)
+    @Size(min = 1, max = 255)
     private String description;
-    
+
     @Column(nullable = false)
-    private Double size;
-    
+    @Digits(integer = 7, fraction = 3)
+    @DecimalMax("1000.000")
+    private BigDecimal size;
+
     @Column(nullable = false)
+    @NotNull
+    @Size(min = 1, max = 32)
     private String bed;
-    
+
     @Column(nullable = false)
-    private Integer capacity;
-    
-    private List<String> amenities;
-    
+    @NotNull
+    @DecimalMax("6")
+    @Digits(integer = 1, fraction = 0)
+    private BigDecimal capacity;
+
+    @NotEmpty(message = "Input list cannot be empty")
+    private List<@Size(min = 1, max = 30) String> amenities;
+
     @Enumerated(EnumType.STRING)
+    @NotNull
     private RoomStatusEnum statusType;
-    
-    
-    @OneToMany(mappedBy = "roomType")
+
+    @OneToMany(mappedBy = "roomRmType")
     private List<Room> rooms;
-    
-    @OneToMany(mappedBy = "roomType")
+
+    @OneToMany
     private List<RoomRate> roomRates;
+    
+//    @Column(nullable = true)
+    @JoinColumn()
+    private RoomType parentRoomType;
 
     public RoomType() {
     }
 
-    public RoomType(String name, String description, Double size, String bed, Integer capacity, List<String> amenities, RoomStatusEnum statusType, List<Room> rooms, List<RoomRate> roomRates) {
+    public RoomType(String name, String description, BigDecimal size, String bed, BigDecimal capacity,
+            List<String> amenities, RoomStatusEnum statusType, List<Room> rooms, List<RoomRate> roomRates,
+            RoomType parentRoomType) {
         this.name = name;
         this.description = description;
         this.size = size;
@@ -69,6 +93,7 @@ public class RoomType implements Serializable {
         this.statusType = statusType;
         this.rooms = rooms;
         this.roomRates = roomRates;
+        this.parentRoomType = parentRoomType;
     }
 
     public String getName() {
@@ -79,6 +104,14 @@ public class RoomType implements Serializable {
         this.name = name;
     }
 
+    public RoomType getParentRoomType() {
+        return parentRoomType;
+    }
+
+    public void setParentRoomType(RoomType parentRoomType) {
+        this.parentRoomType = parentRoomType;
+    }
+    
     public String getDescription() {
         return description;
     }
@@ -87,11 +120,11 @@ public class RoomType implements Serializable {
         this.description = description;
     }
 
-    public Double getSize() {
+    public BigDecimal getSize() {
         return size;
     }
 
-    public void setSize(Double size) {
+    public void setSize(BigDecimal size) {
         this.size = size;
     }
 
@@ -103,11 +136,11 @@ public class RoomType implements Serializable {
         this.bed = bed;
     }
 
-    public Integer getCapacity() {
+    public BigDecimal getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(Integer capacity) {
+    public void setCapacity(BigDecimal capacity) {
         this.capacity = capacity;
     }
 
@@ -134,6 +167,7 @@ public class RoomType implements Serializable {
     public void setRooms(List<Room> rooms) {
         this.rooms = rooms;
     }
+
     public void addRoom(Room room) {
         this.rooms.add(room);
     }
@@ -145,13 +179,11 @@ public class RoomType implements Serializable {
     public void setRoomRates(List<RoomRate> roomRates) {
         this.roomRates = roomRates;
     }
-    
+
     public void addRoomRates(RoomRate roomRate) {
         this.roomRates.add(roomRate);
     }
 
-    
-    
     public Long getRoomTypeId() {
         return roomTypeId;
     }
@@ -165,12 +197,14 @@ public class RoomType implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the roomTypeId fields are not set
+        // TODO: Warning - this method won't work in the case the roomTypeId fields are
+        // not set
         if (!(object instanceof RoomType)) {
             return false;
         }
         RoomType other = (RoomType) object;
-        if ((this.roomTypeId == null && other.roomTypeId != null) || (this.roomTypeId != null && !this.roomTypeId.equals(other.roomTypeId))) {
+        if ((this.roomTypeId == null && other.roomTypeId != null)
+                || (this.roomTypeId != null && !this.roomTypeId.equals(other.roomTypeId))) {
             return false;
         }
         return true;
@@ -180,5 +214,5 @@ public class RoomType implements Serializable {
     public String toString() {
         return "entity.RoomType[ id=" + roomTypeId + " ]";
     }
-    
+
 }

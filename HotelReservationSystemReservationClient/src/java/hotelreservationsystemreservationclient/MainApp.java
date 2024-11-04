@@ -151,7 +151,7 @@ public class MainApp {
         String password = scanner.nextLine();
 
         // Create a new Guest object
-        Guest newGuest = new Guest(name, username, password);
+        Guest newGuest = new Guest(name, username, password,new ArrayList<>());
 
         Set<ConstraintViolation<Guest>> errorList = this.validator.validate(newGuest);
 
@@ -276,7 +276,7 @@ public class MainApp {
         System.out.println("End Date: " + dateFormat.format(reservation.getEndDate()));
         System.out.println("Room Type: " + reservation.getReservationTpy());
         System.out.println("Number of Rooms: " + reservation.getNumOfRooms());
-        System.out.println("Total Amount: " + reservation.getTotalAmount());
+        System.out.println("Total Amount: " + reservation.getAmountPerRoom());
         
         System.out.print("Press enter to continue > ");
         scanner.nextLine();
@@ -295,7 +295,7 @@ public class MainApp {
             System.out.println(reservation.getReservationId() + "      "
                     + dateFormat.format(reservation.getStartDate()) + "      "
                     + dateFormat.format(reservation.getEndDate()) + "      "
-                    + reservation.getTotalAmount());
+                    + reservation.getAmountPerRoom());
 
         }
         System.out.println();

@@ -5,9 +5,13 @@
 package hotelreservationsystemmanagementclient;
 
 import ejb.session.stateless.EmployeeSessionBeanRemote;
+import ejb.session.stateless.GuestSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
+import ejb.session.stateless.ReservationSessionBeanRemote;
+import ejb.session.stateless.RoomRateSessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
+import ejb.session.stateless.SearchRoomSessionBeanRemote;
 import javax.ejb.EJB;
 
 /**
@@ -15,6 +19,18 @@ import javax.ejb.EJB;
  * @author Tan Jian Feng
  */
 public class Main {
+
+    @EJB(name = "ReservationSessionBeanRemote")
+    private static ReservationSessionBeanRemote reservationSessionBeanRemote;
+    
+    @EJB(name = "GuestSessionBeanRemote")
+    private static GuestSessionBeanRemote guestSessionBeanRemote;
+
+    @EJB(name = "SearchRoomSessionBeanRemote")
+    private static SearchRoomSessionBeanRemote searchRoomSessionBeanRemote;
+
+    @EJB(name = "RoomRateSessionBeanRemote")
+    private static RoomRateSessionBeanRemote roomRateSessionBeanRemote;
 
     @EJB(name = "RoomTypeSessionBeanRemote")
     private static RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
@@ -38,7 +54,11 @@ public class Main {
                 roomSessionBeanRemote,
                 partnerSessionBeanRemote,
                 employeeSessionBeanRemote,
-                roomTypeSessionBeanRemote
+                roomTypeSessionBeanRemote,
+                roomRateSessionBeanRemote,
+                reservationSessionBeanRemote,
+                guestSessionBeanRemote,
+                searchRoomSessionBeanRemote
         );
         try{
             app.run();

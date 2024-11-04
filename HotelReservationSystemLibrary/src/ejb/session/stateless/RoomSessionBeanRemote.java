@@ -8,6 +8,9 @@ import entity.Room;
 import entity.RoomType;
 import exception.RoomNotFoundException;
 import exception.RoomNumberAlreadyExistException;
+import exception.RoomRateNotFoundException;
+import exception.RoomTypeNameAlreadyExistException;
+import exception.RoomTypeNotFoundException;
 import java.util.List;
 import javax.ejb.Remote;
 
@@ -17,7 +20,7 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface RoomSessionBeanRemote {
-    Room createNewRoom(Room room) throws RoomNumberAlreadyExistException;
+    Room createNewRoom(Room room) throws RoomNumberAlreadyExistException, RoomTypeNotFoundException;
         
     List<Room> getRooms() throws RoomNotFoundException;
 
@@ -25,15 +28,19 @@ public interface RoomSessionBeanRemote {
 
     Room getRoomByNumber(String roomNumber) throws RoomNotFoundException;
 
-    Room updateNumber(Room room) throws RoomNotFoundException, RoomNumberAlreadyExistException;
-
-    Room updateBookedDates(Room room) throws RoomNotFoundException;
+//    Room updateNumber(Room room) throws RoomNotFoundException, RoomNumberAlreadyExistException;
+//
+//    Room updateBookedDates(Room room) throws RoomNotFoundException;
+//    
+//    Room updateRoomStatus(Room room) throws RoomNotFoundException;
+//    
+//    Room updateIsCheckIn(Room room) throws RoomNotFoundException;
+//    
+//    Room updateRoomType(Room room) throws RoomNotFoundException;
     
-    Room updateRoomStatus(Room room) throws RoomNotFoundException;
+    public Room getLoadedRoom(Room room) throws RoomTypeNotFoundException, RoomNumberAlreadyExistException,RoomNotFoundException;
     
-    Room updateIsCheckIn(Room room) throws RoomNotFoundException;
-    
-    Room updateRoomType(Room room) throws RoomNotFoundException;
+    public Room updateRoom(Room room) throws  RoomTypeNotFoundException, RoomNumberAlreadyExistException, RoomNotFoundException;
     
     boolean deleteRoom(Room room) throws RoomNotFoundException;
 

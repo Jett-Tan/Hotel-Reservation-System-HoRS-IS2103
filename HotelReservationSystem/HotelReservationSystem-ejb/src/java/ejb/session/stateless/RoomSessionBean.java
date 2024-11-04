@@ -34,11 +34,14 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
     @Override
-    public Room createNewRoom(Room room) throws RoomNumberAlreadyExistException {
+    public Room createNewRoom(Room room) throws RoomNumberAlreadyExistException, RoomTypeNotFoundException {
         Query query = em.createQuery("SELECT r FROM Room r WHERE r.roomNumber = :roomNumber")
                 .setParameter("roomNumber", room.getRoomNumber());
         if (query.getFirstResult() == 0) {
             em.persist(room);
+            RoomType roomType = room.getRoomRmType();
+            roomType = roomTypeSessionBeanLocal.getRoomTypeByName(roomType.getName());
+            roomType.addRoom(room);
             em.flush();
             return room;
         }else {
@@ -133,28 +136,50 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
     }
 
     @Override
+    
     public Room updateRoom(Room room) throws RoomNotFoundException, RoomNumberAlreadyExistException, RoomTypeNotFoundException {
-        Room oldRoom = getRoomById(room.getRoomId());
+        Room managedRoom = getRoomById(room.getRoomId());
         try {
-            getRoomByNumber(room.getRoomNumber());
+            Room ifExist = getRoomByNumber(room.getRoomNumber());
+            if(managedRoom.getRoomId() == ifExist.getRoomId()) {
+                managedRoom.setBookedDates(room.getBookedDates());
+                managedRoom.setRoomStatus(room.getRoomStatus());
+                managedRoom.setRoomRmType(room.getRoomRmType());
+                RoomType roomtype = roomTypeSessionBeanLocal.getRoomTypeByName(room.getRoomRmType().getName());
+                for (Room room1 : roomtype.getRooms()) {
+                    if (room1.getRoomId().equals(managedRoom.getRoomId())) {
+                        return managedRoom;
+                    }
+                }
+                roomtype.addRoom(managedRoom);
+                return managedRoom;
+            }
             throw new RoomNumberAlreadyExistException("Room with room number " + room.getRoomNumber() + " already exist!");
         } catch (RoomNotFoundException ex){
-            oldRoom.setRoomNumber(room.getRoomNumber());
+            managedRoom.setRoomNumber(room.getRoomNumber());
+            managedRoom.setBookedDates(room.getBookedDates());
+            managedRoom.setRoomStatus(room.getRoomStatus());
+            managedRoom.setRoomRmType(room.getRoomRmType());
+            RoomType roomtype = roomTypeSessionBeanLocal.getRoomTypeByName(room.getRoomRmType().getName());
+            for (Room room1 : roomtype.getRooms()) {
+                if (room1.getRoomId().equals(managedRoom.getRoomId())) {
+                    return managedRoom;
+                }
+            }
+            roomtype.addRoom(managedRoom);
+            return managedRoom;
         }
         
-        oldRoom.setBookedDates(room.getBookedDates());
-        oldRoom.setRoomStatus(room.getRoomStatus());
-        oldRoom.setRoomRmType(room.getRoomRmType());
-        RoomType roomtype = roomTypeSessionBeanLocal.getRoomTypeByName(room.getRoomRmType().getName());
-        for (Room room1 : roomtype.getRooms()) {
-            if (room1.getRoomId().equals(oldRoom.getRoomId())) {
-                return oldRoom;
-            }
-        }
-        roomtype.addRoom(oldRoom);
-        return oldRoom;
     }
 
+    @Override
+    public Room getLoadedRoom(Room room) throws RoomTypeNotFoundException, RoomNumberAlreadyExistException, RoomNotFoundException {
+        Room oldRoom = getRoomByNumber(room.getRoomNumber());
+        oldRoom.getRoomRmType().getRoomRates();
+        return oldRoom;
+    }
+    
+    
     
 
 }

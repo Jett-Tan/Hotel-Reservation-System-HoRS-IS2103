@@ -9,8 +9,10 @@ import entity.RoomRate;
 import entity.RoomType;
 import enumerations.RoomRateTypeEnum;
 import exception.RoomNotFoundException;
+import exception.RoomRateNotFoundException;
 import exception.RoomTypeNameAlreadyExistException;
 import exception.RoomTypeNotFoundException;
+import java.util.ArrayList;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
@@ -48,7 +50,8 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
             em.flush();
             return roomType;
         } else {
-            throw new RoomTypeNameAlreadyExistException("RoomType with roomType number of " + roomType.getName() + " already exist!");
+            throw new RoomTypeNameAlreadyExistException(
+                    "RoomType with roomType number of " + roomType.getName() + " already exist!");
         }
     }
 
@@ -106,7 +109,8 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
 
     @Override
     public RoomType updateName(RoomType roomType) throws RoomTypeNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     @Override
@@ -159,29 +163,66 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
     }
 
     @Override
-    public RoomType updateRoomType(RoomType roomType) throws RoomTypeNotFoundException, RoomNotFoundException, RoomTypeNameAlreadyExistException {
-        RoomType oldRoomType = getRoomTypeById(roomType.getRoomTypeId());
+    public RoomType updateRoomType(RoomType roomType) throws RoomTypeNotFoundException, RoomNotFoundException,
+            RoomRateNotFoundException, RoomTypeNameAlreadyExistException {
+        RoomType managedRoomType = getRoomTypeById(roomType.getRoomTypeId());
 
         try {
-            getRoomTypeByName(roomType.getName());
-            throw new RoomTypeNameAlreadyExistException("Room type with name of " + roomType.getName() + " already exist!");
+            
+            RoomType ifExist = getRoomTypeByName(roomType.getName());
+            if(managedRoomType.getRoomTypeId() == ifExist.getRoomTypeId()) {
+                managedRoomType.setDescription(roomType.getDescription());
+                managedRoomType.setSize(roomType.getSize());
+                managedRoomType.setBed(roomType.getBed());
+                managedRoomType.setCapacity(roomType.getCapacity());
+                managedRoomType.setAmenities(roomType.getAmenities());
+                managedRoomType.setStatusType(roomType.getStatusType());
+
+                managedRoomType.setRoomRates(roomType.getRoomRates());
+                List<Room> oldRooms = managedRoomType.getRooms();
+
+                oldRooms.forEach(x -> x.setRoomRmType(null));
+                ArrayList<Room> rooms = new ArrayList<>();
+                roomType.getRooms().forEach(x -> rooms.add(x));
+                for (Room room : roomType.getRooms()) {
+                    Room managedRoom = roomSessionBeanLocal.getRoomByNumber(room.getRoomNumber());
+                    managedRoom.setRoomRmType(managedRoomType);
+                    rooms.add(managedRoom);
+                }
+                managedRoomType.setRooms(roomType.getRooms());
+
+                return managedRoomType;
+            }
+            throw new RoomTypeNameAlreadyExistException(
+                    "Room type with name of " + roomType.getName() + " already exist!");
         } catch (RoomTypeNotFoundException ex) {
-            oldRoomType.setName(roomType.getName());
-        }
-        oldRoomType.setDescription(roomType.getDescription());
-        oldRoomType.setSize(roomType.getSize());
-        oldRoomType.setBed(roomType.getBed());
-        oldRoomType.setCapacity(roomType.getCapacity());
-        oldRoomType.setAmenities(roomType.getAmenities());
-        oldRoomType.setStatusType(roomType.getStatusType());
+            managedRoomType.setName(roomType.getName());
+            managedRoomType.setDescription(roomType.getDescription());
+            managedRoomType.setSize(roomType.getSize());
+            managedRoomType.setBed(roomType.getBed());
+            managedRoomType.setCapacity(roomType.getCapacity());
+            managedRoomType.setAmenities(roomType.getAmenities());
+            managedRoomType.setStatusType(roomType.getStatusType());
 
-        List<Room> rooms = roomSessionBeanLocal.getRooms();
-        for (Room room : rooms) {
-//            if(room.getRoomId().equals(roomType.getRooms))
-        }
-        return oldRoomType;
+            managedRoomType.setRoomRates(roomType.getRoomRates());
+            List<Room> oldRooms = managedRoomType.getRooms();
 
-        //List<RoomRate> roomRates;
+            oldRooms.forEach(x -> x.setRoomRmType(null));
+            ArrayList<Room> rooms = new ArrayList<>();
+            roomType.getRooms().forEach(x -> rooms.add(x));
+            for (Room room : roomType.getRooms()) {
+                Room managedRoom = roomSessionBeanLocal.getRoomByNumber(room.getRoomNumber());
+                managedRoom.setRoomRmType(managedRoomType);
+                rooms.add(managedRoom);
+            }
+            managedRoomType.setRooms(roomType.getRooms());
+
+            return managedRoomType;
+        }
+
+        // List<RoomRate> roomRates;
+
+        // List<RoomRate> roomRates;
     }
 
     @Override
@@ -208,7 +249,7 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
                 roomRate = getRoomRate(roomType, RoomRateTypeEnum.PUBLISHED);
                 totalPrice = totalPrice.add(roomRate);
             } else {
-                
+
             }
 
             checkIn.add(Calendar.DATE, 1);
@@ -228,6 +269,15 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
 
     public BigDecimal calculateRoomsAvail(Long id, Date checkInDate, Date checkOutDate) {
         return BigDecimal.ZERO;
+    }
+
+    @Override
+    public RoomType getLoadedRoomType(RoomType roomType) throws RoomTypeNotFoundException,
+            RoomTypeNameAlreadyExistException, RoomNotFoundException, RoomRateNotFoundException {
+        RoomType returnRoomType = getRoomTypeByName(roomType.getName());
+        returnRoomType.getRoomRates().size();
+        returnRoomType.getRooms().size();
+        return returnRoomType;
     }
 
 }

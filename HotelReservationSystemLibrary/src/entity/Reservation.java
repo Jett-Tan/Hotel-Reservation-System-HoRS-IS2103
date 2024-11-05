@@ -63,6 +63,9 @@ public class Reservation implements Serializable {
     @JoinColumn()
     private RoomType roomType;
     
+    @ManyToOne(optional = true, cascade = {}, fetch = FetchType.LAZY)
+    private Guest guest;
+    
     public Long getReservationId() {
         return reservationId;
     }
@@ -201,6 +204,20 @@ public class Reservation implements Serializable {
      */
     public void setNumOfRooms(BigDecimal numOfRooms) {
         this.numOfRooms = numOfRooms;
+    }
+
+    /**
+     * @return the guest
+     */
+    public Guest getGuest() {
+        return guest;
+    }
+
+    /**
+     * @param guest the guest to set
+     */
+    public void setGuest(Guest guest) {
+        this.guest = guest;
     }
 
 }

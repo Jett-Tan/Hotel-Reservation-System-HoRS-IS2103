@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,8 +48,9 @@ public class Guest implements Serializable {
     @Size(min = 10, max = 10)
     private String passportNumber;
     
-    @OneToMany
+    @OneToMany(mappedBy = "guest", cascade = {}, fetch = FetchType.LAZY)
     private List<Reservation> reservationList;
+    
     public Guest() {
     }
 

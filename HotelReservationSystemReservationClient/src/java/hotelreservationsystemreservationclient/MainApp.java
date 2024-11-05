@@ -274,7 +274,7 @@ public class MainApp {
         System.out.println("Reservation Id: " + reservation.getReservationId());
         System.out.println("Start Date: " + dateFormat.format(reservation.getStartDate()));
         System.out.println("End Date: " + dateFormat.format(reservation.getEndDate()));
-        System.out.println("Room Type: " + reservation.getReservationTpy());
+        System.out.println("Room Type: " + reservation.getReservationType());
         System.out.println("Number of Rooms: " + reservation.getNumOfRooms());
         System.out.println("Total Amount: " + reservation.getAmountPerRoom());
         

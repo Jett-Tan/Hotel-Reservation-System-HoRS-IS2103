@@ -55,7 +55,6 @@ public interface RoomTypeSessionBeanRemote {
     //
     // public RoomType updateRoomRates(RoomType roomType) throws
     // RoomTypeNotFoundException;
-
     public RoomType updateRoomType(RoomType roomType) throws RoomTypeNotFoundException,
             RoomTypeNameAlreadyExistException, RoomNotFoundException, RoomRateNotFoundException;
 
@@ -65,9 +64,5 @@ public interface RoomTypeSessionBeanRemote {
     boolean deleteRoomType(RoomType roomType) throws RoomTypeNotFoundException;
 
     boolean deleteRoomTypeById(Long roomTypeId) throws RoomTypeNotFoundException;
-
-    public BigDecimal calculatePrice(Long id, Date checkInDate, Date checkOutDate, Boolean isWalkIn);
-
-    public BigDecimal calculateRoomsAvail(Long id, Date checkInDate, Date checkOutDate);
 
 }

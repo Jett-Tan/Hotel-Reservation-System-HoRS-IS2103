@@ -48,7 +48,7 @@ public class Guest implements Serializable {
     @Size(min = 10, max = 10)
     private String passportNumber;
     
-    @OneToMany(mappedBy = "guest", cascade = {}, fetch = FetchType.LAZY)
+    @OneToMany
     private List<Reservation> reservationList;
     
     public Guest() {

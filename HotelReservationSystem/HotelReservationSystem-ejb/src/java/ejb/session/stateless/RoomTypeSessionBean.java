@@ -225,52 +225,8 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
         // List<RoomRate> roomRates;
     }
 
-    @Override
-    public BigDecimal calculatePrice(Long id, Date checkInDate, Date checkOutDate, Boolean isWalkIn) {
-        RoomType roomType = null;
-        try {
-            roomType = getRoomTypeById(id);
-        } catch (RoomTypeNotFoundException ex) {
-            Logger.getLogger(RoomTypeSessionBean.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        BigDecimal totalPrice = BigDecimal.ZERO;
-        BigDecimal roomRate = BigDecimal.ZERO;
-
-        Calendar checkIn = Calendar.getInstance();
-        checkIn.setTime(checkInDate);
-        Calendar checkOut = Calendar.getInstance();
-        checkOut.setTime(checkInDate);
-
-        while (checkIn.before(checkOut)) {
-            Date date = checkIn.getTime();
-
-            if (isWalkIn) {
-                roomRate = getRoomRate(roomType, RoomRateTypeEnum.PUBLISHED);
-                totalPrice = totalPrice.add(roomRate);
-            } else {
-
-            }
-
-            checkIn.add(Calendar.DATE, 1);
-        }
-
-        return totalPrice;
-    }
-
-    private BigDecimal getRoomRate(RoomType roomType, RoomRateTypeEnum roomRateType) {
-        for (RoomRate roomRate : roomType.getRoomRates()) {
-            if (roomRate.getRateStatus().equals(roomRateType)) {
-                return roomRate.getRate();
-            }
-        }
-        return BigDecimal.ZERO;
-    }
-
-    public BigDecimal calculateRoomsAvail(Long id, Date checkInDate, Date checkOutDate) {
-        return BigDecimal.ZERO;
-    }
-
+    
+    
     @Override
     public RoomType getLoadedRoomType(RoomType roomType) throws RoomTypeNotFoundException,
             RoomTypeNameAlreadyExistException, RoomNotFoundException, RoomRateNotFoundException {

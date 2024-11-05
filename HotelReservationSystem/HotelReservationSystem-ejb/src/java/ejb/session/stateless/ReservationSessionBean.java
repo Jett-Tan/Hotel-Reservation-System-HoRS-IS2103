@@ -13,7 +13,6 @@ import exception.ReservationNotFoundException;
 import exception.RoomNotFoundException;
 import exception.RoomTypeNotFoundException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -23,7 +22,6 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.persistence.TemporalType;
 
 /**
  *
@@ -41,14 +39,16 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
 
+    @Override
     public List<Reservation> retrieveAllMyReservations(Guest guest) {
         long guestId = guest.getGuestId();
         List<Reservation> reservationList = em.createQuery("SELECT r FROM Reservation r WHERE r.guest.guestId = :inGuestId")
                 .setParameter("inGuestId", guestId).getResultList();
-
+        reservationList.forEach(x -> x.getRoomList().size());
         return reservationList;
     }
 
+    @Override
     public Reservation retrieveReservationByReservationId(Guest guest, Long reservationId) {
         long guestId = guest.getGuestId();
         Query query = em.createQuery("SELECT r FROM Reservation r WHERE r.reservationId = :reservationId AND r.guest.guestId = :guestId")
@@ -56,10 +56,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                 .setParameter("guestId", guestId);
         return (Reservation) query.getSingleResult();
     }
-
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
-
+    
     @Override
     public Reservation createNewReservation(Reservation reservation) {
         em.persist(reservation);
@@ -92,9 +89,43 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     public List<Reservation> retrieveAllReservationWithinDates(Date checkInDate, Date checkOutDate, RoomType roomType) {
         Query query =  em.createQuery("SELECT r FROM Reservation r");
         List<Reservation> list =  query.getResultList();
-        list.removeIf(x -> x.getStartDate().after(checkInDate));
-        list.removeIf(x -> x.getEndDate().before(checkOutDate));
+        list.removeIf(x -> {
+            Date temp = x.getStartDate();
+            Date end = x.getEndDate();
+            while(temp.before(end)|| temp.equals(end)) {
+                if((temp.getMonth() == checkInDate.getMonth()&& 
+                    temp.getDate() == checkInDate.getDate() &&
+                    temp.getYear() == checkInDate.getYear() 
+                    ) || (
+                    temp.getMonth() == checkOutDate.getMonth()&& 
+                    temp.getDate() == checkOutDate.getDate() &&
+                    temp.getYear() == checkOutDate.getYear() 
+                        )){
+                    return false;
+                }
+                temp = searchRoomSessionBeanLocal.addDays(temp, 1);
+            }
+            return true;
+        });
+        
         list.removeIf(x -> x.getRoomType().getName() != roomType.getName());
+        System.out.println(list);
+        return list;
+    }
+
+    @Override
+    public Reservation getLoadedReservation(Reservation reservation) throws ReservationNotFoundException{
+        Reservation mReservation = em.find(Reservation.class,reservation.getReservationId());
+        if(mReservation == null) {
+            throw new ReservationNotFoundException("Reservation not found!");
+        }
+        return mReservation;
+    }
+
+    @Override
+    public List<Reservation> retrieveAllReseravtions() {
+        Query query =  em.createQuery("SELECT r FROM Reservation r");
+        List<Reservation> list =  query.getResultList();
         return list;
     }
 }

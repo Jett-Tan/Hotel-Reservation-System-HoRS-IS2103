@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.Guest;
 import exception.GuestNotFoundException;
+import exception.GuestUsernameAlreadyExistException;
 import exception.InvalidDataException;
 import exception.InvalidLoginCredentialsException;
 import java.util.List;
@@ -24,7 +25,7 @@ public interface GuestSessionBeanLocal {
 
     public boolean isUsernameExist(String guestUsername);
 
-    public Guest registerGuest(Guest guest) throws InvalidDataException;
+    public Guest registerGuest(Guest guest) throws InvalidDataException,GuestUsernameAlreadyExistException;
 
     public List<Guest> retrieveAllGuest();
 

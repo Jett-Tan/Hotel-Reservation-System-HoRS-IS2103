@@ -42,17 +42,30 @@ public class Guest implements Serializable {
     @Size(min = 1, max = 32)
     private String password;
     
+    @Column(nullable = false, unique = true, length = 10)
+    @NotNull
+    @Size(min = 10, max = 10)
+    private String passportNumber;
     
     @OneToMany
     private List<Reservation> reservationList;
     public Guest() {
     }
 
-    public Guest(String name, String username, String password, List<Reservation> reservationList) {
+    public Guest(String name, String username, String password, String passportNumber, List<Reservation> reservationList) {
         this.name = name;
         this.username = username;
         this.password = password;
+        this.passportNumber = passportNumber;
         this.reservationList = reservationList;
+    }
+
+    public String getPassportNumber() {
+        return passportNumber;
+    }
+
+    public void setPassportNumber(String passportNumber) {
+        this.passportNumber = passportNumber;
     }
 
     public List<Reservation> getReservationList() {

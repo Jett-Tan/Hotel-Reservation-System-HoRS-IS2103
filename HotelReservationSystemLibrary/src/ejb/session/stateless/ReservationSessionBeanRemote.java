@@ -24,5 +24,6 @@ public interface ReservationSessionBeanRemote {
     public Reservation createNewReservation(Reservation reservation);
     
     public Reservation allocateReservation(Reservation reservation) throws ReservationNotFoundException;
-
+    
+    public List<Reservation> retrieveAllReseravtions();
 }

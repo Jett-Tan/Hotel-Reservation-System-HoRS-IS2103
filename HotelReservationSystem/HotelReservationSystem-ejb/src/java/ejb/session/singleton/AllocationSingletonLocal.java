@@ -4,7 +4,6 @@
  */
 package ejb.session.singleton;
 
-import java.util.Date;
 import javax.ejb.Local;
 
 /**
@@ -12,7 +11,6 @@ import javax.ejb.Local;
  * @author Tan Jian Feng
  */
 @Local
-public interface AllocationSessionBeanRemote {
+public interface AllocationSingletonLocal {
     public void allocateRoom();
-    public void manualAllocateRooms(Date date);
 }

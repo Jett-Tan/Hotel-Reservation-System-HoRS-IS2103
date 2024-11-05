@@ -13,9 +13,10 @@ import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import ejb.session.stateless.SearchRoomSessionBeanRemote;
 import entity.Employee;
-import enumerations.EmployeeTypeEnum;
 import exception.EmployeeNotFoundException;
 import java.util.Scanner;
+import ejb.session.singleton.AllocationSingletonRemote;
+import ejb.session.stateless.AllocationReportSessionBeanRemote;
 
 /**
  *
@@ -28,9 +29,11 @@ public class MainApp {
     private Employee currentEmployee;
     private RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
     private RoomRateSessionBeanRemote roomRateSessionBeanRemote;
-    ReservationSessionBeanRemote reservationSessionBeanRemote;
-    GuestSessionBeanRemote guestSessionBeanRemote;
-    SearchRoomSessionBeanRemote searchRoomSessionBeanRemote;
+    private ReservationSessionBeanRemote reservationSessionBeanRemote;
+    private GuestSessionBeanRemote guestSessionBeanRemote;
+    private SearchRoomSessionBeanRemote searchRoomSessionBeanRemote;
+    private AllocationSingletonRemote allocationSingletonRemote;
+    private AllocationReportSessionBeanRemote allocationReportSessionBeanRemote;
     private Scanner scanner = new Scanner(System.in);
     
     MainApp(
@@ -41,7 +44,9 @@ public class MainApp {
             RoomRateSessionBeanRemote roomRateSessionBeanRemote,
             ReservationSessionBeanRemote reservationSessionBeanRemote,
             GuestSessionBeanRemote guestSessionBeanRemote,
-            SearchRoomSessionBeanRemote searchRoomSessionBeanRemote
+            SearchRoomSessionBeanRemote searchRoomSessionBeanRemote,
+            AllocationSingletonRemote allocationSingletonRemote,
+            AllocationReportSessionBeanRemote allocationReportSessionBeanRemote
     ) {
         this.roomSessionBeanRemote = roomSessionBeanRemote;
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
@@ -51,6 +56,8 @@ public class MainApp {
         this.reservationSessionBeanRemote = reservationSessionBeanRemote;
         this.guestSessionBeanRemote = guestSessionBeanRemote;
         this.searchRoomSessionBeanRemote = searchRoomSessionBeanRemote;
+        this.allocationSingletonRemote = allocationSingletonRemote;
+        this.allocationReportSessionBeanRemote = allocationReportSessionBeanRemote;
     }
 
     void run() {
@@ -103,7 +110,8 @@ public class MainApp {
                                     roomSessionBeanRemote,
                                     reservationSessionBeanRemote,
                                     guestSessionBeanRemote,
-                                    searchRoomSessionBeanRemote
+                                    searchRoomSessionBeanRemote,
+                                    allocationSingletonRemote
                             );
                             app.run();
                             break;
@@ -117,7 +125,8 @@ public class MainApp {
                                     employeeSessionBeanRemote,
                                     currentEmployee,
                                     roomTypeSessionBeanRemote,
-                                    roomRateSessionBeanRemote
+                                    roomRateSessionBeanRemote,
+                                    allocationReportSessionBeanRemote
                             );      app.run();
                             break;
                         }

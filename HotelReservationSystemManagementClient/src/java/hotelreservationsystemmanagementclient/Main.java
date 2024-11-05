@@ -12,7 +12,10 @@ import ejb.session.stateless.RoomRateSessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import ejb.session.stateless.SearchRoomSessionBeanRemote;
+
 import javax.ejb.EJB;
+import ejb.session.singleton.AllocationSingletonRemote;
+import ejb.session.stateless.AllocationReportSessionBeanRemote;
 
 /**
  *
@@ -20,6 +23,12 @@ import javax.ejb.EJB;
  */
 public class Main {
 
+    @EJB(name = "AllocationReportSessionBeanRemote")
+    private static AllocationReportSessionBeanRemote allocationReportSessionBeanRemote;
+
+    @EJB(name = "AllocationSingletonRemote")
+    private static AllocationSingletonRemote allocationSingletonRemote;
+    
     @EJB(name = "ReservationSessionBeanRemote")
     private static ReservationSessionBeanRemote reservationSessionBeanRemote;
     
@@ -44,7 +53,8 @@ public class Main {
     @EJB(name = "EmployeeSessionBeanRemote")
     private static EmployeeSessionBeanRemote employeeSessionBeanRemote;
     
-    
+
+
     /**
      * @param args the command line arguments
      */
@@ -58,7 +68,9 @@ public class Main {
                 roomRateSessionBeanRemote,
                 reservationSessionBeanRemote,
                 guestSessionBeanRemote,
-                searchRoomSessionBeanRemote
+                searchRoomSessionBeanRemote,
+                allocationSingletonRemote,
+                allocationReportSessionBeanRemote
         );
         try{
             app.run();

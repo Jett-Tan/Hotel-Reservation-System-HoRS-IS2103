@@ -7,6 +7,7 @@ package ejb.session.stateless;
 import entity.Guest;
 import entity.Reservation;
 import exception.GuestNotFoundException;
+import exception.GuestUsernameAlreadyExistException;
 import exception.InvalidDataException;
 import exception.InvalidLoginCredentialsException;
 import exception.ReservationNotFoundException;
@@ -46,11 +47,25 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
     public Guest getGuestByUsername(String guestUsername) throws GuestNotFoundException {
         Query query = em.createQuery("SELECT g FROM Guest g WHERE g.username = :userName")
                 .setParameter("userName", guestUsername);
-        Guest guest = (Guest) query.getSingleResult();
-        if (guest == null) {
-            throw new GuestNotFoundException("Guest with username " + guestUsername + " not found!");
+        try {
+            Guest guest = (Guest) query.getSingleResult();
+            guest.getReservationList().size();
+            return guest;
+        } catch (NoResultException ex) {
+            throw new GuestNotFoundException("Guest with username of " + guestUsername + " not found!");
         }
-        return guest;
+    }
+    @Override
+    public Guest getGuestByName(String guestName) throws GuestNotFoundException {
+        Query query = em.createQuery("SELECT g FROM Guest g WHERE g.name = :name")
+                .setParameter("name", guestName);
+        try {
+            Guest guest = (Guest) query.getSingleResult();
+            guest.getReservationList().size();
+            return guest;
+        } catch (NoResultException ex) {
+            throw new GuestNotFoundException("Guest with name of " + guestName + " not found!");
+        }
     }
 
     @Override
@@ -82,7 +97,7 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
     }
 
     @Override
-    public Guest registerGuest(Guest guest) throws InvalidDataException {
+    public Guest registerGuest(Guest guest) throws InvalidDataException, GuestUsernameAlreadyExistException {
         if (isUsernameExist(guest.getUsername())) {
             System.out.println("Duplicate Username!");
         }
@@ -93,9 +108,13 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
         Set<ConstraintViolation<Guest>> errorList = validator.validate(guest);
 
         if (errorList.isEmpty()) {
-            em.persist(guest);
-            em.flush();
-            return guest;
+            if(!isUsernameExist(guest.getUsername())) {
+                em.persist(guest);
+                em.flush();
+                return guest;
+            }else {
+                throw new GuestUsernameAlreadyExistException("Guest with username of " + guest.getUsername() + " already exist!");
+            }
         } else {
             throw new InvalidDataException("Register failed");
         }
@@ -121,5 +140,18 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
         Guest managedGuest = getGuestById(guest.getGuestId());
         managedGuest.getReservationList().add(reservation);
         return managedGuest;
+    }
+
+    @Override
+    public Guest getGuestByPassportNumber(String passportNumber) throws GuestNotFoundException {
+        Query query = em.createQuery("SELECT g FROM Guest g WHERE g.passportNumber = :passportNumber")
+            .setParameter("passportNumber", passportNumber);
+        try {
+            Guest guest = (Guest) query.getSingleResult();
+            guest.getReservationList().size();
+            return guest;
+        } catch (NoResultException ex) {
+            throw new GuestNotFoundException("Guest with passport number of " + passportNumber + " not found!");
+        }
     }
 }

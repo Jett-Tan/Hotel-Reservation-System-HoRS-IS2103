@@ -14,6 +14,7 @@ import entity.Reservation;
 import entity.RoomType;
 import enumerations.ReservationTypeEnum;
 import exception.GuestNotFoundException;
+import exception.GuestUsernameAlreadyExistException;
 import exception.InvalidLoginCredentialsException;
 import exception.RoomTypeNotFoundException;
 import java.math.BigDecimal;
@@ -25,6 +26,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.validation.Validator;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -149,15 +152,20 @@ public class MainApp {
         String username = scanner.nextLine();
         System.out.print("Password >> ");
         String password = scanner.nextLine();
-
+        System.out.print("Passport number >> ");
+        String passportNumber = scanner.nextLine();
         // Create a new Guest object
-        Guest newGuest = new Guest(name, username, password,new ArrayList<>());
+        Guest newGuest = new Guest(name, username, password,passportNumber,new ArrayList<>());
 
         Set<ConstraintViolation<Guest>> errorList = this.validator.validate(newGuest);
 
         if (errorList.isEmpty()) {
-            guestSessionBeanRemote.registerGuest(newGuest);
-            System.out.println("Registration successful! You can now log in as a guest.");
+            try {
+                guestSessionBeanRemote.registerGuest(newGuest);
+                System.out.println("Registration successful! You can now log in as a guest.");
+            } catch (GuestUsernameAlreadyExistException ex) {
+                Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else {
             System.out.println("Registration failed!");
         }
@@ -234,9 +242,9 @@ public class MainApp {
             if (cfmchkout.equals("Y")) {
                 //create new reservation
                 if (isWalkIn) {
-                    Reservation newReservation = new Reservation(totalAmt, checkInDate, checkOutDate, noOfRooms, ReservationTypeEnum.WALK_IN);
+//                    Reservation newReservation = new Reservation(totalAmt, checkInDate, checkOutDate, noOfRooms, ReservationTypeEnum.WALK_IN,);
                 } else {
-                    Reservation newReservation = new Reservation(totalAmt, checkInDate, checkOutDate, noOfRooms, ReservationTypeEnum.ONLINE);
+//                    Reservation newReservation = new Reservation(totalAmt, checkInDate, checkOutDate, noOfRooms, ReservationTypeEnum.ONLINE);
                 }
 
             }

@@ -4,6 +4,7 @@
  */
 package hotelreservationsystemmanagementclient;
 
+import ejb.session.stateless.AllocationReportSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
 import ejb.session.stateless.RoomRateSessionBeanRemote;
@@ -23,6 +24,7 @@ public class HotelOperationModule {
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RoomTypeSessionBeanRemote roomTypeSessionBeanRemote;
     private RoomRateSessionBeanRemote roomRateSessionBeanRemote;
+    private AllocationReportSessionBeanRemote allocationReportSessionBeanRemote;
     private Employee currentEmployee;
     private Scanner scanner = new Scanner(System.in);
 
@@ -32,7 +34,8 @@ public class HotelOperationModule {
             EmployeeSessionBeanRemote employeeSessionBeanRemote, 
             Employee currentEmployee, 
             RoomTypeSessionBeanRemote roomTypeSessionBeanRemote,
-            RoomRateSessionBeanRemote roomRateSessionBeanRemote
+            RoomRateSessionBeanRemote roomRateSessionBeanRemote,
+            AllocationReportSessionBeanRemote allocationReportSessionBeanRemote
     ) {
         this.roomSessionBeanRemote = roomSessionBeanRemote;
         this.partnerSessionBeanRemote = partnerSessionBeanRemote;
@@ -40,6 +43,7 @@ public class HotelOperationModule {
         this.currentEmployee = currentEmployee;
         this.roomTypeSessionBeanRemote = roomTypeSessionBeanRemote;
         this.roomRateSessionBeanRemote = roomRateSessionBeanRemote;
+        this.allocationReportSessionBeanRemote = allocationReportSessionBeanRemote;
     }
     
     public void run() {
@@ -53,7 +57,8 @@ public class HotelOperationModule {
                             employeeSessionBeanRemote,
                             currentEmployee,
                             roomTypeSessionBeanRemote,
-                            roomRateSessionBeanRemote
+                            roomRateSessionBeanRemote,
+                            allocationReportSessionBeanRemote
                     );      app.run();
                         break;
                     }

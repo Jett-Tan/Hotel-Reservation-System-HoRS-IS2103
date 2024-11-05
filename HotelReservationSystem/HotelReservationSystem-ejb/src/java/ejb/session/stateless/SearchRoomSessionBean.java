@@ -116,7 +116,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
     }
     
     @Override
-    public List<Reservation> generateReservation(Date checkInDate,Date checkOutDate) throws RoomNotFoundException {
+    public List<Reservation> generateReservation(Date checkInDate,Date checkOutDate,RoomRateTypeEnum rateType) throws RoomNotFoundException {
         List<Reservation> reservations = new ArrayList<>();
         List<Room> allRooms = roomSessionBeanLocal.getRooms();
         allRooms.removeIf(x -> x.getRoomStatus().equals(RoomStatusEnum.UNAVAILABLE));
@@ -137,15 +137,6 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
             } while (checkin.before(checkout) || checkin.equals(checkout));
             return false;
         });
-//        List<RoomType> allRoomTypes = allRooms.stream().map(x -> x.getRoomRmType()).distinct()
-//                .filter(x -> {
-//                    try {
-//                        return getNumberOfAvailableRoom(checkInDate,checkOutDate,x) > 0;
-//                    } catch (RoomNotFoundException ex) {
-//                        return false;
-//                    }
-//                })
-//                .collect(Collectors.toList());
         List<Room> distinctRooms = new ArrayList<>();
         for(Room room : allRooms) {
             boolean add = true;
@@ -177,8 +168,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
             current.setReservationType(ReservationTypeEnum.WALK_IN);
             current.setRoomType(room.getRoomRmType());
             List<RoomRate> roomRates = room.getRoomRmType().getRoomRates();
-            roomRates.removeIf(x -> !x.getRoomRateType().equals(RoomRateTypeEnum.PUBLISHED));
-//            roomRates.forEach(x -> System.out.println(x.getName()));
+            roomRates.removeIf(x -> !x.getRoomRateType().equals(rateType));
             BigDecimal totalAmount = BigDecimal.ZERO;
             long diffInMillies = Math.abs(checkInDate.getTime() - checkOutDate.getTime());
             long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
@@ -193,4 +183,5 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
         
         return reservations;
     }
+
 }

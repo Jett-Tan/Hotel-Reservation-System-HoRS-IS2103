@@ -37,6 +37,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import ejb.session.singleton.AllocationSingletonRemote;
+import enumerations.RoomRateTypeEnum;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -159,7 +160,7 @@ public class GuestRelationOfficerModule {
         } while (true);
         
         try {
-            List<Reservation> reservations = searchRoomSessionBeanRemote.generateReservation(checkin, checkout);
+            List<Reservation> reservations = searchRoomSessionBeanRemote.generateReservation(checkin, checkout,RoomRateTypeEnum.PUBLISHED);
             if(reservations.size() >0) {
                 do {
                     System.out.println("===============================================================");

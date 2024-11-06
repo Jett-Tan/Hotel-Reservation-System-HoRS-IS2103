@@ -15,6 +15,7 @@ import exception.EmployeeNotFoundException;
 import exception.EmployeeUsernameAlreadyExistException;
 import exception.PartnerNotFoundException;
 import exception.PartnerUsernameAlreadyExistException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -207,7 +208,7 @@ public class SystemAdministrationModule {
                         break;
             }
         }while(option > 2 || option < 1);
-        Partner newPartner = new Partner(firstname,lastname,username,password,employeeType);
+        Partner newPartner = new Partner(firstname,lastname,username,password,employeeType,new ArrayList<>());
         Set<ConstraintViolation<Partner>> errorList = this.validator.validate(newPartner);
         if (errorList.isEmpty()) {
             System.out.println("");

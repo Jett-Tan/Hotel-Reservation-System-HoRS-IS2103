@@ -115,10 +115,14 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
     @Override
     public Reservation getLoadedReservation(Reservation reservation) throws ReservationNotFoundException{
+        // get managed reservation
         Reservation mReservation = em.find(Reservation.class,reservation.getReservationId());
         if(mReservation == null) {
             throw new ReservationNotFoundException("Reservation not found!");
         }
+        // load all the rooms
+        mReservation.getRoomList().size();
+        mReservation.getRoomList().forEach(x -> x.getRoomRmType().getRoomRates().size());
         return mReservation;
     }
 

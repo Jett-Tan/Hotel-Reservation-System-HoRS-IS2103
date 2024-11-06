@@ -149,7 +149,7 @@ public class GuestRelationOfficerModule {
             System.out.print("Enter check out date (dd-MM-yyyy) >> ");
             try {
                 checkout = sdf.parse(scanner.nextLine().trim());
-                if(checkout.after(checkin) || checkout.equals(checkin)){
+                if(checkout.after(checkin)){
                     break;
                 } else {
                     System.out.println("Wrong date input!");
@@ -160,7 +160,9 @@ public class GuestRelationOfficerModule {
         } while (true);
         
         try {
-            List<Reservation> reservations = searchRoomSessionBeanRemote.generateReservation(checkin, checkout,RoomRateTypeEnum.PUBLISHED);
+            List<Reservation> reservations = searchRoomSessionBeanRemote.generateReservationWalkIn(checkin, checkout);
+//            List<Reservation> reservations = searchRoomSessionBeanRemote.generateReservationOnline(checkin, checkout);
+
             if(reservations.size() >0) {
                 do {
                     System.out.println("===============================================================");

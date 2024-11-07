@@ -11,6 +11,7 @@ import ejb.session.stateless.SearchRoomSessionBeanRemote;
 import exception.GuestNotFoundException;
 import exception.InvalidDataException;
 import exception.InvalidLoginCredentialsException;
+import exception.RoomNotFoundException;
 import exception.RoomTypeNotFoundException;
 import java.text.ParseException;
 import javax.ejb.EJB;
@@ -34,7 +35,7 @@ public class Main {
     @EJB(name = "SearchRoomSessionBeanRemote")
     private static SearchRoomSessionBeanRemote searchRoomSessionBeanRemote;
     
-    public static void main(String[] args) throws InvalidDataException, GuestNotFoundException, InvalidLoginCredentialsException, ParseException, RoomTypeNotFoundException {
+    public static void main(String[] args) throws InvalidDataException, GuestNotFoundException, InvalidLoginCredentialsException, ParseException, RoomTypeNotFoundException, RoomNotFoundException {
          MainApp mainApp = new MainApp(roomTypeSessionBeanRemote, reservationSessionBeanRemote, searchRoomSessionBeanRemote, guestSessionBeanRemote);
         mainApp.run();
     }

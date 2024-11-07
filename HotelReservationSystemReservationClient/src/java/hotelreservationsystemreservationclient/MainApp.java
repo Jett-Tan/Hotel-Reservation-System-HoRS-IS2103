@@ -71,7 +71,7 @@ public class MainApp {
 
     }
 
-    public void run() throws InvalidDataException, GuestNotFoundException, InvalidLoginCredentialsException, ParseException, RoomTypeNotFoundException {
+    public void run() throws InvalidDataException, GuestNotFoundException, InvalidLoginCredentialsException, ParseException, RoomTypeNotFoundException, RoomNotFoundException {
         System.out.println("==== Welcome to Hotel Reservation System Client ====");
         int option = 0;
 
@@ -104,7 +104,7 @@ public class MainApp {
             }
 
             while (isLoggedIn) {
-                System.out.println("**** You have successfully logged in. Welcome back " + this.currentGuest.getName() + "! ****\n");
+                System.out.println("**** Welcome back " + this.currentGuest.getName() + "! ****\n");
 
                 System.out.println("Please select an option.");
                 System.out.println("1: Search Hotel Room");
@@ -124,6 +124,8 @@ public class MainApp {
                         break;
                     case 3:
                         doViewAllMyReservations(currentGuest);
+                        System.out.print("Press enter to continue > ");
+                        scanner.nextLine();
                         break;
                     case 4:
                         isLoggedIn = false;
@@ -180,7 +182,7 @@ public class MainApp {
         }
     }
 
-    private void doSearchHotelRoom() throws ParseException, RoomTypeNotFoundException {
+    private void doSearchHotelRoom() throws ParseException, RoomTypeNotFoundException, RoomNotFoundException {
         if (isLoggedIn) {
             doLoggedInSearchRoom();
         } else {
@@ -190,22 +192,22 @@ public class MainApp {
     }
 
     private void doViewMyReservation(Guest currentGuest) {
-        System.out.println("================================================================");
-        System.out.println("==== Welcome to Hotel Reservation System Reservation Client ====");
-        System.out.println("====                 View My Reservations                   ====");
-        System.out.println("================================================================");
         doViewAllMyReservations(currentGuest);
-        System.out.println("Select the reservation id > ");
+        System.out.print("Select the reservation id > ");
         int reservationId = scanner.nextInt();
         scanner.nextLine();
 
         List<Reservation> reservationList = currentGuest.getReservationList();
         Reservation reservation = reservationList.get(reservationId - 1);
 
+        System.out.println("================================================================");
+        System.out.println("==== Welcome to Hotel Reservation System Reservation Client ====");
+        System.out.println("====                  View My Reservation                   ====");
+        System.out.println("================================================================");
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
         System.out.println("Reservation Id: " + reservation.getReservationId());
-        System.out.println("Reservation Type: " + reservation.getReservationType());
-        System.out.println("Room Type: " + reservation.getRoomType());
+        System.out.println("Reservation Type: " + reservation.getReservationType().name());
+        System.out.println("Room Type: " + reservation.getRoomType().getName());
         System.out.println("Number of Rooms: " + reservation.getNumOfRooms());
         System.out.println("Start Date: " + dateFormat.format(reservation.getStartDate()));
         System.out.println("End Date: " + dateFormat.format(reservation.getEndDate()));
@@ -236,11 +238,11 @@ public class MainApp {
         }
         System.out.println();
 
-        System.out.print("Press enter to continue > ");
-        scanner.nextLine();
+//        System.out.print("Press enter to continue > ");
+//        scanner.nextLine();
     }
 
-    private void doWalkInSearchRoom() throws RoomTypeNotFoundException {
+    private void doWalkInSearchRoom() throws RoomTypeNotFoundException, RoomNotFoundException {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         Date checkin, checkout;
         int inputInt;
@@ -279,28 +281,22 @@ public class MainApp {
             }
         } while (true);
 
-        try {
-
-            List<Reservation> reservations = searchRoomSessionBeanRemote.generateReservation(checkin, checkout, RoomRateTypeEnum.PUBLISHED);
-            if (reservations.size() > 0) {
-                do {
-                    System.out.println("===============================================================");
-                    System.out.println(String.format("No.%20s%20s", "Total Amount Per Room", "Room Type"));
-                    for (int i = 1; i < reservations.size() + 1; i++) {
-                        Reservation reservation = reservations.get(i - 1);
-                        System.out.println(String.format("%d.%20s%20s", i, "$ " + reservation.getAmountPerRoom(), reservation.getRoomType().getName()));
-                    }
-                    System.out.println("===============================================================");
-                    System.out.print("Enter >> ");
-                    inputInt = scanner.nextInt();
-                    scanner.nextLine();
-                } while (true);
-            } else {
-                System.out.println("Currently there is not enough rooms");
-            }
-
-        } catch (RoomNotFoundException ex) {
-            System.out.println(ex.getMessage());
+        List<Reservation> reservations = searchRoomSessionBeanRemote.generateReservationWalkIn(checkin, checkout);
+        if (reservations.size() > 0) {
+            do {
+                System.out.println("===============================================================");
+                System.out.println(String.format("No.%20s%20s", "Total Amount Per Room", "Room Type"));
+                for (int i = 1; i < reservations.size() + 1; i++) {
+                    Reservation reservation = reservations.get(i - 1);
+                    System.out.println(String.format("%d.%20s%20s", i, "$ " + reservation.getAmountPerRoom(), reservation.getRoomType().getName()));
+                }
+                System.out.println("===============================================================");
+                System.out.print("Enter >> ");
+                inputInt = scanner.nextInt();
+                scanner.nextLine();
+            } while (true);
+        } else {
+            System.out.println("Currently there is not enough rooms");
         }
     }
 
@@ -344,23 +340,12 @@ public class MainApp {
         } while (true);
 
         try {
-            System.out.print("Enter room type > ");
-            String roomTypeName = scanner.nextLine().trim();
-
-            RoomType roomType = roomTypeSessionBeanRemote.getRoomTypeByName(roomTypeName);
-            RoomRateTypeEnum roomRateType = roomType.getRoomRates();
 
             List<Reservation> reservations = new ArrayList<>();
             if (isWalkIn) {
-                reservations = searchRoomSessionBeanRemote.generateReservation(checkin, checkout, RoomRateTypeEnum.PUBLISHED);
+                reservations = searchRoomSessionBeanRemote.generateReservationWalkIn(checkin, checkout);
             } else {
-                if (roomRateType == RoomRateTypeEnum.PROMOTION && roomType.getStatusType() == RoomStatusEnum.AVAILABLE) {
-                    reservations = searchRoomSessionBeanRemote.generateReservation(checkin, checkout, RoomRateTypeEnum.PROMOTION);
-                } else if (roomRateType == RoomRateTypeEnum.PEAK && roomType.getStatusType() == RoomStatusEnum.AVAILABLE) {
-                    reservations = searchRoomSessionBeanRemote.generateReservation(checkin, checkout, RoomRateTypeEnum.PEAK);
-                } else if (roomRateType == RoomRateTypeEnum.NORMAL && roomType.getStatusType() == RoomStatusEnum.AVAILABLE) {
-                    reservations = searchRoomSessionBeanRemote.generateReservation(checkin, checkout, RoomRateTypeEnum.NORMAL);
-                }
+                reservations = searchRoomSessionBeanRemote.generateReservationOnline(checkin, checkout);
             }
 
             if (reservations.size() > 0) {

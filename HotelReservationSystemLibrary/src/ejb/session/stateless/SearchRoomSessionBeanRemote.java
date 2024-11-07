@@ -7,6 +7,7 @@ package ejb.session.stateless;
 import entity.Reservation;
 import entity.Room;
 import entity.RoomType;
+import enumerations.ReservationTypeEnum;
 import enumerations.RoomRateTypeEnum;
 import exception.RoomNotFoundException;
 import exception.RoomTypeNotFoundException;
@@ -23,6 +24,8 @@ public interface SearchRoomSessionBeanRemote {
     
     public List<Room> searchRooms(Date checkIndate,Date checkOutDate, RoomType roomType) throws RoomNotFoundException, RoomTypeNotFoundException;
     
-    public List<Reservation> generateReservation(Date checkInDate,Date checkOutDate,RoomRateTypeEnum rateType) throws RoomNotFoundException;
+    public List<Reservation> generateReservationWalkIn(Date checkInDate,Date checkOutDate) throws RoomNotFoundException;
     
+    public List<Reservation> generateReservationOnline(Date checkInDate,Date checkOutDate) throws RoomNotFoundException;
+  
 }

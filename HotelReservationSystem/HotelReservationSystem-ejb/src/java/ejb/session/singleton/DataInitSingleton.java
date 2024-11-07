@@ -104,19 +104,19 @@ public class DataInitSingleton {
                 RoomRate roomRate1 = roomRateSessionBeanLocal.createNewRoomRate(
                         new RoomRate("WALKIN-SINGLE",new BigDecimal("100.00"),sdf.parse("10-10-2020"),sdf.parse("10-10-2030"),RoomStatusEnum.AVAILABLE,RoomRateTypeEnum.PUBLISHED));
                 RoomRate roomRate2 = roomRateSessionBeanLocal.createNewRoomRate(
-                        new RoomRate("NORMAL-SINGLE",new BigDecimal("100.00"),sdf.parse("10-10-2020"),sdf.parse("10-10-2030"),RoomStatusEnum.AVAILABLE,RoomRateTypeEnum.NORMAL));
+                        new RoomRate("NORMAL-SINGLE",new BigDecimal("100.00"),sdf.parse("10-10-2025"),sdf.parse("10-10-2025"),RoomStatusEnum.AVAILABLE,RoomRateTypeEnum.NORMAL));
                 RoomRate roomRate3 = roomRateSessionBeanLocal.createNewRoomRate(
-                        new RoomRate("PEAK-SINGLE",new BigDecimal("100.00"),sdf.parse("10-10-2020"),sdf.parse("10-10-2030"),RoomStatusEnum.AVAILABLE,RoomRateTypeEnum.PEAK));
+                        new RoomRate("PEAK-SINGLE",new BigDecimal("200.00"),sdf.parse("01-12-2025"),sdf.parse("01-12-2025"),RoomStatusEnum.AVAILABLE,RoomRateTypeEnum.PEAK));
                 RoomRate roomRate4 = roomRateSessionBeanLocal.createNewRoomRate(
-                        new RoomRate("PROMOTION-SINGLE",new BigDecimal("100.00"),sdf.parse("10-10-2020"),sdf.parse("10-10-2030"),RoomStatusEnum.AVAILABLE,RoomRateTypeEnum.PROMOTION));
+                        new RoomRate("PROMOTION-SINGLE",new BigDecimal("50.00"),sdf.parse("10-10-2025"),sdf.parse("10-10-2025"),RoomStatusEnum.AVAILABLE,RoomRateTypeEnum.PROMOTION));
                 RoomRate roomRate5 = roomRateSessionBeanLocal.createNewRoomRate(
                         new RoomRate("WALKIN-DOUBLE", new BigDecimal("200.00"), sdf.parse("10-10-2020"), sdf.parse("10-10-2030"), RoomStatusEnum.AVAILABLE, RoomRateTypeEnum.PUBLISHED));
                 RoomRate roomRate6 = roomRateSessionBeanLocal.createNewRoomRate(
                         new RoomRate("NORMAL-DOUBLE", new BigDecimal("200.00"), sdf.parse("10-10-2020"), sdf.parse("10-10-2030"), RoomStatusEnum.AVAILABLE, RoomRateTypeEnum.NORMAL));
                 RoomRate roomRate7 = roomRateSessionBeanLocal.createNewRoomRate(
-                        new RoomRate("PEAK-DOUBLE", new BigDecimal("200.00"), sdf.parse("10-10-2020"), sdf.parse("10-10-2030"), RoomStatusEnum.AVAILABLE, RoomRateTypeEnum.PEAK));
+                        new RoomRate("PEAK-DOUBLE", new BigDecimal("400.00"),sdf.parse("01-12-2025"),sdf.parse("01-12-2025"), RoomStatusEnum.AVAILABLE, RoomRateTypeEnum.PEAK));
                 RoomRate roomRate8 = roomRateSessionBeanLocal.createNewRoomRate(
-                        new RoomRate("PROMOTION-DOUBLE", new BigDecimal("200.00"), sdf.parse("10-10-2020"), sdf.parse("10-10-2030"), RoomStatusEnum.AVAILABLE, RoomRateTypeEnum.PROMOTION));
+                        new RoomRate("PROMOTION-DOUBLE", new BigDecimal("100.00"),sdf.parse("10-10-2025"),sdf.parse("10-10-2025"), RoomStatusEnum.AVAILABLE, RoomRateTypeEnum.PROMOTION));
 
                 List<String> anemities = new ArrayList();
                 anemities.add("SOAP");

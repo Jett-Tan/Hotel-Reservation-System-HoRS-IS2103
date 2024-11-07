@@ -1,0 +1,193 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/WebServices/EjbWebService.java to edit this template
+ */
+package ejb.session.ws;
+
+import ejb.session.stateless.PartnerSessionBeanLocal;
+import ejb.session.stateless.ReservationSessionBeanLocal;
+import ejb.session.stateless.RoomRateSessionBeanLocal;
+import ejb.session.stateless.RoomSessionBeanLocal;
+import ejb.session.stateless.RoomTypeSessionBeanLocal;
+import ejb.session.stateless.SearchRoomSessionBeanLocal;
+
+import exception.RoomNotFoundException;
+import exception.PartnerNotFoundException;
+import exception.ReservationNotFoundException;
+import exception.RoomNumberAlreadyExistException;
+import exception.RoomRateNotFoundException;
+
+import entity.RoomRate;
+import entity.Guest;
+import entity.Partner;
+import entity.Reservation;
+import entity.Room;
+import entity.RoomType;
+import enumerations.RoomRateTypeEnum;
+import exception.RoomTypeNotFoundException;
+import java.util.ArrayList;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.jws.WebService;
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+/**
+ *
+ * @author Tan Jian Feng
+ */
+@WebService(serviceName = "HotelReservationWebService")
+@Stateless()
+public class HotelReservationWebService {
+
+    @EJB(name = "SearchRoomSessionBeanLocal")
+    private SearchRoomSessionBeanLocal searchRoomSessionBeanLocal;
+
+    @EJB(name = "PartnerSessionBeanLocal")
+    private PartnerSessionBeanLocal partnerSessionBeanLocal;
+
+    @EJB(name = "ReservationSessionBeanLocal")
+    private ReservationSessionBeanLocal reservationSessionBeanLocal;
+
+    @EJB(name = "RoomTypeSessionBeanLocal")
+    private RoomTypeSessionBeanLocal roomTypeSessionBeanLocal;
+
+    @EJB(name = "RoomRateSessionBeanLocal")
+    private RoomRateSessionBeanLocal roomRateSessionBeanLocal;
+    
+    @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
+    private EntityManager em;
+
+    @EJB(name = "RoomSessionBeanLocal")
+    private RoomSessionBeanLocal roomSessionBeanLocal;
+
+    @WebMethod(operationName = "getPartners")
+    public List<Partner> getPartners() throws PartnerNotFoundException {
+        return partnerSessionBeanLocal.getPartners();
+    }
+
+    @WebMethod(operationName = "getPartnerByUsername")
+    public Partner getPartnerByUsername(@WebParam(name = "partnerUsername") String partnerUsername)
+            throws PartnerNotFoundException {
+        return partnerSessionBeanLocal.getPartnerByUsername(partnerUsername);
+    }
+
+    // RoomRate
+    @WebMethod(operationName = "getRoomRateByName")
+    public RoomRate getRoomRateByName(@WebParam(name = "roomRate") RoomRate roomRate) throws RoomRateNotFoundException {
+        return roomRateSessionBeanLocal.getRoomRateByName(roomRate);
+    }
+
+    @WebMethod(operationName = "getRoomRateById")
+    public RoomRate getRoomRateById(@WebParam(name = "roomRateId") Long roomRateId) throws RoomRateNotFoundException {
+        return roomRateSessionBeanLocal.getRoomRateById(roomRateId);
+    }
+
+    @WebMethod(operationName = "getRoomRates")
+    public List<RoomRate> getRoomRates() throws RoomRateNotFoundException {
+        return roomRateSessionBeanLocal.getRoomRates();
+    }
+
+    // RoomType
+
+    @WebMethod(operationName = "getRoomTypes")
+    public List<RoomType> getRoomTypes() throws RoomTypeNotFoundException {
+        return roomTypeSessionBeanLocal.getRoomTypes();
+    }
+
+    @WebMethod(operationName = "getRoomTypeById")
+    public RoomType getRoomTypeById(@WebParam(name = "roomTypeID") Long roomTypeID) throws RoomTypeNotFoundException {
+        return roomTypeSessionBeanLocal.getRoomTypeById(roomTypeID);
+    }
+
+    @WebMethod(operationName = "getRoomTypeByName")
+    public RoomType getRoomTypeByName(@WebParam(name = "roomTypeName") String roomTypeName)
+            throws RoomTypeNotFoundException {
+        return roomTypeSessionBeanLocal.getRoomTypeByName(roomTypeName);
+    }
+
+    // Room
+    @WebMethod(operationName = "getRooms")
+    public List<Room> getRooms() throws RoomNotFoundException {
+        List<Room> rooms =  roomSessionBeanLocal.getRooms();
+        
+        rooms.forEach(x -> em.detach(x));
+        rooms.forEach(x -> x.getRoomRmType().setRooms(new ArrayList<>()));
+        return rooms;
+    }
+
+    @WebMethod(operationName = "getRoomById")
+    public Room getRoomById(@WebParam(name = "roomID") Long roomID) throws RoomNotFoundException {
+        return roomSessionBeanLocal.getRoomById(roomID);
+    }
+
+    @WebMethod(operationName = "getRoomByNumber")
+    public Room getRoomByNumber(@WebParam(name = "roomNumber") String roomNumber) throws RoomNotFoundException {
+        return roomSessionBeanLocal.getRoomByNumber(roomNumber);
+    }
+
+    @WebMethod(operationName = "updateRoom")
+    public Room updateRoom(@WebParam(name = "room") Room room)
+            throws RoomNotFoundException, RoomNumberAlreadyExistException, RoomTypeNotFoundException {
+        return roomSessionBeanLocal.updateRoom(room);
+    }
+
+    // Reservation
+    @WebMethod(operationName = "retrieveAllMyReservations")
+    public List<Reservation> retrieveAllMyReservations(@WebParam(name = "guest") Guest guest) {
+        return reservationSessionBeanLocal.retrieveAllMyReservations(guest);
+    }
+
+    @WebMethod(operationName = "retrieveReservationByReservationId")
+    public Reservation retrieveReservationByReservationId(@WebParam(name = "guest") Guest guest,
+            @WebParam(name = "reservationId") Long reservationId) {
+        return reservationSessionBeanLocal.retrieveReservationByReservationId(guest, reservationId);
+    }
+
+    @WebMethod(operationName = "retrieveAllReservationWithinDates")
+    public List<Reservation> retrieveAllReservationWithinDates(@WebParam(name = "checkInDate") Date checkInDate,
+            @WebParam(name = "checkOutDate") Date checkOutDate, @WebParam(name = "roomType") RoomType roomType) {
+        return reservationSessionBeanLocal.retrieveAllReservationWithinDates(checkInDate, checkOutDate, roomType);
+    }
+
+    @WebMethod(operationName = "getLoadedReservation")
+    public Reservation getLoadedReservation(@WebParam(name = "reservation") Reservation reservation)
+            throws ReservationNotFoundException {
+        return reservationSessionBeanLocal.getLoadedReservation(reservation);
+    }
+
+    @WebMethod(operationName = "retrieveAllReseravtions")
+    public List<Reservation> retrieveAllReseravtions() {
+        return reservationSessionBeanLocal.retrieveAllReseravtions();
+    }
+
+    // searchRoom
+    @WebMethod(operationName = "searchRooms")
+    public List<Room> searchRooms(@WebParam(name = "checkIndate") Date checkIndate,
+            @WebParam(name = "checkOutDate") Date checkOutDate, @WebParam(name = "roomType") RoomType roomType)
+            throws RoomNotFoundException, RoomTypeNotFoundException {
+        return searchRoomSessionBeanLocal.searchRooms(checkIndate, checkOutDate, roomType);
+    }
+
+    @WebMethod(operationName = "generateReservation")
+    public List<Reservation> generateReservation(@WebParam(name = "checkInDate") Date checkInDate,
+            @WebParam(name = "checkOutDate") Date checkOutDate)
+            throws RoomNotFoundException {
+        return searchRoomSessionBeanLocal.generateReservationOnline(checkInDate, checkOutDate);
+    }
+
+    @WebMethod(operationName = "addDays")
+    public Date addDays(@WebParam(name = "date") Date date, @WebParam(name = "days") int days) {
+        return searchRoomSessionBeanLocal.addDays(date, days);
+    }
+
+    public void persist(Object object) {
+        em.persist(object);
+    }
+}

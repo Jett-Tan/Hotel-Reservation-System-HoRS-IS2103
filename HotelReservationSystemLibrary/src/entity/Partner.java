@@ -6,6 +6,7 @@ package entity;
 
 import enumerations.PartnerEmployeeTypeEnum;
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,6 +14,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -51,26 +53,27 @@ public class Partner implements Serializable {
     @Enumerated(EnumType.STRING)
     @NotNull
     private PartnerEmployeeTypeEnum employeeType;
-
+    
+    @OneToMany
+    private List<Reservation> reservationList;
     public Partner() {
     }
-
-    public Partner(Long PartnerId, String firstName, String lastName, String username, String password, PartnerEmployeeTypeEnum employeeType) {
-        this.PartnerId = PartnerId;
+    
+    public Partner(String firstName, String lastName, String username, String password, PartnerEmployeeTypeEnum employeeType, List<Reservation> reservationList) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.password = password;
         this.employeeType = employeeType;
+        this.reservationList = reservationList;
     }
 
-    
-    public Partner(String firstName, String lastName, String username, String password, PartnerEmployeeTypeEnum employeeType) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.username = username;
-        this.password = password;
-        this.employeeType = employeeType;
+    public List<Reservation> getReservationList() {
+        return reservationList;
+    }
+
+    public void setReservationList(List<Reservation> reservationList) {
+        this.reservationList = reservationList;
     }
 
     public String getFirstName() {

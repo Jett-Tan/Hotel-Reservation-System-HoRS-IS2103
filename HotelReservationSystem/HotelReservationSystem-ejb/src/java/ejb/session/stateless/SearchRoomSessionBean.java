@@ -28,6 +28,7 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -109,14 +110,14 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
         rooms.removeIf(x -> x.getRoomStatus().equals(RoomStatusEnum.UNAVAILABLE));
         List<Reservation> reservations = reservationSessionBeanLocal.retrieveAllReservationWithinDates(checkInDate, checkOutDate,roomType);
         int numOfRooms = reservations.stream().filter(x -> !x.getAllocated()).map(x -> x.getNumOfRooms()).reduce(BigDecimal.ZERO,(x,y)->x.add(y)).intValue();
-        System.out.println(reservations);
-        System.out.println("numofRooms"+numOfRooms);
-        System.out.println("roomSize" + rooms.size());
+//        System.out.println(reservations);
+//        System.out.println("numofRooms"+numOfRooms);
+//        System.out.println("roomSize" + rooms.size());
         return rooms.size() - numOfRooms;
     }
     
     @Override
-    public List<Reservation> generateReservation(Date checkInDate,Date checkOutDate,RoomRateTypeEnum rateType) throws RoomNotFoundException {
+    public List<Reservation> generateReservationWalkIn(Date checkInDate,Date checkOutDate) throws RoomNotFoundException {
         List<Reservation> reservations = new ArrayList<>();
         List<Room> allRooms = roomSessionBeanLocal.getRooms();
         allRooms.removeIf(x -> x.getRoomStatus().equals(RoomStatusEnum.UNAVAILABLE));
@@ -158,7 +159,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
                 return true;
             }
         });
-        System.out.println("Distinct Rooms" + distinctRooms);
+        
         for(Room room : distinctRooms) {
             Reservation current = new Reservation();
             current.setStartDate(checkInDate);
@@ -168,11 +169,11 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
             current.setReservationType(ReservationTypeEnum.WALK_IN);
             current.setRoomType(room.getRoomRmType());
             List<RoomRate> roomRates = room.getRoomRmType().getRoomRates();
-            roomRates.removeIf(x -> !x.getRoomRateType().equals(rateType));
+            roomRates.removeIf(x -> !x.getRoomRateType().equals(RoomRateTypeEnum.PUBLISHED));
             BigDecimal totalAmount = BigDecimal.ZERO;
             long diffInMillies = Math.abs(checkInDate.getTime() - checkOutDate.getTime());
             long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-            BigDecimal numOfDays = new BigDecimal(diff+1);
+            BigDecimal numOfDays = new BigDecimal(diff);
             for(RoomRate x : roomRates) {
                 totalAmount = totalAmount.add(x.getRate().multiply(numOfDays));
             }
@@ -183,5 +184,111 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
         
         return reservations;
     }
+
+    @Override
+    public List<Reservation> generateReservationOnline(Date checkInDate, Date checkOutDate) throws RoomNotFoundException {
+        List<Reservation> reservations = new ArrayList<>();
+        List<Room> allRooms = roomSessionBeanLocal.getRooms();
+        allRooms.removeIf(x -> x.getRoomStatus().equals(RoomStatusEnum.UNAVAILABLE));
+        allRooms.removeIf(x -> {
+//            boolean free = false;
+            List<Date> bookedDates = x.getBookedDates();
+            Date checkin = checkInDate;
+            Date checkout = checkOutDate;
+            do {
+                for(Date bookedDate : bookedDates) {
+                    if(bookedDate.getYear() == (checkin.getYear()) &&
+                       bookedDate.getMonth()== (checkin.getMonth()) &&
+                       bookedDate.getDate()== (checkin.getDate()) ) {
+                        return true;
+                    }
+                }
+                checkin = addDays(checkin,1);
+            } while (checkin.before(checkout) || checkin.equals(checkout));
+            return false;
+        });
+        List<Room> distinctRooms = new ArrayList<>();
+        for(Room room : allRooms) {
+            boolean add = true;
+            for(Room distinctRoom : distinctRooms) {
+                if (room.getRoomRmType().equals(distinctRoom.getRoomRmType())) {
+                    add = false;
+                    break;
+                }
+            }
+            if(add) {
+                distinctRooms.add(room);
+            }            
+        }
+        
+        distinctRooms.removeIf(x -> {
+            try {
+                return !(getNumberOfAvailableRoom(checkInDate,checkOutDate,x.getRoomRmType()) > 0);
+            } catch (RoomNotFoundException ex) {
+                return true;
+            }
+        });
+        
+        for(Room room : distinctRooms) {
+            Reservation current = new Reservation();
+            current.setStartDate(checkInDate);
+            current.setEndDate(checkOutDate);
+            current.setNumOfRooms(new BigDecimal(getNumberOfAvailableRoom(checkInDate,checkOutDate,room.getRoomRmType())));
+            current.setAllocated(Boolean.FALSE);
+            current.setReservationType(ReservationTypeEnum.ONLINE);
+            current.setRoomType(room.getRoomRmType());
+            List<RoomRate> roomRates = room.getRoomRmType().getRoomRates();
+            roomRates.removeIf(x -> x.getRoomRateType().equals(RoomRateTypeEnum.PUBLISHED));
+            BigDecimal totalAmount = BigDecimal.ZERO;
+            Date tempDate = checkInDate;
+            System.out.println(roomRates);
+            do {
+//                System.out.println("Looking at " + tempDate);
+                RoomRate selectedRoomRate;
+                if(roomRates.size() > 0) {
+                    selectedRoomRate = roomRates.get(0);
+                    for(RoomRate roomRate: roomRates) {
+                        if(((tempDate.getYear() == roomRate.getEndDate().getYear() &&
+                            tempDate.getMonth()== roomRate.getEndDate().getMonth() &&
+                            tempDate.getDate()== roomRate.getEndDate().getDate()) 
+                            || tempDate.before(roomRate.getEndDate())
+                            )&& 
+                            ((tempDate.getYear() == roomRate.getStartDate().getYear() &&
+                                tempDate.getMonth()== roomRate.getStartDate().getMonth() &&
+                                tempDate.getDate()== roomRate.getStartDate().getDate()) 
+                                || tempDate.after(roomRate.getStartDate())
+                            )){
+//                            System.out.println("Current looking at " + roomRate);
+                                switch (roomRate.getRoomRateType()){
+                                    case NORMAL:
+                                        if (!selectedRoomRate.getRoomRateType().equals(RoomRateTypeEnum.PROMOTION)) {
+                                            if (!selectedRoomRate.getRoomRateType().equals(RoomRateTypeEnum.PEAK)) {
+                                                selectedRoomRate = roomRate;
+                                            }
+                                        }
+                                        break;
+                                    case PEAK: 
+                                        if (!selectedRoomRate.getRoomRateType().equals(RoomRateTypeEnum.PROMOTION)) {
+                                            selectedRoomRate = roomRate;
+                                        }
+                                        break;
+                                    case PROMOTION: 
+                                        selectedRoomRate = roomRate;
+                                        break;
+                                } 
+                        }
+                    }
+                    System.out.println(selectedRoomRate);
+                    totalAmount = totalAmount.add(selectedRoomRate.getRate());
+                }
+                tempDate = addDays(tempDate,1);
+            } while (tempDate.before(checkOutDate));
+            current.setAmountPerRoom(totalAmount);
+            reservations.add(current);
+        }
+        
+        return reservations;
+    }
+
 
 }

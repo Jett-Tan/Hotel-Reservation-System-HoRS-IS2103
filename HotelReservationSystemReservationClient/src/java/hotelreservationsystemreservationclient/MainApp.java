@@ -175,6 +175,7 @@ public class MainApp {
                 guestSessionBeanRemote.registerGuest(newGuest);
                 System.out.println("Registration successful! You can now log in as a guest.");
             } catch (GuestUsernameAlreadyExistException ex) {
+                System.out.println("Registration failed! The username '" + username + "' is already taken. Please choose a different username.");
                 Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
@@ -192,12 +193,18 @@ public class MainApp {
     }
 
     private void doViewMyReservation(Guest currentGuest) {
+        List<Reservation> reservationList = currentGuest.getReservationList();
+        if (reservationList == null || reservationList.isEmpty()) {
+            System.out.println("You currently have no reservations.");
+            System.out.println();
+            return;
+        }
+        
         doViewAllMyReservations(currentGuest);
         System.out.print("Select the reservation id > ");
         int reservationId = scanner.nextInt();
         scanner.nextLine();
 
-        List<Reservation> reservationList = currentGuest.getReservationList();
         Reservation reservation = reservationList.get(reservationId - 1);
 
         System.out.println("================================================================");
@@ -225,6 +232,12 @@ public class MainApp {
 
         List<Reservation> reservationList = currentGuest.getReservationList();
 
+        if (reservationList == null || reservationList.isEmpty()) {
+            System.out.println("You currently have no reservations.");
+            System.out.println();
+            return;
+        }
+        
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
 
         System.out.println("Id    Reservation Start Date   Reservation End Date    Total Amount");
@@ -234,12 +247,9 @@ public class MainApp {
                     + dateFormat.format(reservation.getStartDate()) + "      "
                     + dateFormat.format(reservation.getEndDate()) + "      "
                     + reservation.getAmountPerRoom());
-
         }
         System.out.println();
 
-//        System.out.print("Press enter to continue > ");
-//        scanner.nextLine();
     }
 
     private void doWalkInSearchRoom() throws RoomTypeNotFoundException, RoomNotFoundException {
@@ -281,7 +291,7 @@ public class MainApp {
             }
         } while (true);
 
-        List<Reservation> reservations = searchRoomSessionBeanRemote.generateReservationWalkIn(checkin, checkout);
+        List<Reservation> reservations = searchRoomSessionBeanRemote.generateReservationOnline(checkin, checkout);
         if (reservations.size() > 0) {
             do {
                 System.out.println("===============================================================");
@@ -292,8 +302,8 @@ public class MainApp {
                 }
                 System.out.println("===============================================================");
                 System.out.print("Enter >> ");
-                inputInt = scanner.nextInt();
                 scanner.nextLine();
+                break;
             } while (true);
         } else {
             System.out.println("Currently there is not enough rooms");

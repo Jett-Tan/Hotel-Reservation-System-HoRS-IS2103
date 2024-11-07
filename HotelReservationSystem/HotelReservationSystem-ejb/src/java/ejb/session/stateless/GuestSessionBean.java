@@ -87,6 +87,7 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
         try {
             Guest guest = getGuestByUsername(username);
             if (guest.getPassword().equals(password)) {
+                guest.getReservationList().size();
                 return guest;
             } else {
                 throw new InvalidLoginCredentialsException("You have entered the wrong password!");
@@ -131,6 +132,7 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
 
         return guestList;
     }
+    
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
@@ -139,6 +141,7 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
     public Guest addReservation(Guest guest,Reservation reservation) throws GuestNotFoundException, ReservationNotFoundException {
         Guest managedGuest = getGuestById(guest.getGuestId());
         managedGuest.getReservationList().add(reservation);
+        managedGuest.getReservationList().size();
         return managedGuest;
     }
 

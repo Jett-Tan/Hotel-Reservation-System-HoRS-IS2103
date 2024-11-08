@@ -197,5 +197,12 @@ public class HotelReservationWebService {
     public Reservation createNewReservation(@WebParam(name = "reservation") Reservation reservation) {
         return reservationSessionBeanLocal.createNewReservation(reservation);
     }
-    
+    @WebMethod(operationName = "addReservation")
+    public Partner addReservation(@WebParam(name = "partner") Partner partner, @WebParam(name = "reservation") Reservation reservation) throws PartnerNotFoundException, ReservationNotFoundException {
+        partner = partnerSessionBeanLocal.getPartnerByUsername(partner.getUsername());
+        reservation = reservationSessionBeanLocal.getLoadedReservation(reservation);
+        partner.getReservationList().add(reservation);
+        partner.getReservationList().size();
+        return partner;
+    }
 }

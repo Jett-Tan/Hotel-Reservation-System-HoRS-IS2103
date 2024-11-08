@@ -28,4 +28,9 @@ public interface ReservationSessionBeanLocal {
     public Reservation getLoadedReservation(Reservation reservation) throws ReservationNotFoundException;
     
     public List<Reservation> retrieveAllReseravtions();
+    
+    public Reservation createNewReservation(Reservation reservation);
+    
+    public Reservation allocateReservation(Reservation reservation) throws ReservationNotFoundException;
+    
 }

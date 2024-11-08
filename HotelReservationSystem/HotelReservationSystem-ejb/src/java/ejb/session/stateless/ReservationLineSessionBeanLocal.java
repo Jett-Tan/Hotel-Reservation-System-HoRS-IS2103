@@ -4,6 +4,10 @@
  */
 package ejb.session.stateless;
 
+import entity.Guest;
+import entity.Reservation;
+import exception.ReservationNotFoundException;
+import java.util.List;
 import javax.ejb.Local;
 
 /**

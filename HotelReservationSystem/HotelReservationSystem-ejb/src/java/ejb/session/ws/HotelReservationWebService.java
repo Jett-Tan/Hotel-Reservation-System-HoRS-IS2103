@@ -4,6 +4,7 @@
  */
 package ejb.session.ws;
 
+import ejb.session.stateless.GuestSessionBeanLocal;
 import ejb.session.stateless.PartnerSessionBeanLocal;
 import ejb.session.stateless.ReservationSessionBeanLocal;
 import ejb.session.stateless.RoomRateSessionBeanLocal;
@@ -24,6 +25,8 @@ import entity.Reservation;
 import entity.Room;
 import entity.RoomType;
 import enumerations.RoomRateTypeEnum;
+import exception.GuestNotFoundException;
+import exception.InvalidLoginCredentialsException;
 import exception.RoomTypeNotFoundException;
 import java.util.ArrayList;
 
@@ -45,6 +48,9 @@ import javax.persistence.PersistenceContext;
 @WebService(serviceName = "HotelReservationWebService")
 @Stateless()
 public class HotelReservationWebService {
+
+    @EJB(name = "GuestSessionBeanLocal")
+    private GuestSessionBeanLocal guestSessionBeanLocal;
 
     @EJB(name = "SearchRoomSessionBeanLocal")
     private SearchRoomSessionBeanLocal searchRoomSessionBeanLocal;
@@ -182,12 +188,14 @@ public class HotelReservationWebService {
         return searchRoomSessionBeanLocal.generateReservationOnline(checkInDate, checkOutDate);
     }
 
-    @WebMethod(operationName = "addDays")
-    public Date addDays(@WebParam(name = "date") Date date, @WebParam(name = "days") int days) {
-        return searchRoomSessionBeanLocal.addDays(date, days);
+    @WebMethod(operationName = "loginGuest")
+    public Guest loginGuest(@WebParam(name = "username") String username, @WebParam(name = "password") String password) throws GuestNotFoundException, InvalidLoginCredentialsException {
+        return guestSessionBeanLocal.loginGuest(username, password);
     }
-
-    public void persist(Object object) {
-        em.persist(object);
+    
+    @WebMethod(operationName = "createNewReservation")
+    public Reservation createNewReservation(@WebParam(name = "reservation") Reservation reservation) {
+        return reservationSessionBeanLocal.createNewReservation(reservation);
     }
+    
 }

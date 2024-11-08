@@ -4,28 +4,22 @@
  */
 package hotelreservationsystemclient;
 
-import exception.GuestNotFoundException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.validation.ConstraintViolation;
+
 import javax.validation.Validation;
-import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
-
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.validation.Validator;
+
+import ejb.session.ws.HotelReservationWebService;
 
 /**
  *
@@ -106,8 +100,8 @@ public class PartnerModule {
 
     private void doSearchRoom() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        Date checkin, checkout;
-        RoomType roomType = new RoomType();
+        Date checkin1,checkout1;
+        RoomType roomType = new RoomType(); 
         int inputInt;
         System.out.println("===============================================================");
         System.out.println("==== Welcome to Hotel Reservation System Management Client ====");
@@ -117,11 +111,11 @@ public class PartnerModule {
         do {
             System.out.print("Enter check in date (dd-MM-yyyy) >> ");
             try {
-                checkin = sdf.parse(scanner.nextLine().trim());
-                if (checkin.after(today)
-                        || (checkin.getDate() == today.getDate()
-                        && checkin.getYear() == today.getYear()
-                        && checkin.getMonth() == today.getMonth())) {
+                checkin1 = sdf.parse(scanner.nextLine().trim());
+                if(checkin1.after(today)||
+                            (checkin1.getDate() == today.getDate() &&
+                            checkin1.getYear() == today.getYear()&& 
+                            checkin1.getMonth()== today.getMonth()) ){
                     break;
                 } else {
                     System.out.println("Wrong date input!");
@@ -133,8 +127,8 @@ public class PartnerModule {
         do {
             System.out.print("Enter check out date (dd-MM-yyyy) >> ");
             try {
-                checkout = sdf.parse(scanner.nextLine().trim());
-                if (checkout.after(checkin)) {
+                checkout1 = sdf.parse(scanner.nextLine().trim());
+                if(checkout1.after(checkin1)){
                     break;
                 } else {
                     System.out.println("Wrong date input!");
@@ -143,18 +137,18 @@ public class PartnerModule {
                 System.out.println("Wrong date format!");
             }
         } while (true);
-        XMLGregorianCalendar xmlCheckInDate = null;
-        XMLGregorianCalendar xmlCheckOutDate = null;
+        XMLGregorianCalendar checkInDate = null;
+        XMLGregorianCalendar checkOutDate = null;
         GregorianCalendar gcIn = new GregorianCalendar();
         GregorianCalendar gcOut = new GregorianCalendar();
-        gcIn.setTime(checkin);
-        gcOut.setTime(checkout);
+        gcIn.setTime(checkin1);
+        gcOut.setTime(checkout1);
         try {
-            xmlCheckOutDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcOut);
-            xmlCheckInDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcIn);
-            List<Reservation> reservations = this.hotelReservationWebService.generateReservation(xmlCheckInDate, xmlCheckOutDate);
-
-            if (reservations.size() > 0) {
+            checkOutDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcOut);
+            checkInDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcIn);
+            List<Reservation> reservations = this.hotelReservationWebService.generateReservation(checkInDate, checkOutDate);
+            
+            if(reservations.size() >0) {
                 do {
                     System.out.println("===============================================================");
                     System.out.println(String.format("No.%20s%20s", "Total Amount Per Room", "Room Type"));
@@ -166,9 +160,8 @@ public class PartnerModule {
                     System.out.print("Enter >> ");
                     inputInt = scanner.nextInt();
                     scanner.nextLine();
-
-                    if (inputInt > 0 && inputInt < reservations.size() + 1) {
-                        do {
+                    if (inputInt > 0 && inputInt < reservations.size()+1 && this.currentPartner.getEmployeeType().equals(PartnerEmployeeTypeEnum.MANAGER)) {
+                        do{
                             Reservation reservation = reservations.get(inputInt - 1);
                             System.out.println("1. Create reservation");
                             System.out.println("2. Exit");
@@ -183,6 +176,8 @@ public class PartnerModule {
                             }
 
                         } while (true);
+                        break;
+                    }else if(this.currentPartner.getEmployeeType().equals(PartnerEmployeeTypeEnum.EMPLOYEE)){
                         break;
                     }
                 } while (true);
@@ -237,33 +232,38 @@ public class PartnerModule {
                 reservation.setNumOfRooms(new BigDecimal(inputInt));
                 break;
             }
-        } while (true);
-
-        //Set<ConstraintViolation<Reservation>> errorList = this.validator.validate(reservation);
-        //if (errorList.isEmpty()) {
-        boolean continueWith = true;
-        do {
-            System.out.println("Total amount: " + reservation.getNumOfRooms().multiply(reservation.getAmountPerRoom()));
-            System.out.print("Enter confirmation (Y/N): ");
-            input = scanner.nextLine().trim();
-            if ("Y".equalsIgnoreCase(input)) {
-                reservation = this.hotelReservationWebService.createNewReservation(reservation);
-                break;
-            } else if ("N".equalsIgnoreCase(input)) {
-                continueWith = false;
-                break;
+        } while(true);
+        
+//        Set<ConstraintViolation<Reservation>> errorList = this.validator.validate(reservation);
+//        if (errorList.isEmpty()) {
+            boolean continueWith = true;
+            do {
+                System.out.println("Total amount: "+ reservation.getNumOfRooms().multiply(reservation.getAmountPerRoom()));
+                System.out.print("Enter confirmation (Y/N): ");
+                input = scanner.nextLine().trim();
+                if("Y".equalsIgnoreCase(input)){
+                    try {
+                        reservation = this.hotelReservationWebService.createNewReservation(reservation);
+                    } catch (RoomTypeNotFoundException_Exception ex) {
+                        System.out.println(ex.getMessage());
+                        continueWith = false;
+                    }
+                    break;
+                } else if ("N".equalsIgnoreCase(input)){
+                    continueWith = false;
+                    break;
+                }                        
+            } while(true);
+            if(continueWith) {
+                try {
+                    currentPartner = this.hotelReservationWebService.addReservation(this.currentPartner, reservation);
+                    System.out.println("Successfully create reservation!"); 
+                } catch (PartnerNotFoundException_Exception | ReservationNotFoundException_Exception ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }else {
+                System.out.println("CANCELLED");
             }
-        } while (true);
-        if (continueWith) {
-            try {
-                currentPartner = this.hotelReservationWebService.addReservation(this.currentPartner, reservation);
-                System.out.println("Successfully create reservation!");
-            } catch (PartnerNotFoundException_Exception | ReservationNotFoundException_Exception ex) {
-                System.out.println(ex.getMessage());
-            }
-        } else {
-            System.out.println("CANCELLED");
-        }
 //        } else {
 //            System.out.println("");
 //            System.out.println("===============================================================");

@@ -380,6 +380,18 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="retrieveAllMyReservations">
+<xs:sequence>
+<xs:element name="guest" type="tns:guest" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveAllMyReservationsResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:reservation" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="getLoadedReservation">
 <xs:sequence>
 <xs:element name="reservation" type="tns:reservation" minOccurs="0"/>

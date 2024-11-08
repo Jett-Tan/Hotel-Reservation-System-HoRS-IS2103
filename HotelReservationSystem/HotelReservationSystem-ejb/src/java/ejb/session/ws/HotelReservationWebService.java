@@ -66,7 +66,7 @@ public class HotelReservationWebService {
 
     @EJB(name = "RoomRateSessionBeanLocal")
     private RoomRateSessionBeanLocal roomRateSessionBeanLocal;
-    
+
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
 
@@ -101,7 +101,6 @@ public class HotelReservationWebService {
     }
 
     // RoomType
-
     @WebMethod(operationName = "getRoomTypes")
     public List<RoomType> getRoomTypes() throws RoomTypeNotFoundException {
         return roomTypeSessionBeanLocal.getRoomTypes();
@@ -121,8 +120,8 @@ public class HotelReservationWebService {
     // Room
     @WebMethod(operationName = "getRooms")
     public List<Room> getRooms() throws RoomNotFoundException {
-        List<Room> rooms =  roomSessionBeanLocal.getRooms();
-        
+        List<Room> rooms = roomSessionBeanLocal.getRooms();
+
         rooms.forEach(x -> em.detach(x));
         rooms.forEach(x -> x.getRoomRmType().setRooms(new ArrayList<>()));
         return rooms;
@@ -145,9 +144,9 @@ public class HotelReservationWebService {
     }
 
     // Reservation
-    @WebMethod(operationName = "retrieveAllMyReservations")
-    public List<Reservation> retrieveAllMyReservations(@WebParam(name = "guest") Guest guest) {
-        return reservationSessionBeanLocal.retrieveAllMyReservations(guest);
+    @WebMethod(operationName = "retrieveAllPartnerReservations")
+    public List<Reservation> retrieveAllPartnerReservations(@WebParam(name = "partner") Partner partner) throws ReservationNotFoundException{
+        return reservationSessionBeanLocal.retrieveAllPartnerReservations(partner);
     }
 
     @WebMethod(operationName = "retrieveReservationByReservationId")
@@ -185,18 +184,29 @@ public class HotelReservationWebService {
     public List<Reservation> generateReservation(@WebParam(name = "checkInDate") Date checkInDate,
             @WebParam(name = "checkOutDate") Date checkOutDate)
             throws RoomNotFoundException {
-        return searchRoomSessionBeanLocal.generateReservationOnline(checkInDate, checkOutDate);
+        List<Reservation> reservations = searchRoomSessionBeanLocal.generateReservationOnline(checkInDate, checkOutDate);
+        for (Reservation r : reservations) {
+            em.detach(r);
+            r.getRoomList().forEach(x -> {
+                em.detach(x);
+                x.setRoomRmType(null);
+            });
+            em.detach(r.getRoomType());
+            r.getRoomType().setRooms(new ArrayList<>());
+        }
+        return reservations;
     }
 
     @WebMethod(operationName = "loginGuest")
     public Guest loginGuest(@WebParam(name = "username") String username, @WebParam(name = "password") String password) throws GuestNotFoundException, InvalidLoginCredentialsException {
         return guestSessionBeanLocal.loginGuest(username, password);
     }
-    
+
     @WebMethod(operationName = "createNewReservation")
     public Reservation createNewReservation(@WebParam(name = "reservation") Reservation reservation) {
         return reservationSessionBeanLocal.createNewReservation(reservation);
     }
+
     @WebMethod(operationName = "addReservation")
     public Partner addReservation(@WebParam(name = "partner") Partner partner, @WebParam(name = "reservation") Reservation reservation) throws PartnerNotFoundException, ReservationNotFoundException {
         partner = partnerSessionBeanLocal.getPartnerByUsername(partner.getUsername());

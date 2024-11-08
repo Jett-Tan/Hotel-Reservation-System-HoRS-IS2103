@@ -176,7 +176,6 @@ public class MainApp {
                 System.out.println("Registration successful! You can now log in as a guest.");
             } catch (GuestUsernameAlreadyExistException ex) {
                 System.out.println("Registration failed! The username '" + username + "' is already taken. Please choose a different username.");
-                Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
             System.out.println("Registration failed!");

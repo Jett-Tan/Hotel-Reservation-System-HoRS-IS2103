@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.AllocationReport;
 import entity.Guest;
+import entity.Partner;
 import entity.Reservation;
 import entity.Room;
 import entity.RoomType;
@@ -44,6 +45,15 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         long guestId = guest.getGuestId();
         List<Reservation> reservationList = em.createQuery("SELECT r FROM Reservation r WHERE r.guest.guestId = :inGuestId")
                 .setParameter("inGuestId", guestId).getResultList();
+        reservationList.forEach(x -> x.getRoomList().size());
+        return reservationList;
+    }
+    
+    @Override
+    public List<Reservation> retrieveAllPartnerReservations(Partner partner) {
+        long partnerId = partner.getPartnerId();
+        List<Reservation> reservationList = em.createQuery("SELECT r FROM Reservation r WHERE r.partner.partnerId = :inPartnerId")
+                .setParameter("inPartnerId", partnerId).getResultList();
         reservationList.forEach(x -> x.getRoomList().size());
         return reservationList;
     }

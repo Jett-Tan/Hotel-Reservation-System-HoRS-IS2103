@@ -149,7 +149,7 @@ public class PartnerModule {
         try {
             xmlCheckOutDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcOut);
             xmlCheckInDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcIn);
-            List<Reservation> reservations = this.hotelReservationWebService.generateReservation(xmlCheckInDate, xmlCheckOutDate, RoomRateTypeEnum.PEAK);
+            List<Reservation> reservations = this.hotelReservationWebService.generateReservation(xmlCheckInDate, xmlCheckOutDate);
             
             if(reservations.size() >0) {
                 do {
@@ -211,64 +211,39 @@ public class PartnerModule {
                 break;
             }
         } while(true);
-        Guest guest = new Guest();
-        String name,username,password,passportNumber;
-        boolean continueOn = false;
-        do {
-            System.out.println("1. Registered guest");
-            System.out.print("Enter >> ");
-            inputInt = scanner.nextInt();
-            scanner.nextLine();
-            if(inputInt == 1) {
-                System.out.print("Enter username >> ");
-                username = scanner.nextLine().trim();
-                System.out.print("Enter password >> ");
-                password = scanner.nextLine().trim();
+        
+        Set<ConstraintViolation<Reservation>> errorList = this.validator.validate(reservation);
+        if (errorList.isEmpty()) {
+            boolean continueWith = true;
+            do {
+                System.out.println("Total amount: "+ reservation.getNumOfRooms().multiply(reservation.getAmountPerRoom()));
+                System.out.print("Enter confirmation (Y/N): ");
+                input = scanner.nextLine().trim();
+                if("Y".equalsIgnoreCase(input)){
+                    reservation = this.hotelReservationWebService.createNewReservation(reservation);
+                    break;
+                } else if ("N".equalsIgnoreCase(input)){
+                    continueWith = false;
+                    break;
+                }                        
+            } while(true);
+            if(continueWith) {
                 try {
-                    guest = this.hotelReservationWebService.loginGuest(username, password);
-                    continueOn = true;
-                    break;
-                } catch (InvalidLoginCredentialsException ex) {
-                    System.out.println("Invalid Credentials");
-                } catch (GuestNotFoundException ex) {
-                    System.out.println("Guest not found");
+                    currentPartner = this.hotelReservationWebService.addReservation(this.currentPartner, reservation);
+                    System.out.println("Successfully create reservation!"); 
+                } catch (PartnerNotFoundException_Exception | ReservationNotFoundException_Exception ex) {
+                    System.out.println(ex.getMessage());
                 }
+            }else {
+                System.out.println("CANCELLED");
             }
-            if (continueOn) {
-                Set<ConstraintViolation<Reservation>> errorList = this.validator.validate(reservation);
-                if (errorList.isEmpty()) {
-                    boolean continueWith = true;
-                    do {
-                        System.out.println("Total amount: "+ reservation.getNumOfRooms().multiply(reservation.getAmountPerRoom()));
-                        System.out.print("Enter confirmation (Y/N): ");
-                        input = scanner.nextLine().trim();
-                        if("Y".equalsIgnoreCase(input)){
-                            reservation = reservationSessionBeanRemote.createNewReservation(reservation);
-                            break;
-                        } else if ("N".equalsIgnoreCase(input)){
-                            continueWith = false;
-                            break;
-                        }                        
-                    } while(true);
-                    if(continueWith) {
-                        guest = guestSessionBeanRemote.addReservation(guest, reservation);
-                        System.out.println("Successfully create reservation!"); 
-                        break;
-                    }else {
-                        System.out.println("CANCELLED");
-                        break;
-                    }
-                } else {
-                    System.out.println("");
-                    System.out.println("===============================================================");
-                    System.out.println("====              Error Creating Reservation               ====");
-                    errorList.forEach(x -> System.out.println(x.getPropertyPath() + " : " + x.getMessage().replace("size", "input") + " length"));
-                    System.out.println("===============================================================");
-                    break;
-                }
-            }
-        }while (true);
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        } else {
+            System.out.println("");
+            System.out.println("===============================================================");
+            System.out.println("====              Error Creating Reservation               ====");
+            errorList.forEach(x -> System.out.println(x.getPropertyPath() + " : " + x.getMessage().replace("size", "input") + " length"));
+            System.out.println("===============================================================");
+        }
     }
     
 }

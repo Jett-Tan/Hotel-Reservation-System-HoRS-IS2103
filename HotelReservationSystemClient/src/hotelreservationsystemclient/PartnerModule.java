@@ -103,7 +103,7 @@ public class PartnerModule {
 
     private void doSearchRoom() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        Date checkin,checkout;
+        Date checkin1,checkout1;
         RoomType roomType = new RoomType(); 
         int inputInt;
         System.out.println("===============================================================");
@@ -114,11 +114,11 @@ public class PartnerModule {
         do {
             System.out.print("Enter check in date (dd-MM-yyyy) >> ");
             try {
-                checkin = sdf.parse(scanner.nextLine().trim());
-                if(checkin.after(today)||
-                            (checkin.getDate() == today.getDate() &&
-                            checkin.getYear() == today.getYear()&& 
-                            checkin.getMonth()== today.getMonth()) ){
+                checkin1 = sdf.parse(scanner.nextLine().trim());
+                if(checkin1.after(today)||
+                            (checkin1.getDate() == today.getDate() &&
+                            checkin1.getYear() == today.getYear()&& 
+                            checkin1.getMonth()== today.getMonth()) ){
                     break;
                 } else {
                     System.out.println("Wrong date input!");
@@ -130,8 +130,8 @@ public class PartnerModule {
         do {
             System.out.print("Enter check out date (dd-MM-yyyy) >> ");
             try {
-                checkout = sdf.parse(scanner.nextLine().trim());
-                if(checkout.after(checkin)){
+                checkout1 = sdf.parse(scanner.nextLine().trim());
+                if(checkout1.after(checkin1)){
                     break;
                 } else {
                     System.out.println("Wrong date input!");
@@ -140,16 +140,16 @@ public class PartnerModule {
                 System.out.println("Wrong date format!");
             }
         } while (true);
-        XMLGregorianCalendar xmlCheckInDate = null;
-        XMLGregorianCalendar xmlCheckOutDate = null;
+        XMLGregorianCalendar checkInDate = null;
+        XMLGregorianCalendar checkOutDate = null;
         GregorianCalendar gcIn = new GregorianCalendar();
         GregorianCalendar gcOut = new GregorianCalendar();
-        gcIn.setTime(checkin);
-        gcOut.setTime(checkout);
+        gcIn.setTime(checkin1);
+        gcOut.setTime(checkout1);
         try {
-            xmlCheckOutDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcOut);
-            xmlCheckInDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcIn);
-            List<Reservation> reservations = this.hotelReservationWebService.generateReservation(xmlCheckInDate, xmlCheckOutDate);
+            checkOutDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcOut);
+            checkInDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcIn);
+            List<Reservation> reservations = this.hotelReservationWebService.generateReservation(checkInDate, checkOutDate);
             
             if(reservations.size() >0) {
                 do {
@@ -163,7 +163,7 @@ public class PartnerModule {
                     System.out.print("Enter >> ");
                     inputInt = scanner.nextInt();
                     scanner.nextLine();
-                    if (inputInt > 0 && inputInt < reservations.size()+1) {
+                    if (inputInt > 0 && inputInt < reservations.size()+1 && this.currentPartner.getEmployeeType().equals(PartnerEmployeeTypeEnum.MANAGER)) {
                         do{
                             Reservation reservation = reservations.get(inputInt - 1);
                             System.out.println("1. Create reservation");
@@ -179,6 +179,8 @@ public class PartnerModule {
                             }
 
                         } while(true);
+                        break;
+                    }else if(this.currentPartner.getEmployeeType().equals(PartnerEmployeeTypeEnum.EMPLOYEE)){
                         break;
                     }
                 } while(true);
@@ -212,15 +214,20 @@ public class PartnerModule {
             }
         } while(true);
         
-        Set<ConstraintViolation<Reservation>> errorList = this.validator.validate(reservation);
-        if (errorList.isEmpty()) {
+//        Set<ConstraintViolation<Reservation>> errorList = this.validator.validate(reservation);
+//        if (errorList.isEmpty()) {
             boolean continueWith = true;
             do {
                 System.out.println("Total amount: "+ reservation.getNumOfRooms().multiply(reservation.getAmountPerRoom()));
                 System.out.print("Enter confirmation (Y/N): ");
                 input = scanner.nextLine().trim();
                 if("Y".equalsIgnoreCase(input)){
-                    reservation = this.hotelReservationWebService.createNewReservation(reservation);
+                    try {
+                        reservation = this.hotelReservationWebService.createNewReservation(reservation);
+                    } catch (RoomTypeNotFoundException_Exception ex) {
+                        System.out.println(ex.getMessage());
+                        continueWith = false;
+                    }
                     break;
                 } else if ("N".equalsIgnoreCase(input)){
                     continueWith = false;
@@ -237,13 +244,13 @@ public class PartnerModule {
             }else {
                 System.out.println("CANCELLED");
             }
-        } else {
-            System.out.println("");
-            System.out.println("===============================================================");
-            System.out.println("====              Error Creating Reservation               ====");
-            errorList.forEach(x -> System.out.println(x.getPropertyPath() + " : " + x.getMessage().replace("size", "input") + " length"));
-            System.out.println("===============================================================");
-        }
+//        } else {
+//            System.out.println("");
+//            System.out.println("===============================================================");
+//            System.out.println("====              Error Creating Reservation               ====");
+//            errorList.forEach(x -> System.out.println(x.getPropertyPath() + " : " + x.getMessage().replace("size", "input") + " length"));
+//            System.out.println("===============================================================");
+//        }
     }
     
 }

@@ -40,6 +40,7 @@ import javax.jws.WebParam;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  *
@@ -81,7 +82,10 @@ public class HotelReservationWebService {
     @WebMethod(operationName = "getPartnerByUsername")
     public Partner getPartnerByUsername(@WebParam(name = "partnerUsername") String partnerUsername)
             throws PartnerNotFoundException {
-        return partnerSessionBeanLocal.getPartnerByUsername(partnerUsername);
+        Partner p = partnerSessionBeanLocal.getPartnerByUsername(partnerUsername);
+        em.detach(p);
+        p.setReservationList(new ArrayList<>());
+        return p;
     }
 
     // RoomRate
@@ -185,7 +189,17 @@ public class HotelReservationWebService {
     public List<Reservation> generateReservation(@WebParam(name = "checkInDate") Date checkInDate,
             @WebParam(name = "checkOutDate") Date checkOutDate)
             throws RoomNotFoundException {
-        return searchRoomSessionBeanLocal.generateReservationOnline(checkInDate, checkOutDate);
+        List<Reservation> reservations = searchRoomSessionBeanLocal.generateReservationOnline(checkInDate, checkOutDate);
+        for(Reservation r : reservations) {
+            em.detach(r);
+            r.getRoomList().forEach(x -> {
+                em.detach(x);
+                x.setRoomRmType(null);
+            } );
+            em.detach(r.getRoomType());
+            r.getRoomType().setRooms(new ArrayList<>());
+        }
+        return reservations;
     }
 
     @WebMethod(operationName = "loginGuest")
@@ -194,8 +208,15 @@ public class HotelReservationWebService {
     }
     
     @WebMethod(operationName = "createNewReservation")
-    public Reservation createNewReservation(@WebParam(name = "reservation") Reservation reservation) {
-        return reservationSessionBeanLocal.createNewReservation(reservation);
+    public Reservation createNewReservation(@WebParam(name = "reservation") Reservation reservation) throws RoomTypeNotFoundException {
+        RoomType roomtype = roomTypeSessionBeanLocal.getRoomTypeByName(reservation.getRoomType().getName());
+        reservation.setRoomType(roomtype);
+        Reservation r = reservationSessionBeanLocal.createNewReservation(reservation);
+        em.detach(r);
+        
+        r.setRoomList(new ArrayList<>());
+        r.setRoomType(null);
+        return r;
     }
     @WebMethod(operationName = "addReservation")
     public Partner addReservation(@WebParam(name = "partner") Partner partner, @WebParam(name = "reservation") Reservation reservation) throws PartnerNotFoundException, ReservationNotFoundException {

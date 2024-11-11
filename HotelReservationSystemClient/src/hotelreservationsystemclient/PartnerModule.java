@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
@@ -19,8 +21,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.validation.Validator;
 
-import ejb.session.ws.HotelReservationWebService;
-
+//import ejb.session.ws.HotelReservationWebService;
 /**
  *
  * @author Tan Jian Feng
@@ -36,8 +37,6 @@ public class PartnerModule {
     private Validator validator;
 
     public PartnerModule() {
-        validatorFactory = Validation.buildDefaultValidatorFactory();
-        validator = validatorFactory.getValidator();
     }
 
     PartnerModule(HotelReservationWebService hotelReservationWebService, Partner partner) {
@@ -83,16 +82,19 @@ public class PartnerModule {
             System.out.println("====                    Partner Manager                    ====");
             System.out.println("===============================================================");
             System.out.println("1. Search rooms");
-            System.out.println("2. View all my reservations");
-            System.out.println("3. Exit");
+            System.out.println("2. View my reservation");
+            System.out.println("3. View all my reservations");
+            System.out.println("4. Exit");
             System.out.print("Enter >> ");
             inputInt = scanner.nextInt();
             scanner.nextLine();
             if (inputInt == 1) {
                 doSearchRoom();
             } else if (inputInt == 2) {
-                viewAllMyReservation();
+                viewMyReservation();
             } else if (inputInt == 3) {
+                viewAllMyReservation();
+            } else if (inputInt == 4) {
                 break;
             }
         } while (true);
@@ -100,8 +102,8 @@ public class PartnerModule {
 
     private void doSearchRoom() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        Date checkin1,checkout1;
-        RoomType roomType = new RoomType(); 
+        Date checkin1, checkout1;
+        RoomType roomType = new RoomType();
         int inputInt;
         System.out.println("===============================================================");
         System.out.println("==== Welcome to Hotel Reservation System Management Client ====");
@@ -112,10 +114,10 @@ public class PartnerModule {
             System.out.print("Enter check in date (dd-MM-yyyy) >> ");
             try {
                 checkin1 = sdf.parse(scanner.nextLine().trim());
-                if(checkin1.after(today)||
-                            (checkin1.getDate() == today.getDate() &&
-                            checkin1.getYear() == today.getYear()&& 
-                            checkin1.getMonth()== today.getMonth()) ){
+                if (checkin1.after(today)
+                        || (checkin1.getDate() == today.getDate()
+                        && checkin1.getYear() == today.getYear()
+                        && checkin1.getMonth() == today.getMonth())) {
                     break;
                 } else {
                     System.out.println("Wrong date input!");
@@ -128,7 +130,7 @@ public class PartnerModule {
             System.out.print("Enter check out date (dd-MM-yyyy) >> ");
             try {
                 checkout1 = sdf.parse(scanner.nextLine().trim());
-                if(checkout1.after(checkin1)){
+                if (checkout1.after(checkin1)) {
                     break;
                 } else {
                     System.out.println("Wrong date input!");
@@ -147,8 +149,8 @@ public class PartnerModule {
             checkOutDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcOut);
             checkInDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcIn);
             List<Reservation> reservations = this.hotelReservationWebService.generateReservation(checkInDate, checkOutDate);
-            
-            if(reservations.size() >0) {
+
+            if (reservations.size() > 0) {
                 do {
                     System.out.println("===============================================================");
                     System.out.println(String.format("No.%20s%20s", "Total Amount Per Room", "Room Type"));
@@ -160,8 +162,8 @@ public class PartnerModule {
                     System.out.print("Enter >> ");
                     inputInt = scanner.nextInt();
                     scanner.nextLine();
-                    if (inputInt > 0 && inputInt < reservations.size()+1 && this.currentPartner.getEmployeeType().equals(PartnerEmployeeTypeEnum.MANAGER)) {
-                        do{
+                    if (inputInt > 0 && inputInt < reservations.size() + 1 && this.currentPartner.getEmployeeType().equals(PartnerEmployeeTypeEnum.MANAGER)) {
+                        do {
                             Reservation reservation = reservations.get(inputInt - 1);
                             System.out.println("1. Create reservation");
                             System.out.println("2. Exit");
@@ -177,7 +179,7 @@ public class PartnerModule {
 
                         } while (true);
                         break;
-                    }else if(this.currentPartner.getEmployeeType().equals(PartnerEmployeeTypeEnum.EMPLOYEE)){
+                    } else if (this.currentPartner.getEmployeeType().equals(PartnerEmployeeTypeEnum.EMPLOYEE)) {
                         break;
                     }
                 } while (true);
@@ -189,31 +191,58 @@ public class PartnerModule {
         }
     }
 
-    private void viewAllMyReservation() throws ReservationNotFoundException_Exception {
-//        this.hotelReservationWebService.retrieveAllMyReservations(guest);
-        System.out.println("================================================================");
-        System.out.println("==== Welcome to Hotel Reservation System Reservation Client ====");
-        System.out.println("====               View All My Reservations                 ====");
-        System.out.println("================================================================");
-
-        List<Reservation> reservationList = hotelReservationWebService.retrieveAllPartnerReservations(currentPartner);
-
+    private void viewMyReservation() {
+        List<Reservation> reservationList = currentPartner.getReservationList();
         if (reservationList == null || reservationList.isEmpty()) {
             System.out.println("You currently have no reservations.");
             System.out.println();
             return;
         }
+         
+        viewAllMyReservation();
         
+        System.out.print("Select the reservation id > ");
+        int reservationId = scanner.nextInt();
+        scanner.nextLine();
+
+        Reservation reservation = reservationList.get(reservationId - 1);
+        System.out.println("================================================================");
+        System.out.println("====        Welcome to Hotel Reservation System Client      ====");
+        System.out.println("====                  View My Reservation                   ====");
+        System.out.println("================================================================");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
+        System.out.println("Reservation Id: " + reservation.getReservationId());
+        System.out.println("Reservation Type: " + reservation.getReservationType().name());
+        System.out.println("Room Type: " + reservation.getRoomType().getName());
+        System.out.println("Number of Rooms: " + reservation.getNumOfRooms());
+        System.out.println("Start Date: " + dateFormat.format(reservation.getStartDate().toGregorianCalendar().getTime()));
+        System.out.println("End Date: " + dateFormat.format(reservation.getEndDate().toGregorianCalendar().getTime()));
+        System.out.println("Total Amount: " + reservation.getAmountPerRoom().multiply(reservation.getNumOfRooms()));
+    }
+
+    private void viewAllMyReservation() {
+//        this.hotelReservationWebService.retrieveAllMyReservations(guest);
+        System.out.println("================================================================");
+        System.out.println("====        Welcome to Hotel Reservation System Client      ====");
+        System.out.println("====               View All My Reservations                 ====");
+        System.out.println("================================================================");
+
+        List<Reservation> reservationList = currentPartner.getReservationList();
+        if (reservationList == null || reservationList.isEmpty()) {
+            System.out.println("You currently have no reservations.");
+            System.out.println();
+            return;
+        }
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
 
         System.out.println("Id    Reservation Start Date   Reservation End Date    Total Amount");
-
         for (Reservation reservation : reservationList) {
             System.out.println(reservation.getReservationId() + "      "
-                    + dateFormat.format(reservation.getStartDate()) + "      "
-                    + dateFormat.format(reservation.getEndDate()) + "      "
+                    + dateFormat.format(reservation.getStartDate().toGregorianCalendar().getTime()) + "      "
+                    + dateFormat.format(reservation.getEndDate().toGregorianCalendar().getTime()) + "      "
                     + reservation.getAmountPerRoom());
         }
+
         System.out.println();
     }
 
@@ -232,38 +261,38 @@ public class PartnerModule {
                 reservation.setNumOfRooms(new BigDecimal(inputInt));
                 break;
             }
-        } while(true);
-        
+        } while (true);
+
 //        Set<ConstraintViolation<Reservation>> errorList = this.validator.validate(reservation);
 //        if (errorList.isEmpty()) {
-            boolean continueWith = true;
-            do {
-                System.out.println("Total amount: "+ reservation.getNumOfRooms().multiply(reservation.getAmountPerRoom()));
-                System.out.print("Enter confirmation (Y/N): ");
-                input = scanner.nextLine().trim();
-                if("Y".equalsIgnoreCase(input)){
-                    try {
-                        reservation = this.hotelReservationWebService.createNewReservation(reservation);
-                    } catch (RoomTypeNotFoundException_Exception ex) {
-                        System.out.println(ex.getMessage());
-                        continueWith = false;
-                    }
-                    break;
-                } else if ("N".equalsIgnoreCase(input)){
-                    continueWith = false;
-                    break;
-                }                        
-            } while(true);
-            if(continueWith) {
+        boolean continueWith = true;
+        do {
+            System.out.println("Total amount: " + reservation.getNumOfRooms().multiply(reservation.getAmountPerRoom()));
+            System.out.print("Enter confirmation (Y/N): ");
+            input = scanner.nextLine().trim();
+            if ("Y".equalsIgnoreCase(input)) {
                 try {
-                    currentPartner = this.hotelReservationWebService.addReservation(this.currentPartner, reservation);
-                    System.out.println("Successfully create reservation!"); 
-                } catch (PartnerNotFoundException_Exception | ReservationNotFoundException_Exception ex) {
+                    reservation = this.hotelReservationWebService.createNewReservation(reservation);
+                } catch (RoomTypeNotFoundException_Exception ex) {
                     System.out.println(ex.getMessage());
+                    continueWith = false;
                 }
-            }else {
-                System.out.println("CANCELLED");
+                break;
+            } else if ("N".equalsIgnoreCase(input)) {
+                continueWith = false;
+                break;
             }
+        } while (true);
+        if (continueWith) {
+            try {
+                currentPartner = this.hotelReservationWebService.addReservation(this.currentPartner, reservation);
+                System.out.println("Successfully create reservation!");
+            } catch (PartnerNotFoundException_Exception | ReservationNotFoundException_Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        } else {
+            System.out.println("CANCELLED");
+        }
 //        } else {
 //            System.out.println("");
 //            System.out.println("===============================================================");

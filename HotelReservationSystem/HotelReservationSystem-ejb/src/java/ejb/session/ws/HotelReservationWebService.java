@@ -145,7 +145,7 @@ public class HotelReservationWebService {
 
     // Reservation
     @WebMethod(operationName = "retrieveAllPartnerReservations")
-    public List<Reservation> retrieveAllPartnerReservations(@WebParam(name = "partner") Partner partner) throws ReservationNotFoundException{
+    public List<Reservation> retrieveAllPartnerReservations(@WebParam(name = "partner") Partner partner) throws ReservationNotFoundException {
         return reservationSessionBeanLocal.retrieveAllPartnerReservations(partner);
     }
 
@@ -185,12 +185,12 @@ public class HotelReservationWebService {
             @WebParam(name = "checkOutDate") Date checkOutDate)
             throws RoomNotFoundException {
         List<Reservation> reservations = searchRoomSessionBeanLocal.generateReservationOnline(checkInDate, checkOutDate);
-        for(Reservation r : reservations) {
+        for (Reservation r : reservations) {
             em.detach(r);
             r.getRoomList().forEach(x -> {
                 em.detach(x);
                 x.setRoomRmType(null);
-            } );
+            });
             em.detach(r.getRoomType());
             r.getRoomType().setRooms(new ArrayList<>());
         }
@@ -208,7 +208,7 @@ public class HotelReservationWebService {
         reservation.setRoomType(roomtype);
         Reservation r = reservationSessionBeanLocal.createNewReservation(reservation);
         em.detach(r);
-        
+
         r.setRoomList(new ArrayList<>());
         r.setRoomType(null);
         return r;

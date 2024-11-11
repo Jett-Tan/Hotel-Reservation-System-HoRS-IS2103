@@ -80,7 +80,10 @@ public class HotelReservationWebService {
             throws PartnerNotFoundException {
         Partner p = partnerSessionBeanLocal.getPartnerByUsername(partnerUsername);
         em.detach(p);
-        p.setReservationList(new ArrayList<>());
+        p.getReservationList().forEach(x -> x.getRoomList().forEach(y -> y.getRoomRmType().setRooms(new ArrayList<>())));
+        p.getReservationList().forEach(x -> x.getRoomType().setRooms(new ArrayList<>()));
+        p.getReservationList().forEach(x -> x.getRoomType().setParentRoomType(null));
+        
         return p;
     }
 
@@ -185,15 +188,19 @@ public class HotelReservationWebService {
             @WebParam(name = "checkOutDate") Date checkOutDate)
             throws RoomNotFoundException {
         List<Reservation> reservations = searchRoomSessionBeanLocal.generateReservationOnline(checkInDate, checkOutDate);
-        for (Reservation r : reservations) {
-            em.detach(r);
-            r.getRoomList().forEach(x -> {
-                em.detach(x);
-                x.setRoomRmType(null);
-            });
-            em.detach(r.getRoomType());
-            r.getRoomType().setRooms(new ArrayList<>());
-        }
+//        for (Reservation r : reservations) {
+//            em.detach(r);
+//            r.getRoomList().forEach(x -> {
+//                em.detach(x);
+//                x.setRoomRmType(null);
+//            });
+//            em.detach(r.getRoomType());
+//            r.getRoomType().setRooms(new ArrayList<>());
+//        }
+//        reservations.forEach(x -> x.getRoomList().forEach(y -> y.getRoomRmType().setRooms(new ArrayList<>())));
+        reservations.forEach(x -> x.getRoomType().setRooms(new ArrayList<>()));
+        reservations.forEach(x -> x.getRoomType().setParentRoomType(null));
+        reservations.forEach(x -> x.getRoomType());
         return reservations;
     }
 
@@ -208,6 +215,7 @@ public class HotelReservationWebService {
         reservation.setRoomType(roomtype);
         Reservation r = reservationSessionBeanLocal.createNewReservation(reservation);
         em.detach(r);
+        em.detach(r.getRoomType());
 
         r.setRoomList(new ArrayList<>());
         r.setRoomType(null);
@@ -217,9 +225,22 @@ public class HotelReservationWebService {
     @WebMethod(operationName = "addReservation")
     public Partner addReservation(@WebParam(name = "partner") Partner partner, @WebParam(name = "reservation") Reservation reservation) throws PartnerNotFoundException, ReservationNotFoundException {
         partner = partnerSessionBeanLocal.getPartnerByUsername(partner.getUsername());
-        reservation = reservationSessionBeanLocal.getLoadedReservation(reservation);
-        partner.getReservationList().add(reservation);
+        Reservation mreservation = reservationSessionBeanLocal.getLoadedReservation(reservation);
+        partner.getReservationList().forEach(x -> System.out.println("RESERVATION: " + x.getRoomType()));
+        System.out.println("NEW RESERVATION: " + mreservation.getRoomType());
+        partner.getReservationList().add(mreservation);
         partner.getReservationList().size();
+        
+        em.flush();
+        em.detach(partner);
+        
+//        partner.getReservationList().forEach(x -> x.getRoomType());
+//        partner.getReservationList().forEach(x -> x.getRoomList()
+//                .forEach(y -> y.getRoomRmType()
+//                        .setRooms(new ArrayList<>())));
+//        partner.getReservationList().forEach(x -> x.getRoomType().setRooms(new ArrayList<>()));
+//        partner.getReservationList().forEach(x -> x.getRoomType().setParentRoomType(null));
+        
         return partner;
     }
 }

@@ -69,8 +69,12 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     
     @Override
     public Reservation createNewReservation(Reservation reservation) {
+        RoomType rt = em.find(RoomType.class,reservation.getRoomType().getRoomTypeId());
+        reservation.setRoomType(rt);
+        
         em.persist(reservation);
         em.flush();
+        System.out.println("PERSIST: "+ reservation.getRoomType());
         return reservation;
     }
     @Override
@@ -127,12 +131,15 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     public Reservation getLoadedReservation(Reservation reservation) throws ReservationNotFoundException{
         // get managed reservation
         Reservation mReservation = em.find(Reservation.class,reservation.getReservationId());
+        em.refresh(mReservation);
         if(mReservation == null) {
             throw new ReservationNotFoundException("Reservation not found!");
         }
         // load all the rooms
         mReservation.getRoomList().size();
         mReservation.getRoomList().forEach(x -> x.getRoomRmType().getRoomRates().size());
+        mReservation.getRoomType();
+        System.out.println("LOADED RESERVATION "+mReservation.getReservationId()+" : " + mReservation.getRoomType());
         return mReservation;
     }
 

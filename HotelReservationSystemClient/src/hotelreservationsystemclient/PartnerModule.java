@@ -236,8 +236,9 @@ public class PartnerModule {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
 
         System.out.println("Id    Reservation Start Date   Reservation End Date    Total Amount");
+        int i = 1;
         for (Reservation reservation : reservationList) {
-            System.out.println(reservation.getReservationId() + "      "
+            System.out.println(i++ + "      "
                     + dateFormat.format(reservation.getStartDate().toGregorianCalendar().getTime()) + "      "
                     + dateFormat.format(reservation.getEndDate().toGregorianCalendar().getTime()) + "      "
                     + reservation.getAmountPerRoom());

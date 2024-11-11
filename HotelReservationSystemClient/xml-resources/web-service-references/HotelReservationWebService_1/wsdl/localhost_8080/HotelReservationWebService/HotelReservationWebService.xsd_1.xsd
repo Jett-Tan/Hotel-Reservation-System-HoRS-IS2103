@@ -80,9 +80,9 @@
 
 <xs:element name="loginGuestResponse" type="tns:loginGuestResponse"/>
 
-<xs:element name="retrieveAllMyReservations" type="tns:retrieveAllMyReservations"/>
+<xs:element name="retrieveAllPartnerReservations" type="tns:retrieveAllPartnerReservations"/>
 
-<xs:element name="retrieveAllMyReservationsResponse" type="tns:retrieveAllMyReservationsResponse"/>
+<xs:element name="retrieveAllPartnerReservationsResponse" type="tns:retrieveAllPartnerReservationsResponse"/>
 
 <xs:element name="retrieveAllReseravtions" type="tns:retrieveAllReseravtions"/>
 
@@ -311,6 +311,24 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="retrieveAllPartnerReservations">
+<xs:sequence>
+<xs:element name="partner" type="tns:partner" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveAllPartnerReservationsResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:reservation" minOccurs="0" maxOccurs="unbounded"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ReservationNotFoundException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="addReservation">
 <xs:sequence>
 <xs:element name="partner" type="tns:partner" minOccurs="0"/>
@@ -321,12 +339,6 @@
 <xs:complexType name="addReservationResponse">
 <xs:sequence>
 <xs:element name="return" type="tns:partner" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="ReservationNotFoundException">
-<xs:sequence>
-<xs:element name="message" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
@@ -354,6 +366,18 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="getLoadedReservation">
+<xs:sequence>
+<xs:element name="reservation" type="tns:reservation" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="getLoadedReservationResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:reservation" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="retrieveAllReservationWithinDates">
 <xs:sequence>
 <xs:element name="checkInDate" type="xs:dateTime" minOccurs="0"/>
@@ -365,30 +389,6 @@
 <xs:complexType name="retrieveAllReservationWithinDatesResponse">
 <xs:sequence>
 <xs:element name="return" type="tns:reservation" minOccurs="0" maxOccurs="unbounded"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="retrieveAllMyReservations">
-<xs:sequence>
-<xs:element name="guest" type="tns:guest" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="retrieveAllMyReservationsResponse">
-<xs:sequence>
-<xs:element name="return" type="tns:reservation" minOccurs="0" maxOccurs="unbounded"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="getLoadedReservation">
-<xs:sequence>
-<xs:element name="reservation" type="tns:reservation" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="getLoadedReservationResponse">
-<xs:sequence>
-<xs:element name="return" type="tns:reservation" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
@@ -450,18 +450,6 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="getRoomByNumber">
-<xs:sequence>
-<xs:element name="roomNumber" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="getRoomByNumberResponse">
-<xs:sequence>
-<xs:element name="return" type="tns:room" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="getRoomRateByName">
 <xs:sequence>
 <xs:element name="roomRate" type="tns:roomRate" minOccurs="0"/>
@@ -471,6 +459,18 @@
 <xs:complexType name="getRoomRateByNameResponse">
 <xs:sequence>
 <xs:element name="return" type="tns:roomRate" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="getRoomByNumber">
+<xs:sequence>
+<xs:element name="roomNumber" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="getRoomByNumberResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:room" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 

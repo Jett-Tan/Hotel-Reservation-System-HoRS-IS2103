@@ -174,6 +174,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
             long diffInMillies = Math.abs(checkInDate.getTime() - checkOutDate.getTime());
             long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
             BigDecimal numOfDays = new BigDecimal(diff);
+            System.out.println(numOfDays);
             for(RoomRate x : roomRates) {
                 totalAmount = totalAmount.add(x.getRate().multiply(numOfDays));
             }

@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import entity.Guest;
+import entity.Partner;
 import entity.Reservation;
 import exception.ReservationNotFoundException;
 import java.util.List;
@@ -20,10 +21,13 @@ public interface ReservationSessionBeanRemote {
     public List<Reservation> retrieveAllMyReservations(Guest guest);
 
     public Reservation retrieveReservationByReservationId(Guest guest, Long reservationId);
-    
+
     public Reservation createNewReservation(Reservation reservation);
-    
+
     public Reservation allocateReservation(Reservation reservation) throws ReservationNotFoundException;
-    
+
     public List<Reservation> retrieveAllReseravtions();
+
+    public List<Reservation> retrieveAllPartnerReservations(Partner partner);
+
 }

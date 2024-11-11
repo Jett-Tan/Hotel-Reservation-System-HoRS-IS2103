@@ -63,6 +63,8 @@ public class DataInitSingleton {
     
     @EJB(name = "EmployeeSessionBeanLocal")
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
+    
+    
 
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
@@ -179,5 +181,7 @@ public class DataInitSingleton {
             }
         }
     }
+    
+    
     
 }

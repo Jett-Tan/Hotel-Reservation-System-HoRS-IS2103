@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import entity.Guest;
+import entity.Partner;
 import entity.Reservation;
 import entity.RoomType;
 import exception.ReservationNotFoundException;
@@ -32,5 +33,7 @@ public interface ReservationSessionBeanLocal {
     public Reservation createNewReservation(Reservation reservation);
     
     public Reservation allocateReservation(Reservation reservation) throws ReservationNotFoundException;
+
+    public List<Reservation> retrieveAllPartnerReservations(Partner partner);
     
 }

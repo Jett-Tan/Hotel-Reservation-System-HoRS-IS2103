@@ -170,7 +170,7 @@ public class SystemAdministrationModule {
                 System.out.println(String.format("%d.%31s%30s",i ,employee.getFirstName() +" "+ employee.getLastName(), employee.getEmployeeType()));
             }
             System.out.println("===============================================================");
-            System.out.println("");
+            scanner.nextLine();
         } catch (EmployeeNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
@@ -241,6 +241,7 @@ public class SystemAdministrationModule {
                 System.out.println(String.format("%d.%31s%30s",i ,partner.getFirstName() +" "+ partner.getLastName(), partner.getEmployeeType()));
             }
             System.out.println("===============================================================");
+            scanner.nextLine();
         } catch (PartnerNotFoundException ex) {
             System.out.println(ex.getMessage());
         }

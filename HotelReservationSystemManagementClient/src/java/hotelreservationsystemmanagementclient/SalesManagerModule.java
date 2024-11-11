@@ -14,6 +14,7 @@ import enumerations.RoomRateTypeEnum;
 import enumerations.RoomStatusEnum;
 import exception.RoomRateNameAlreadyExistException;
 import exception.RoomRateNotFoundException;
+import exception.RoomTypeNotFoundException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -101,32 +102,15 @@ public class SalesManagerModule {
         RoomRate newRoomRate = new RoomRate();
         String name;
         BigDecimal rate;
-        Date startDate;
-        Date endDate;
+        Date startDate = new Date(Long.MIN_VALUE);
+        Date endDate = new Date(Long.MAX_VALUE);
         RoomStatusEnum rateStatus;
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         System.out.print("Enter name >> ");
         newRoomRate.setName(scanner.nextLine());
         System.out.print("Enter rate >> ");    
         newRoomRate.setRate(new BigDecimal(scanner.nextLine().trim()));
-        do {
-            System.out.print("Enter startDate (dd-mm-yyyy)>> ");
-            try {
-                newRoomRate.setStartDate(sdf.parse(scanner.nextLine().trim()));
-                break;
-            } catch (ParseException ex) {
-                System.out.println("Wrong date format");
-            }            
-        } while(true);
-        do {
-            System.out.print("Enter endDate (dd-mm-yyyy)>> ");  
-            try {
-                newRoomRate.setEndDate(sdf.parse(scanner.nextLine().trim()));
-                break;
-            } catch (ParseException ex) {
-                System.out.println("Wrong date format!");
-            }
-        } while(true);
+        
         int option = 0;
         do{
             System.out.println("Select Rate Status");
@@ -147,6 +131,7 @@ public class SalesManagerModule {
             System.out.println("2. Normal");
             System.out.println("3. Peak");
             System.out.println("4. Promotion");
+            System.out.print("Enter >> ");
             option = scanner.nextInt();
             scanner.nextLine();
             if(option == 1) {
@@ -159,6 +144,29 @@ public class SalesManagerModule {
                 newRoomRate.setRoomRateType(RoomRateTypeEnum.PROMOTION);
             }
         }while(option > 4 || option < 1);
+        if(newRoomRate.getRoomRateType().equals(RoomRateTypeEnum.PROMOTION) || newRoomRate.getRoomRateType().equals(RoomRateTypeEnum.PEAK) ) {
+            do {
+                System.out.print("Enter start date (dd-mm-yyyy)>> ");
+                try {
+                    newRoomRate.setStartDate(sdf.parse(scanner.nextLine().trim()));
+                    break;
+                } catch (ParseException ex) {
+                    System.out.println("Wrong date format");
+                }            
+            } while(true);
+            do {
+                System.out.print("Enter end date (dd-mm-yyyy)>> ");  
+                try {
+                    newRoomRate.setEndDate(sdf.parse(scanner.nextLine().trim()));
+                    break;
+                } catch (ParseException ex) {
+                    System.out.println("Wrong date format!");
+                }
+            } while(true);
+        } else {
+            newRoomRate.setStartDate(startDate);
+            newRoomRate.setEndDate(endDate);
+        }
         Set<ConstraintViolation<RoomRate>> errorList = this.validator.validate(newRoomRate);
         if (errorList.isEmpty()) {
             System.out.println("");
@@ -345,8 +353,13 @@ public class SalesManagerModule {
 
     private void doDeleteRoomRate(RoomRate roomRate) {
         try{
-            roomRateSessionBeanRemote.deleteRoomRate(roomRate);
-        } catch (RoomRateNotFoundException ex) {
+            boolean isDeleted = roomRateSessionBeanRemote.deleteRoomRate(roomRate);
+            if(isDeleted) {
+                System.out.println("Room rate deleted !");
+            }else {
+                System.out.println("Room rate disabled !");
+            }
+        } catch (RoomRateNotFoundException | RoomTypeNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
     }

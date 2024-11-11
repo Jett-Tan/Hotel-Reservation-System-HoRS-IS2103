@@ -37,7 +37,7 @@ public interface RoomSessionBeanLocal {
     
     Room updateRoom(Room room) throws RoomNotFoundException, RoomNumberAlreadyExistException, RoomTypeNotFoundException;
     
-    boolean deleteRoom(Room room) throws RoomNotFoundException;
+    boolean deleteRoom(Room room) throws RoomNotFoundException,RoomTypeNotFoundException;
 
-    boolean deleteRoomById(Long roomId) throws RoomNotFoundException;
+    boolean deleteRoomById(Long roomId) throws RoomNotFoundException, RoomTypeNotFoundException;
 }

@@ -135,26 +135,26 @@ public class OperationManagerModule {
         System.out.println("===============================================================");
 
         RoomType roomType = new RoomType();
-        List<String> amenities = new ArrayList<String>();
-        List<Room> rooms = new ArrayList<Room>();
-        List<RoomRate> roomRates = new ArrayList<RoomRate>();
+        List<String> amenities = new ArrayList<>();
+        List<Room> rooms = new ArrayList<>();
+        List<RoomRate> roomRates = new ArrayList<>();
         
         int inputInt = 0;
         System.out.print("Enter name >> ");
         roomType.setName(scanner.nextLine().trim());
         System.out.print("Enter description >> ");
         roomType.setDescription(scanner.nextLine().trim());
-        System.out.print("Enter bed >> ");
+        System.out.print("Enter bed (string) >> ");
         roomType.setBed(scanner.nextLine().trim());
         System.out.print("Enter size (double) >> ");
         roomType.setSize(new BigDecimal(scanner.nextLine().trim()));
-        System.out.print("Enter capacity (integer)>> ");
+        System.out.print("Enter capacity (integer) >> ");
         roomType.setCapacity(new BigDecimal(scanner.nextLine().trim()));
         
         boolean isDone = false;
-        System.out.println("Enter amentities >>");
+        System.out.println("Enter amentities >> ");
         do {
-            System.out.print("Enter >> ");
+            System.out.print("Enter (Enter to skip) >> ");
             String value = scanner.nextLine().trim();
             if(!value.equals("")){
                 amenities.add(value);
@@ -164,7 +164,7 @@ public class OperationManagerModule {
         }while(!isDone);
         roomType.setAmenities(amenities);
         do{
-            System.out.println("Select Room Status");
+            System.out.println("Select Room Status: ");
             System.out.println("1. Available");
             System.out.println("2. Unavailable");
             System.out.print("Enter room status (1 - 2) >> ");
@@ -178,12 +178,13 @@ public class OperationManagerModule {
         }while (inputInt > 2 || inputInt < 1);
         inputInt = 0;
         try {
-            List<RoomRate> roomRatesList = roomRateSessionBeanRemote.getRoomRates();
-            System.out.println(String.format("%s%11s%15s%15s%15s%15s","No.","Name","Rate","Start Date","End Date","Rate Status"));
+            System.out.println("Select room rates: ");
+            List<RoomRate> roomRatesList = roomRateSessionBeanRemote.getAvailableRoomRates();
+            System.out.println(String.format("%s%22s%8s%12s%12s%13s","No.","Name","Rate","Start Date","End Date","Rate Status"));
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             for(int i = 1; i< roomRatesList.size() + 1; i++) {
                 RoomRate roomrate = roomRatesList.get(i - 1);
-                System.out.println(String.format("%d.%12s%15s%15s%15s%15s",
+                System.out.println(String.format("%d.%23s%8s%12s%12s%13s",
                         i,
                         roomrate.getName(),
                         roomrate.getRate(),
@@ -191,9 +192,8 @@ public class OperationManagerModule {
                         dateFormat.format(roomrate.getEndDate()),
                         roomrate.getRateStatus()));
             }
-            System.out.println(roomRatesList.size() + 1 + ". Exit");
             do{
-                System.out.print("Enter (Enter "+(roomRatesList.size() + 1) +" to exit)>> ");
+                System.out.print("Enter ("+(roomRatesList.size() + 1)+" to skip) >> ");
                 inputInt = scanner.nextInt();
                 scanner.nextLine();
                 if (inputInt < roomRatesList.size() + 1 && inputInt > 0) {
@@ -208,13 +208,13 @@ public class OperationManagerModule {
         
         do{
             try{
-                List<RoomType> roomTypes = roomTypeSessionBeanRemote.getRoomTypes();
-                System.out.println("Select parent room type");
+                List<RoomType> roomTypes = roomTypeSessionBeanRemote.getAvailableRoomTypes();
+                System.out.println("Select parent room type: ");
                 int i = 1;
                 for(RoomType roomtype : roomTypes) {
-                    System.out.println(String.format("%d.%20s",i++,roomtype.getName()));
+                    System.out.println(String.format("%d.%60s",i++,roomtype.getName()));
                 }
-                System.out.println(String.format("%d.%20s",i++,"Exit"));
+                System.out.print("Enter ("+ i++ +" to skip) >> ");
                 inputInt = scanner.nextInt();
                 scanner.nextLine();
                 if(inputInt == roomTypes.size() + 1){
@@ -316,7 +316,7 @@ public class OperationManagerModule {
         
         try {
             List<RoomType> roomTypes;
-            roomTypes = roomTypeSessionBeanRemote.getRoomTypes();
+            roomTypes = roomTypeSessionBeanRemote.getAvailableRoomTypes();
             int option = 0;
             do{
                 System.out.println("Room Type :");
@@ -367,10 +367,14 @@ public class OperationManagerModule {
             List<RoomType> roomTypes = roomTypeSessionBeanRemote.getRoomTypes();
             int option = 0;
             do{
-                System.out.println(String.format("%s%10s%10s", "No.","Name", "Description"));
+                System.out.println(String.format("%s%20s%40s", "No.","Name", "Description"));
                 for(int i = 1; i < roomTypes.size() + 1; i++) {
                     RoomType roomType = roomTypes.get(i - 1);
-                    System.out.println(String.format("%d.%32s%40s", i,roomType.getName(), roomType.getDescription()));
+                    String description = roomType.getDescription();
+                    if(description.length()> 20) {
+                        description = description.substring(0, 17).concat("...");
+                    }
+                    System.out.println(String.format("%d.%21s%40s", i,roomType.getName(), description));
                 }
                 System.out.println("===============================================================");
                 if(roomTypes.size() < 1) {
@@ -386,12 +390,14 @@ public class OperationManagerModule {
                 if(option == EXITVALUE) {
                     break;
                 }
-                System.out.print("Select room type >> ");
-                RoomType roomType = roomTypes.get(scanner.nextInt() -1);
-                switch(option) {
-                    case 1: {
-                        doViewRoomType(roomType);
-                        break;
+                if(option == 1) {
+                    System.out.print("Select room type >> ");
+                    RoomType roomType = roomTypes.get(scanner.nextInt() -1);
+                    switch(option) {
+                        case 1: {
+                            doViewRoomType(roomType);
+                            break;
+                        }
                     }
                 }
             }while (option > 2 || option < 1 );
@@ -420,12 +426,8 @@ public class OperationManagerModule {
                             roomType = roomTypeSessionBeanRemote.getLoadedRoomType(room.getRoomRmType());
                         }
                         System.out.println(String.format("%d.%21s%20s%20s", i,room.getRoomNumber(),roomType.getName(), room.getRoomStatus()));
-                    } catch (RoomTypeNotFoundException ex) {
-                        Logger.getLogger(OperationManagerModule.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (RoomTypeNameAlreadyExistException ex) {
-                        Logger.getLogger(OperationManagerModule.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (RoomRateNotFoundException ex) {
-                        Logger.getLogger(OperationManagerModule.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (RoomTypeNotFoundException | RoomTypeNameAlreadyExistException | RoomRateNotFoundException ex) {
+                        System.out.println(ex.getMessage());
                     }
                     
                 }
@@ -584,6 +586,7 @@ public class OperationManagerModule {
             inputInt = scanner.nextInt();
             scanner.nextLine();
             if (inputInt == 4) {
+                roomType.setAmenities(amenities);
                 break;
             } else if (inputInt == 1) {
                 do {
@@ -632,6 +635,7 @@ public class OperationManagerModule {
             System.out.println(i + ". " + roomRate.getName());
                 i++;
             }
+            System.out.println("===============================================================");
             System.out.println("1. Add");
             System.out.println("2. Remove");
             System.out.println("3. Skip");
@@ -640,19 +644,22 @@ public class OperationManagerModule {
             scanner.nextLine();
             if (inputInt == 1) {
                 try {
-                    List<RoomRate> newRoomRates = roomRateSessionBeanRemote.getRoomRates();
+                    List<RoomRate> newRoomRates = roomRateSessionBeanRemote.getAvailableRoomRates();
                     newRoomRates.removeAll(roomRates);
                     i = 0;
                     for(RoomRate roomRate : newRoomRates) {
-                        System.out.println(++i + roomRate.getName());
+                        System.out.println(++i +". "+ roomRate.getName());
                     }
-                    System.out.print("Enter Room rate number >> ");
-                    inputInt = scanner.nextInt();
-                    scanner.nextLine();
-                    if (inputInt > 0 && inputInt < roomRates.size() + 1) {
-                        roomRates.add(newRoomRates.get(inputInt - 1));
-                        break;
-                    }
+                    do{
+                        System.out.print("Enter Room rate number >> ");
+                        inputInt = scanner.nextInt();
+                        scanner.nextLine();
+
+                        if (inputInt > 0 && inputInt < newRoomRates.size() + 1) {
+                            roomRates.add(newRoomRates.get(inputInt - 1));
+                            break;
+                        }
+                    }while (true);
                 } catch (RoomRateNotFoundException ex) {
                     System.out.println("No room rate to choose!");
                     break;
@@ -668,6 +675,7 @@ public class OperationManagerModule {
                     }
                 } while (true);
             } else if (inputInt == 3) {
+                roomType.setRoomRates(roomRates);
                 break;
             }
         } while (true);
@@ -677,7 +685,7 @@ public class OperationManagerModule {
             System.out.println("");
             try {
                 roomType = roomTypeSessionBeanRemote.updateRoomType(roomType);
-                System.out.println("New room type created with username of " + roomType.getName());
+                System.out.println("Room type with name of " + roomType.getName()+" updated! ");
             } catch (RoomTypeNameAlreadyExistException | RoomNotFoundException |RoomRateNotFoundException| RoomTypeNotFoundException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -693,8 +701,11 @@ public class OperationManagerModule {
     
     private void doDeleteRoomType(RoomType roomType) {
         try {
-            roomTypeSessionBeanRemote.deleteRoomType(roomType);
-            System.out.println("Room type successfully deleted !");
+            if(roomTypeSessionBeanRemote.deleteRoomType(roomType)){
+                System.out.println("Room type successfully deleted !");
+            }else {
+                System.out.println("Romm type has been disabled !");
+            }
         } catch (RoomTypeNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
@@ -760,7 +771,7 @@ public class OperationManagerModule {
                 try {
                     roomTypeTemp = roomTypeSessionBeanRemote.getLoadedRoomType(room.getRoomRmType());
                 } catch (RoomTypeNotFoundException | RoomTypeNameAlreadyExistException | RoomNotFoundException | RoomRateNotFoundException ex) {
-                    Logger.getLogger(OperationManagerModule.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println(ex.getMessage());
                 }
             }
             System.out.println("RoomRmType: " + roomTypeTemp.getName());
@@ -774,7 +785,7 @@ public class OperationManagerModule {
                     System.out.println("RoomTypes: ");
                     int i = 1;
                     try {
-                        roomTypes = roomTypeSessionBeanRemote.getRoomTypes();
+                        roomTypes = roomTypeSessionBeanRemote.getAvailableRoomTypes();
                         for(RoomType roomType : roomTypes) {
                             System.out.println(i + ". " + roomType.getName());
                             i++;
@@ -901,8 +912,8 @@ public class OperationManagerModule {
         try {
             roomSessionBeanRemote.deleteRoom(room);
             System.out.println("Room successfully deleted !");
-        } catch (RoomNotFoundException ex) {
+        } catch (RoomNotFoundException|RoomTypeNotFoundException ex) {
             System.out.println(ex.getMessage());
-        }
+        } 
     }
 }

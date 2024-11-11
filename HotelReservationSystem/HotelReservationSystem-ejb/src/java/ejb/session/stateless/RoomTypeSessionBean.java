@@ -8,6 +8,7 @@ import entity.Room;
 import entity.RoomRate;
 import entity.RoomType;
 import enumerations.RoomRateTypeEnum;
+import enumerations.RoomStatusEnum;
 import exception.RoomNotFoundException;
 import exception.RoomRateNotFoundException;
 import exception.RoomTypeNameAlreadyExistException;
@@ -45,13 +46,14 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
     public RoomType createNewRoomType(RoomType roomType) throws RoomTypeNameAlreadyExistException {
         Query query = em.createQuery("SELECT r FROM RoomType r WHERE r.name = :name")
                 .setParameter("name", roomType.getName());
-        if (query.getFirstResult() == 0) {
+        try{
+            RoomType temp = (RoomType) query.getSingleResult();
+            throw new RoomTypeNameAlreadyExistException(
+                    "RoomType with roomType number of " + roomType.getName() + " already exist!");
+        } catch (NoResultException ex){
             em.persist(roomType);
             em.flush();
             return roomType;
-        } else {
-            throw new RoomTypeNameAlreadyExistException(
-                    "RoomType with roomType number of " + roomType.getName() + " already exist!");
         }
     }
 
@@ -64,6 +66,17 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
             throw new RoomTypeNotFoundException("There is no roomType in the system");
         }
     }
+    
+    @Override
+    public List<RoomType> getAvailableRoomTypes() throws RoomTypeNotFoundException {
+        try {
+            List<RoomType> list = em.createQuery("SELECT r FROM RoomType r WHERE r.statusType = :statusType").setParameter("statusType",RoomStatusEnum.AVAILABLE).getResultList();
+            return list;
+        } catch (NoResultException ex) {
+            throw new RoomTypeNotFoundException("There is no roomType in the system");
+        }
+    }
+
 
     @Override
     public RoomType getRoomTypeById(Long roomTypeId) throws RoomTypeNotFoundException {
@@ -94,17 +107,47 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
     }
 
     @Override
-    public boolean deleteRoomType(RoomType roomType) throws RoomTypeNotFoundException {
-        RoomType emRoomType = getRoomTypeById(roomType.getRoomTypeId());
-        em.remove(emRoomType);
-        return true;
+    public boolean deleteRoomType(RoomType roomType) throws RoomTypeNotFoundException {        
+        return deleteRoomTypeById(roomType.getRoomTypeId());
     }
 
     @Override
     public boolean deleteRoomTypeById(Long roomTypeId) throws RoomTypeNotFoundException {
         RoomType emRoomType = getRoomTypeById(roomTypeId);
-        em.remove(emRoomType);
-        return true;
+        boolean toRemove = true;
+        if(emRoomType.getRooms().stream().anyMatch(x -> x.isIsCheckedIn())){
+            System.out.println("HAVE CHECKIN ROOMS");
+            emRoomType.setStatusType(RoomStatusEnum.UNAVAILABLE);
+            emRoomType.getRooms().forEach(x -> {
+                if(!x.isIsCheckedIn()) {
+                    x.setRoomStatus(RoomStatusEnum.UNAVAILABLE);
+                }
+            });
+            toRemove = false;
+        }
+        if(toRemove) {
+            emRoomType.getRooms().forEach(x -> {
+                x.setRoomRmType(null);
+                x.setRoomStatus(RoomStatusEnum.UNAVAILABLE);
+            });
+            emRoomType.setRooms(null);
+            emRoomType.setParentRoomType(null);
+            List<RoomType> childrenRoomType = getRoomTypes();
+            childrenRoomType.removeIf(x -> x.getParentRoomType()== null || !x.getParentRoomType().equals(emRoomType));
+//                try {
+//                    RoomType y = this.getLoadedRoomType(x);
+//                    return !y.getParentRoomType().equals(emRoomType);
+//                } catch (RoomTypeNotFoundException | RoomTypeNameAlreadyExistException | RoomNotFoundException | RoomRateNotFoundException ex) {
+//                    System.out.println(ex.getMessage());
+//                    return true;
+//                }
+//            });
+            childrenRoomType.forEach(x -> x.setParentRoomType(null));
+            emRoomType.setRoomRates(null);
+            em.remove(emRoomType);
+            return true;
+        }
+        return false;
     }
 
     @Override

@@ -37,7 +37,7 @@ public class RoomType implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomTypeId;
 
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     @NotNull
     private String name;
 
@@ -61,7 +61,6 @@ public class RoomType implements Serializable {
     @Digits(integer = 1, fraction = 0)
     private BigDecimal capacity;
 
-    @NotEmpty(message = "Input list cannot be empty")
     private List<@Size(min = 1, max = 30) String> amenities;
 
     @Enumerated(EnumType.STRING)

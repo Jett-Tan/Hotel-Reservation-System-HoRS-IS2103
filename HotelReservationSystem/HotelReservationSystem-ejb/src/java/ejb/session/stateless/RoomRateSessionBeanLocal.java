@@ -7,6 +7,7 @@ package ejb.session.stateless;
 import entity.RoomRate;
 import exception.RoomRateNameAlreadyExistException;
 import exception.RoomRateNotFoundException;
+import exception.RoomTypeNotFoundException;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -20,8 +21,9 @@ public interface RoomRateSessionBeanLocal {
     public RoomRate getRoomRateByName(RoomRate roomRate) throws RoomRateNotFoundException;
     public RoomRate getRoomRateById(Long roomRateId) throws RoomRateNotFoundException;
     public List<RoomRate> getRoomRates() throws RoomRateNotFoundException;
+    public List<RoomRate> getAvailableRoomRates() throws RoomRateNotFoundException;
     public RoomRate updateRoomRate(RoomRate roomRate) throws RoomRateNotFoundException, RoomRateNameAlreadyExistException;
-    public boolean deleteRoomRate(RoomRate roomRate) throws RoomRateNotFoundException;
-    public boolean deleteRoomRateById(Long roomRateId) throws RoomRateNotFoundException;
+    public boolean deleteRoomRate(RoomRate roomRate) throws RoomRateNotFoundException, RoomTypeNotFoundException;
+    public boolean deleteRoomRateById(Long roomRateId) throws RoomRateNotFoundException, RoomTypeNotFoundException;
 
 }

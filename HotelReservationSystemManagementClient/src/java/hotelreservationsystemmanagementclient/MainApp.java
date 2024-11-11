@@ -61,9 +61,12 @@ public class MainApp {
     }
 
     void run() {
-        System.out.println("==== Welcome to Hotel Reservation System Management Client ====");
         int option = 0;
         do {
+            System.out.println("===============================================================");
+            System.out.println("==== Welcome to Hotel Reservation System Management Client ====");
+            System.out.println("====                                                       ====");
+            System.out.println("===============================================================");
             System.out.println("1. Login");
             System.out.println("2. Exit");
             System.out.print(">> ");
@@ -80,14 +83,17 @@ public class MainApp {
     }
 
     private void doLogin() {
-        System.out.println("");
+        System.out.println("===============================================================");
+        System.out.println("====       Hotel Reservation System Management Client      ====");
+        System.out.println("====                         Log in                        ====");
+        System.out.println("===============================================================");
+
         System.out.print("Username >> ");
         String username = scanner.nextLine();
         System.out.print("Password >> ");
         String password = scanner.nextLine();
         try {
             Employee employee = employeeSessionBeanRemote.getEmployeeByUsername(username);
-//            System.out.println(employee);
             if(employee.getPassword().equals(password)) {
                 currentEmployee = employee;
                 switch (employee.getEmployeeType()) {

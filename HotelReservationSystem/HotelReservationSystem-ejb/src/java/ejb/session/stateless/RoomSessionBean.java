@@ -6,7 +6,6 @@ package ejb.session.stateless;
 
 import entity.Room;
 import entity.RoomType;
-import enumerations.RoomStatusEnum;
 import exception.RoomNotFoundException;
 import exception.RoomNumberAlreadyExistException;
 import exception.RoomTypeNotFoundException;
@@ -122,21 +121,22 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
  
 
     @Override
-    public boolean deleteRoom(Room room) throws RoomNotFoundException {
-        Room emRoom = getRoomById(room.getRoomId());
-        em.remove(emRoom);
+    public boolean deleteRoom(Room room) throws RoomNotFoundException,RoomTypeNotFoundException {
+        deleteRoomById(room.getRoomId());
         return true;
     }
 
     @Override
-    public boolean deleteRoomById(Long roomId) throws RoomNotFoundException {
+    public boolean deleteRoomById(Long roomId) throws RoomNotFoundException, RoomTypeNotFoundException {
         Room emRoom = getRoomById(roomId);
+        RoomType emRoomType = roomTypeSessionBeanLocal.getRoomTypeById(emRoom.getRoomRmType().getRoomTypeId());
+        emRoomType.getRooms().remove(emRoom);
+        emRoom.setRoomRmType(null);
         em.remove(emRoom);
         return true;
     }
 
     @Override
-    
     public Room updateRoom(Room room) throws RoomNotFoundException, RoomNumberAlreadyExistException, RoomTypeNotFoundException {
         Room managedRoom = getRoomById(room.getRoomId());
         try {

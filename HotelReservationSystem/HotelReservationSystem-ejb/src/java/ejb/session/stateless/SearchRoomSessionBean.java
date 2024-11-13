@@ -121,6 +121,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
     public List<Reservation> generateReservationWalkIn(Date checkInDate,Date checkOutDate) throws RoomNotFoundException {
         List<Reservation> reservations = new ArrayList<>();
         List<Room> allRooms = roomSessionBeanLocal.getRooms();
+        allRooms.forEach(x -> em.detach(x));
         allRooms.removeIf(x -> x.getRoomStatus().equals(RoomStatusEnum.UNAVAILABLE));
         allRooms.removeIf(x -> {
 //            boolean free = false;
@@ -164,6 +165,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
         });
         System.out.println("SearchRoomSessionBean distinctRooms after filter: " + distinctRooms);
         for(Room room : distinctRooms) {
+            em.detach(room.getRoomRmType());
             Reservation current = new Reservation();
             current.setStartDate(checkInDate);
             current.setEndDate(checkOutDate);
@@ -173,7 +175,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
             current.setRoomType(room.getRoomRmType());
             List<RoomRate> roomRates = room.getRoomRmType().getRoomRates();
             System.out.println("SearchRoomSessionBean roomRates before filter for " +room.getRoomRmType().getName()+ " | "+ roomRates);
-
+            roomRates.forEach(x -> em.detach(x));
             roomRates.removeIf(x -> !x.getRoomRateType().equals(RoomRateTypeEnum.PUBLISHED));
             System.out.println("SearchRoomSessionBean roomRates  after filter for " +room.getRoomRmType().getName()+ " | "+ roomRates);
             BigDecimal totalAmount = BigDecimal.ZERO;
@@ -196,6 +198,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
     public List<Reservation> generateReservationOnline(Date checkInDate, Date checkOutDate) throws RoomNotFoundException {
         List<Reservation> reservations = new ArrayList<>();
         List<Room> allRooms = roomSessionBeanLocal.getRooms();
+        allRooms.forEach(x -> em.detach(x));
         allRooms.removeIf(x -> x.getRoomStatus().equals(RoomStatusEnum.UNAVAILABLE));
         allRooms.removeIf(x -> {
 //            boolean free = false;
@@ -241,6 +244,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
         System.out.println("SearchRoomSessionBean distinctRooms after filter: " + distinctRooms);
         for(Room room : distinctRooms) {
             Reservation current = new Reservation();
+            em.detach(room.getRoomRmType());
             current.setStartDate(checkInDate);
             current.setEndDate(checkOutDate);
             current.setNumOfRooms(new BigDecimal(getNumberOfAvailableRoom(checkInDate,checkOutDate,room.getRoomRmType())));
@@ -248,6 +252,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
             current.setReservationType(ReservationTypeEnum.ONLINE);
             current.setRoomType(room.getRoomRmType());
             List<RoomRate> roomRates = room.getRoomRmType().getRoomRates();
+            roomRates.forEach(x -> em.detach(x));
             roomRates.removeIf(x -> x.getRoomRateType().equals(RoomRateTypeEnum.PUBLISHED));
             BigDecimal totalAmount = BigDecimal.ZERO;
             Date tempDate = checkInDate;

@@ -233,13 +233,16 @@ public class HotelReservationWebService {
         
         em.flush();
         em.detach(partner);
+        partner.getReservationList().forEach(x -> em.detach(x));
+        partner.getReservationList().forEach(x -> em.detach(x.getRoomType()));
+        partner.getReservationList().forEach(x -> x.getRoomList().forEach(y -> em.detach(y)));
         
-//        partner.getReservationList().forEach(x -> x.getRoomType());
-//        partner.getReservationList().forEach(x -> x.getRoomList()
-//                .forEach(y -> y.getRoomRmType()
-//                        .setRooms(new ArrayList<>())));
-//        partner.getReservationList().forEach(x -> x.getRoomType().setRooms(new ArrayList<>()));
-//        partner.getReservationList().forEach(x -> x.getRoomType().setParentRoomType(null));
+        partner.getReservationList().forEach(x -> x.getRoomType());
+        partner.getReservationList().forEach(x -> x.getRoomList()
+                .forEach(y -> y.getRoomRmType()
+                        .setRooms(new ArrayList<>())));
+        partner.getReservationList().forEach(x -> x.getRoomType().setRooms(new ArrayList<>()));
+        partner.getReservationList().forEach(x -> x.getRoomType().setParentRoomType(null));
         
         return partner;
     }

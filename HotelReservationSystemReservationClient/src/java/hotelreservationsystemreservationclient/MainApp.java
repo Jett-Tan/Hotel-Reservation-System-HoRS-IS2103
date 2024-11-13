@@ -280,7 +280,7 @@ public class MainApp {
             System.out.print("Enter check out date (dd-MM-yyyy) >> ");
             try {
                 checkout = sdf.parse(scanner.nextLine().trim());
-                if (checkout.after(checkin) || checkout.equals(checkin)) {
+                if (checkout.after(checkin)) {
                     break;
                 } else {
                     System.out.println("Wrong date input!");
@@ -338,7 +338,7 @@ public class MainApp {
             System.out.print("Enter check out date (dd-MM-yyyy) >> ");
             try {
                 checkout = sdf.parse(scanner.nextLine().trim());
-                if (checkout.after(checkin) || checkout.equals(checkin)) {
+                if (checkout.after(checkin)) {
                     break;
                 } else {
                     System.out.println("Wrong date input!");

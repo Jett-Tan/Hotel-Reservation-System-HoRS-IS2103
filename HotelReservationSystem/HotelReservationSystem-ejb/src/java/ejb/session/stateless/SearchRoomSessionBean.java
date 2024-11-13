@@ -104,7 +104,8 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
                     }
                 }
                 temp = addDays(temp,1);
-            } while (temp.before(checkOutDate) || temp.equals(checkOutDate));
+            } while (temp.before(checkOutDate));
+//            } while (temp.before(checkOutDate) || temp.equals(checkOutDate));// Original code but has to remove equals
             return free;
         });
         rooms.removeIf(x -> x.getRoomStatus().equals(RoomStatusEnum.UNAVAILABLE));
@@ -135,7 +136,9 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
                     }
                 }
                 checkin = addDays(checkin,1);
-            } while (checkin.before(checkout) || checkin.equals(checkout));
+            } while (checkin.before(checkout));            
+//            } while (checkin.before(checkout) || checkin.equals(checkout)); // Original code but has to remove equals
+
             return false;
         });
         List<Room> distinctRooms = new ArrayList<>();
@@ -208,7 +211,9 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
                     }
                 }
                 checkin = addDays(checkin,1);
-            } while (checkin.before(checkout) || checkin.equals(checkout));
+            } while (checkin.before(checkout));
+//            } while (checkin.before(checkout) || checkin.equals(checkout));
+
             return false;
         });
         List<Room> distinctRooms = new ArrayList<>();

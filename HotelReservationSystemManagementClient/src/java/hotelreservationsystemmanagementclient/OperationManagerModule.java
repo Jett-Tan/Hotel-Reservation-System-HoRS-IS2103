@@ -948,8 +948,11 @@ public class OperationManagerModule {
 
     private void doDeleteRoom(Room room) {
         try {
-            roomSessionBeanRemote.deleteRoom(room);
-            System.out.println("Room successfully deleted !");
+            if(roomSessionBeanRemote.deleteRoom(room)){
+                System.out.println("Room successfully deleted !");
+            }else {
+                System.out.println("Romm has been disabled !");
+            }
         } catch (RoomNotFoundException|RoomTypeNotFoundException ex) {
             System.out.println(ex.getMessage());
         } 

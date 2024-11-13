@@ -82,7 +82,7 @@ public class MainApp {
                 case 2: doAllocate();
                     break;  
             }
-            if(option > 3){
+            if(option >2){
                 break;
             }
         } while (true);

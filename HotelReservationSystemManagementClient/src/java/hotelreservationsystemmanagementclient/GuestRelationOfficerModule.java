@@ -129,7 +129,7 @@ public class GuestRelationOfficerModule {
         System.out.println("====                      Search Room                      ====");
         System.out.println("===============================================================");
         Date today = new Date();
-        Boolean after2Am = today.getHours() >= 2;
+        
         do {
             System.out.print("Enter check in date (dd-MM-yyyy) >> ");
             try {
@@ -159,7 +159,7 @@ public class GuestRelationOfficerModule {
                 System.out.println("Wrong date format!");
             }
         } while (true);
-        
+        Boolean after2Am = today.getHours() >= 2 && (today.getYear()==(checkin.getYear()) && today.getDate()==(checkin.getDate()) && today.getMonth()==(checkin.getMonth()));
         try {
             List<Reservation> reservations = searchRoomSessionBeanRemote.generateReservationWalkIn(checkin, checkout);
 //            List<Reservation> reservations = searchRoomSessionBeanRemote.generateReservationOnline(checkin, checkout);
@@ -173,30 +173,29 @@ public class GuestRelationOfficerModule {
                         System.out.println(String.format("%d.%20s%20s",i,"$ "+reservation.getAmountPerRoom(),reservation.getRoomType().getName()));
                     }
                     System.out.println("===============================================================");
+                    System.out.println("1. Create reservation");
+                    System.out.println("2. Exit");
                     System.out.print("Enter >> ");
                     inputInt = scanner.nextInt();
                     scanner.nextLine();
-                    if (inputInt > 0 && inputInt < reservations.size()+1) {
+                    if (inputInt > 0 && inputInt <2 ) {
                         do{
-                            Reservation reservation = reservations.get(inputInt - 1);
-//                            System.out.println("1. Create check in");
-                            System.out.println("1. Create reservation");
-                            System.out.print("Enter >> ");
+                            System.out.print("Enter reservation number >> ");
                             inputInt = scanner.nextInt();
                             scanner.nextLine();
-                            if (inputInt == 1) {
+                            if (inputInt > 0 && inputInt < reservations.size()+1) {
+                                Reservation reservation = reservations.get(inputInt - 1);
                                 if(after2Am) {
                                     doReserveAndAllocate(reservation);
                                     break;
                                 }
                                 doReserve(reservation);
                                 break;
-                            }else if (inputInt == 2) {
-//                                doReserve(reservation);
-//                                break;
                             }
 
                         } while(true);
+                        break;
+                    }else if (inputInt == 2) {
                         break;
                     }
                 } while(true);
@@ -222,22 +221,27 @@ public class GuestRelationOfficerModule {
         String roomNumber,passportNumber;
         System.out.print("Enter room number >> ");
         roomNumber = scanner.nextLine().trim();
-        System.out.print("Enter passport number >> ");
-        passportNumber = scanner.nextLine().trim();
+//        System.out.print("Enter passport number >> ");
+//        passportNumber = scanner.nextLine().trim();
         try {
-            guest = guestSessionBeanRemote.getGuestByPassportNumber(passportNumber);
-            List<Reservation> reservations = guest.getReservationList();
+//            guest = guestSessionBeanRemote.getGuestByPassportNumber(passportNumber);
+//            List<Reservation> reservations = guest.getReservationList();
             room = roomSessionBeanRemote.getRoomByNumber(roomNumber);
-            final Room tempRoom = room;
-            reservations.removeIf(x -> !x.getEndDate().equals(today));
-            reservations.removeIf(x -> !x.getRoomList().contains(tempRoom));
-            
-            room.setIsCheckedIn(false);
-            room = roomSessionBeanRemote.updateRoom(room);
-            System.out.println("===============================================================");
-            System.out.println("Check out completed for room " + room.getRoomNumber());
-            System.out.println("===============================================================");
-        } catch (RoomNotFoundException | RoomTypeNotFoundException | RoomNumberAlreadyExistException | GuestNotFoundException ex) {
+//            final Room tempRoom = room;
+//            reservations.removeIf(x -> !x.getEndDate().equals(today));
+//            reservations.removeIf(x -> !x.getRoomList().contains(tempRoom));
+            if(room.isIsCheckedIn()) {
+                room.setIsCheckedIn(false);
+                room = roomSessionBeanRemote.updateRoom(room);
+                System.out.println("===============================================================");
+                System.out.println("Check out completed for room " + room.getRoomNumber());
+                System.out.println("===============================================================");
+            } else {
+                System.out.println("===============================================================");
+                System.out.println("Room is not checked in!");
+                System.out.println("===============================================================");
+            }
+        } catch (RoomNotFoundException | RoomTypeNotFoundException | RoomNumberAlreadyExistException  ex) {
             System.out.println(ex.getMessage());
         }
     }
@@ -286,7 +290,7 @@ public class GuestRelationOfficerModule {
                 }
             }while(true);
             if(reservation != null) {
-                reservation = allocationSingletonRemote.manualAllocateRooms(reservation);
+                reservation = allocationSingletonRemote.manualAllocateRoomsWithCheckin(reservation);
                 System.out.println("===============================================================");
                 System.out.println(String.format("%s.%30s","No","Room Number"));
                 for(int i = 1; i < reservation.getRoomList().size() +1 ; i ++ ){

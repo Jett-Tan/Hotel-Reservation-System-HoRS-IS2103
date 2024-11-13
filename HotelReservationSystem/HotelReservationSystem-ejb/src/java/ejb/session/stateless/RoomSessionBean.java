@@ -4,6 +4,7 @@
  */
 package ejb.session.stateless;
 
+import entity.Reservation;
 import entity.Room;
 import entity.RoomType;
 import enumerations.RoomStatusEnum;
@@ -24,6 +25,9 @@ import javax.persistence.Query;
  */
 @Stateless
 public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLocal {
+
+    @EJB(name = "ReservationSessionBeanLocal")
+    private ReservationSessionBeanLocal reservationSessionBeanLocal;
 
     @EJB(name = "RoomTypeSessionBeanLocal")
     private RoomTypeSessionBeanLocal roomTypeSessionBeanLocal;
@@ -123,14 +127,17 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
 
     @Override
     public boolean deleteRoom(Room room) throws RoomNotFoundException,RoomTypeNotFoundException {
-        deleteRoomById(room.getRoomId());
-        return true;
+        return deleteRoomById(room.getRoomId());
     }
 
     @Override
     public boolean deleteRoomById(Long roomId) throws RoomNotFoundException, RoomTypeNotFoundException {
         Room emRoom = getRoomById(roomId);
-        if(!emRoom.isIsCheckedIn()){
+        em.refresh(emRoom);
+        List<Reservation> reservations = reservationSessionBeanLocal.retrieveAllReseravtions();
+        reservations.removeIf(x -> !x.getAllocated());
+        reservations.removeIf(x -> !x.getRoomList().contains(emRoom));
+        if(!emRoom.isIsCheckedIn() && !(reservations.size() > 0)){
             RoomType emRoomType = roomTypeSessionBeanLocal.getRoomTypeById(emRoom.getRoomRmType().getRoomTypeId());
             emRoomType.getRooms().remove(emRoom);
             emRoom.setRoomRmType(null);
@@ -150,6 +157,7 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
                 managedRoom.setBookedDates(room.getBookedDates());
                 managedRoom.setRoomStatus(room.getRoomStatus());
                 managedRoom.setRoomRmType(room.getRoomRmType());
+                managedRoom.setIsCheckedIn(room.isIsCheckedIn());
                 RoomType roomtype = roomTypeSessionBeanLocal.getRoomTypeByName(room.getRoomRmType().getName());
                 for (Room room1 : roomtype.getRooms()) {
                     if (room1.getRoomId().equals(managedRoom.getRoomId())) {
@@ -165,6 +173,7 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
             managedRoom.setBookedDates(room.getBookedDates());
             managedRoom.setRoomStatus(room.getRoomStatus());
             managedRoom.setRoomRmType(room.getRoomRmType());
+                managedRoom.setIsCheckedIn(room.isIsCheckedIn());
             RoomType roomtype = roomTypeSessionBeanLocal.getRoomTypeByName(room.getRoomRmType().getName());
             for (Room room1 : roomtype.getRooms()) {
                 if (room1.getRoomId().equals(managedRoom.getRoomId())) {

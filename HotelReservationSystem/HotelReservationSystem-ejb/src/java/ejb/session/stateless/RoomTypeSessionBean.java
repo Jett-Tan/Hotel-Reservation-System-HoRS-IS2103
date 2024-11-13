@@ -4,6 +4,7 @@
  */
 package ejb.session.stateless;
 
+import entity.Reservation;
 import entity.Room;
 import entity.RoomRate;
 import entity.RoomType;
@@ -15,6 +16,7 @@ import exception.RoomTypeNameAlreadyExistException;
 import exception.RoomTypeNotFoundException;
 import java.util.ArrayList;
 import java.math.BigDecimal;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +35,9 @@ import javax.persistence.Query;
  */
 @Stateless
 public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeSessionBeanLocal {
+
+    @EJB(name = "ReservationSessionBeanLocal")
+    private ReservationSessionBeanLocal reservationSessionBeanLocal;
 
     @EJB(name = "RoomSessionBeanLocal")
     private RoomSessionBeanLocal roomSessionBeanLocal;
@@ -115,7 +120,9 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
     public boolean deleteRoomTypeById(Long roomTypeId) throws RoomTypeNotFoundException {
         RoomType emRoomType = getRoomTypeById(roomTypeId);
         boolean toRemove = true;
-        if(emRoomType.getRooms().stream().anyMatch(x -> x.isIsCheckedIn())){
+        List<Reservation> reservations = reservationSessionBeanLocal.retrieveAllReseravtions();
+        reservations.removeIf(x -> !x.getRoomType().equals(emRoomType));
+        if((reservations.size()> 0) || emRoomType.getRooms().stream().anyMatch(x -> x.isIsCheckedIn())) {
             System.out.println("HAVE CHECKIN ROOMS");
             emRoomType.setStatusType(RoomStatusEnum.UNAVAILABLE);
             emRoomType.getRooms().forEach(x -> {
@@ -134,20 +141,21 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
             emRoomType.setParentRoomType(null);
             List<RoomType> childrenRoomType = getRoomTypes();
             childrenRoomType.removeIf(x -> x.getParentRoomType()== null || !x.getParentRoomType().equals(emRoomType));
-//                try {
-//                    RoomType y = this.getLoadedRoomType(x);
-//                    return !y.getParentRoomType().equals(emRoomType);
-//                } catch (RoomTypeNotFoundException | RoomTypeNameAlreadyExistException | RoomNotFoundException | RoomRateNotFoundException ex) {
-//                    System.out.println(ex.getMessage());
-//                    return true;
-//                }
-//            });
+            //                try {
+            //                    RoomType y = this.getLoadedRoomType(x);
+            //                    return !y.getParentRoomType().equals(emRoomType);
+            //                } catch (RoomTypeNotFoundException | RoomTypeNameAlreadyExistException | RoomNotFoundException | RoomRateNotFoundException ex) {
+            //                    System.out.println(ex.getMessage());
+            //                    return true;
+            //                }
+            //            });
             childrenRoomType.forEach(x -> x.setParentRoomType(null));
             emRoomType.setRoomRates(null);
             em.remove(emRoomType);
             return true;
         }
         return false;
+        
     }
 
     @Override

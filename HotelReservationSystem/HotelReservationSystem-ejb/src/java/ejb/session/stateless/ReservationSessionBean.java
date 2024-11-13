@@ -106,7 +106,9 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         list.removeIf(x -> {
             Date temp = x.getStartDate();
             Date end = x.getEndDate();
-            while(temp.before(end)|| temp.equals(end)) {
+//            while(temp.before(end)|| temp.equals(end)) {
+            while(temp.before(end)) {
+
                 if((temp.getMonth() == checkInDate.getMonth()&& 
                     temp.getDate() == checkInDate.getDate() &&
                     temp.getYear() == checkInDate.getYear() 

@@ -70,7 +70,7 @@ public class AllocationSingleton implements AllocationSingletonRemote, Allocatio
         System.out.println("Allocating Room for Reservations ");
         reservations.forEach(x -> System.out.println(x));
         reservations.forEach(x -> {
-            if(x.getAllocated()) {
+            if(!x.getAllocated()) {
                 try {
                     Reservation managedReservation = reservationSessionBeanLocal.getLoadedReservation(x);
                     BigDecimal numOfRooms = managedReservation.getNumOfRooms();
@@ -104,11 +104,13 @@ public class AllocationSingleton implements AllocationSingletonRemote, Allocatio
                                 }
                                 allocationReport.setType(AllocationTypeEnum.UPGRADED);
                                 needToCreateAllocationReport = true;
+                                System.out.println("AllocationSingleton Allocation Upgraded");
                             }
                             if (numOfRooms.intValue() > 0) {
                                 allocationReport.setType(AllocationTypeEnum.NO_UPGRADE);
                                 needToCreateAllocationReport = true;
                                 needToHaltAllocation = true;
+                                System.out.println("AllocationSingleton Halt Allocation");
                             }
                             if (needToCreateAllocationReport) {
                                 ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
@@ -126,7 +128,9 @@ public class AllocationSingleton implements AllocationSingletonRemote, Allocatio
                         managedReservation.setRoomList(reservationRooms);
                         for (Room room : reservationRooms) {
                             Date temp = checkIndate;
-                            while (temp.before(checkOutDate) || temp.equals(checkOutDate)) {
+                            while (temp.before(checkOutDate)) {
+//                            while (temp.before(checkOutDate) || temp.equals(checkOutDate)) {
+
                                 room.getBookedDates().add(temp);
                                 temp = searchRoomSessionBeanLocal.addDays(temp, 1);
                             }
@@ -202,7 +206,8 @@ public class AllocationSingleton implements AllocationSingletonRemote, Allocatio
             managedReservation.setRoomList(reservationRooms);
             for(Room room : reservationRooms){
                 Date temp = checkIndate;
-                while(temp.before(checkOutDate) || temp.equals(checkOutDate)){
+                while(temp.before(checkOutDate)){
+//                while(temp.before(checkOutDate) || temp.equals(checkOutDate)){
                     room.getBookedDates().add(temp);
 //                    room.setIsCheckedIn(true);
                     temp = searchRoomSessionBeanLocal.addDays(temp, 1);
@@ -213,5 +218,86 @@ public class AllocationSingleton implements AllocationSingletonRemote, Allocatio
         return managedReservation;
     }
     
+    @Override
+    public Reservation manualAllocateRoomsWithCheckin(Reservation reservation) throws ReservationNotFoundException, AllocationException {
+        System.out.println("RUNNING MANUAL ALLOCATE ROOMS");
+        Reservation managedReservation = reservationSessionBeanLocal.getLoadedReservation(reservation);
+        BigDecimal numOfRooms = managedReservation.getNumOfRooms();
+        List<Room> reservationRooms = managedReservation.getRoomList();
+        Date checkIndate = managedReservation.getStartDate();
+        Date checkOutDate = managedReservation.getEndDate();
+        RoomType roomType = managedReservation.getRoomType();
+        RoomType parentRoomType = roomType.getParentRoomType();
+        List<Room> availableRooms = new ArrayList<>();
+        AllocationReport allocationReport = new AllocationReport();
+        allocationReport.setReservation(managedReservation);
+        if(!managedReservation.getAllocated()){
+            try {
+                boolean needToCreateAllocationReport = false;
+                boolean needToHaltAllocation = false;
 
+                availableRooms = searchRoomSessionBeanLocal.searchRooms(checkIndate, checkOutDate, roomType);
+                while(numOfRooms.intValue() > 0 && availableRooms.size() > 0){
+                    Room room = availableRooms.get(0);
+                    availableRooms.remove(0);
+                    reservationRooms.add(room);
+                    numOfRooms = numOfRooms.subtract(BigDecimal.ONE);
+                }
+                if(numOfRooms.intValue() > 0) {
+                    availableRooms = searchRoomSessionBeanLocal.searchRooms(checkIndate, checkOutDate, parentRoomType);
+                    while(numOfRooms.intValue() > 0 && availableRooms.size() > 0){
+                        Room room = availableRooms.get(0);
+                        availableRooms.remove(0);
+                        reservationRooms.add(room);
+                        numOfRooms = numOfRooms.subtract(BigDecimal.ONE);
+                    }
+                    allocationReport.setType(AllocationTypeEnum.UPGRADED);
+                    needToCreateAllocationReport = true;
+                }
+                if(numOfRooms.intValue() > 0) {
+                    allocationReport.setType(AllocationTypeEnum.NO_UPGRADE);
+                    needToCreateAllocationReport = true;
+                    needToHaltAllocation = true;
+                }
+                if(needToCreateAllocationReport) {
+                    ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+                    Validator validator = validatorFactory.getValidator();
+                    Set<ConstraintViolation<AllocationReport>> errorList = validator.validate(allocationReport);
+                    if(errorList.isEmpty()){
+                        allocationReport = allocationReportSessionBeanLocal.createNewAllocationReport(allocationReport);
+                    }
+                    if(needToHaltAllocation) {
+                        throw new AllocationException("Error allocating rooms");
+                    }
+                }
+            } catch (RoomNotFoundException | RoomTypeNotFoundException ex) {
+                System.out.println(ex.getMessage());
+            }
+            
+            managedReservation.setAllocated(Boolean.TRUE);
+            managedReservation.setRoomList(reservationRooms);
+            for(Room room : reservationRooms){
+                Date temp = checkIndate;
+                while(temp.before(checkOutDate)){
+//                while(temp.before(checkOutDate) || temp.equals(checkOutDate)){
+                    room.getBookedDates().add(temp);
+                    room.setIsCheckedIn(true);
+                    temp = searchRoomSessionBeanLocal.addDays(temp, 1);
+                }
+            }
+        } else {
+            managedReservation.setRoomList(reservationRooms);
+            for(Room room : reservationRooms){
+                Date temp = checkIndate;
+                while(temp.before(checkOutDate)){
+//                while(temp.before(checkOutDate) || temp.equals(checkOutDate)){
+                    room.getBookedDates().add(temp);
+                    room.setIsCheckedIn(true);
+                    temp = searchRoomSessionBeanLocal.addDays(temp, 1);
+                }
+            }
+        }
+        managedReservation.getRoomList().size();
+        return managedReservation;
+    }
 }

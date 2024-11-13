@@ -20,4 +20,6 @@ public interface AllocationSingletonRemote {
     public void allocateRoom();
     public void allocateRoom(Date currentDate);
     public Reservation manualAllocateRooms(Reservation reservation) throws ReservationNotFoundException,AllocationException;
+    public Reservation manualAllocateRoomsWithCheckin(Reservation reservation) throws ReservationNotFoundException,AllocationException;
+
 }

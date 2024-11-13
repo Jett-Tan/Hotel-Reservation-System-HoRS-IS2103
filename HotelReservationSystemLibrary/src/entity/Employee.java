@@ -29,17 +29,17 @@ public class Employee implements Serializable {
     private Long employeeId;
     
     @Column(nullable = false)
-    @Size(min = 1, max = 10)
+    @Size(min = 1, max = 64)
     @NotNull
     private String firstName;
     
     @Column(nullable = false)
-    @Size(min = 1, max = 10)
+    @Size(min = 1, max = 64)
     @NotNull
     private String lastName;
     
     @Column(nullable = false,unique = true)
-    @Size(min = 1, max = 10)
+    @Size(min = 1, max = 64)
     @NotNull
     private String username;
     

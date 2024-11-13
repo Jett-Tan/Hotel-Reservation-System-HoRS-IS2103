@@ -30,18 +30,18 @@ public class Partner implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long PartnerId;
     
-    @Column(nullable = false)
-    @Size(min = 1, max = 10)
+    @Column(nullable = false, length = 64)
+    @Size(min = 1, max = 64)
     @NotNull
     private String firstName;
     
-    @Column(nullable = false)
-    @Size(min = 1, max = 10)
+    @Column(nullable = false, length = 64)
+    @Size(min = 1, max = 64)
     @NotNull
     private String lastName;
     
-    @Column(nullable = false,unique = true)
-    @Size(min = 1, max = 10)
+    @Column(nullable = false,unique = true, length = 64)
+    @Size(min = 1, max = 64)
     @NotNull
     private String username;
     

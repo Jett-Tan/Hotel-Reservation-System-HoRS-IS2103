@@ -28,19 +28,19 @@ public class Guest implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long guestId;
     
-    @Column(nullable = false, length = 32)
+    @Column(nullable = false, length = 64)
     @NotNull
-    @Size(min = 1, max = 32)
+    @Size(min = 1, max = 64)
     private String name;
     
-    @Column(nullable = false, unique = true, length = 32)
+    @Column(nullable = false, unique = true, length = 64)
     @NotNull
-    @Size(min = 1, max = 32)
+    @Size(min = 1, max = 64)
     private String username;
     
-    @Column(nullable = false, length = 32)
+    @Column(nullable = false)
     @NotNull
-    @Size(min = 1, max = 32)
+    @Size(min = 8)
     private String password;
     
     @Column(nullable = false, unique = true, length = 10)

@@ -17,6 +17,9 @@ import exception.EmployeeNotFoundException;
 import java.util.Scanner;
 import ejb.session.singleton.AllocationSingletonRemote;
 import ejb.session.stateless.AllocationReportSessionBeanRemote;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  *
@@ -68,15 +71,18 @@ public class MainApp {
             System.out.println("====                                                       ====");
             System.out.println("===============================================================");
             System.out.println("1. Login");
-            System.out.println("2. Exit");
+            System.out.println("2. Allocate Room to Current Day Reservations ");
+            System.out.println("3. Exit");
             System.out.print(">> ");
             option = scanner.nextInt();
             scanner.nextLine();
             switch(option) {
                 case 1: doLogin();
-                        break;                        
+                        break;    
+                case 2: doAllocate();
+                    break;  
             }
-            if(option > 1){
+            if(option > 3){
                 break;
             }
         } while (true);
@@ -144,6 +150,22 @@ public class MainApp {
             System.out.println("Invalid Credentials");
 //            System.out.println(ex.getMessage());
         }
+    }
+
+    private void doAllocate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        Date currentDate = new Date();
+        do {
+            System.out.print("Enter date (dd-MM-yyyy) >> ");
+            try {
+                currentDate = sdf.parse(scanner.nextLine().trim());
+                break;
+            } catch (ParseException ex) {
+                System.out.println("Wrong date format!");
+            }
+        } while (true);
+        
+        this.allocationSingletonRemote.allocateRoom(currentDate);
     }
     
     

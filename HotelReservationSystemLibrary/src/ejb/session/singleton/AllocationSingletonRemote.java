@@ -7,6 +7,7 @@ package ejb.session.singleton;
 import entity.Reservation;
 import exception.AllocationException;
 import exception.ReservationNotFoundException;
+import java.util.Date;
 import javax.ejb.Remote;
 
 /**
@@ -17,5 +18,6 @@ import javax.ejb.Remote;
 public interface AllocationSingletonRemote {
     
     public void allocateRoom();
+    public void allocateRoom(Date currentDate);
     public Reservation manualAllocateRooms(Reservation reservation) throws ReservationNotFoundException,AllocationException;
 }

@@ -69,8 +69,10 @@ public class RoomRateSessionBean implements RoomRateSessionBeanRemote, RoomRateS
     @Override
     public List<RoomRate> getAvailableRoomRates() throws RoomRateNotFoundException {
         try {
-            Query query = em.createQuery("SELECT rr FROM RoomRate rr WHERE rr.rateStatus = AVAILABLE");
+            Query query = em.createQuery("SELECT rr FROM RoomRate rr");
             List<RoomRate> roomrates = query.getResultList();
+            
+            roomrates.removeIf(x -> x.getRateStatus().equals(RoomStatusEnum.UNAVAILABLE));
             return roomrates;
         } catch (NoResultException ex) {
             throw new RoomRateNotFoundException("There is no room rates in the system");

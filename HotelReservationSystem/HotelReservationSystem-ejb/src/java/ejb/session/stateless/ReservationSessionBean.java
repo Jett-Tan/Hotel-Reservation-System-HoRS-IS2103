@@ -123,7 +123,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         });
         
         list.removeIf(x -> x.getRoomType().getName() != roomType.getName());
-        System.out.println(list);
+        System.out.println("ReservationSessionBean retrieveAllReservationWithinDates" + list);
         return list;
     }
 

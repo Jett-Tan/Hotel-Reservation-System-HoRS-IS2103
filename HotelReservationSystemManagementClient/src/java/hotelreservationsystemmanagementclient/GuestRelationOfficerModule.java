@@ -1,5 +1,20 @@
 package hotelreservationsystemmanagementclient;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
+import javax.xml.validation.Validator;
+
+import ejb.session.singleton.AllocationSingletonRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.GuestSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
@@ -21,23 +36,6 @@ import exception.ReservationNotFoundException;
 import exception.RoomNotFoundException;
 import exception.RoomNumberAlreadyExistException;
 import exception.RoomTypeNotFoundException;
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import ejb.session.singleton.AllocationSingletonRemote;
-import enumerations.RoomRateTypeEnum;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -129,6 +127,7 @@ public class GuestRelationOfficerModule {
         System.out.println("====                      Search Room                      ====");
         System.out.println("===============================================================");
         Date today = new Date();
+        Boolean after2Am = today.getHours() >= 2;
         do {
             System.out.print("Enter check in date (dd-MM-yyyy) >> ");
             try {
@@ -178,17 +177,21 @@ public class GuestRelationOfficerModule {
                     if (inputInt > 0 && inputInt < reservations.size()+1) {
                         do{
                             Reservation reservation = reservations.get(inputInt - 1);
-                            System.out.println("1. Create check in");
-                            System.out.println("2. Create reservation");
+//                            System.out.println("1. Create check in");
+                            System.out.println("1. Create reservation");
                             System.out.print("Enter >> ");
                             inputInt = scanner.nextInt();
                             scanner.nextLine();
                             if (inputInt == 1) {
-                                doCheckInRn(reservation);
-                                break;
-                            }else if (inputInt == 2) {
+                                if(after2Am) {
+                                    doReserveAndAllocate(reservation);
+                                    break;
+                                }
                                 doReserve(reservation);
                                 break;
+                            }else if (inputInt == 2) {
+//                                doReserve(reservation);
+//                                break;
                             }
 
                         } while(true);
@@ -222,17 +225,13 @@ public class GuestRelationOfficerModule {
         try {
             guest = guestSessionBeanRemote.getGuestByPassportNumber(passportNumber);
             List<Reservation> reservations = guest.getReservationList();
-            for (Reservation reservation : reservations) {
-                List<Room> rooms = reservation.getRoomList();
-                for (Room room : rooms) {
-                    room.setIsCheckedIn(false);
-                    chkOutRoom = roomSessionBeanRemote.updateRoom(room);
-                }
-            }
+            room = roomSessionBeanRemote.getRoomByNumber(roomNumber);
+            final Room tempRoom = room;
+            reservations.removeIf(x -> !x.getEndDate().equals(today));
+            reservations.removeIf(x -> !x.getRoomList().contains(tempRoom));
             
-//            room = roomSessionBeanRemote.getRoomByNumber(roomNumber);
-//            room.setIsCheckedIn(false);
-//            room = roomSessionBeanRemote.updateRoom(room);
+            room.setIsCheckedIn(false);
+            room = roomSessionBeanRemote.updateRoom(room);
             System.out.println("===============================================================");
             System.out.println("Check out completed for room " + chkOutRoom.getRoomNumber());
             System.out.println("===============================================================");
@@ -299,7 +298,7 @@ public class GuestRelationOfficerModule {
              
     }
 
-    private void doCheckInRn(Reservation reservation) {
+    private void doReserveAndAllocate(Reservation reservation) {
         int inputInt;
         String input;
         System.out.println("===============================================================");
@@ -388,6 +387,7 @@ public class GuestRelationOfficerModule {
                             System.out.println("Successfully create reservation!");
                             System.out.println("===============================================================");
                             reservation = allocationSingletonRemote.manualAllocateRooms(reservation);
+                            System.out.println("Rooms allocated successfully!");
                             if(reservation.getAllocated()) {
                                 reservation.getRoomList().forEach(x -> {
                                     try {
@@ -453,7 +453,7 @@ public class GuestRelationOfficerModule {
                 try {
                     guest = guestSessionBeanRemote.loginGuest(username, password);
                     continueOn = true;
-                    break;
+//                    break;
                 } catch (InvalidLoginCredentialsException ex) {
                     System.out.println("Invalid Credentials");
                 } catch (GuestNotFoundException ex) {
@@ -509,9 +509,7 @@ public class GuestRelationOfficerModule {
                         try {
                             guest = guestSessionBeanRemote.addReservation(guest, reservation);
                             System.out.println("Successfully create reservation!");
-                        } catch (GuestNotFoundException  ex) {
-                            System.out.println(ex.getMessage());
-                        } catch (ReservationNotFoundException  ex) {
+                        } catch (GuestNotFoundException | ReservationNotFoundException  ex) {
                             System.out.println(ex.getMessage());
                         } 
                         break;

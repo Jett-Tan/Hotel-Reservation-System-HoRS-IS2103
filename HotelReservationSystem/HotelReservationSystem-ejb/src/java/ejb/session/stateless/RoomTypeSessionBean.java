@@ -220,7 +220,7 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
                 managedRoomType.setCapacity(roomType.getCapacity());
                 managedRoomType.setAmenities(roomType.getAmenities());
                 managedRoomType.setStatusType(roomType.getStatusType());
-
+                managedRoomType.setParentRoomType(roomType.getParentRoomType());
                 managedRoomType.setRoomRates(roomType.getRoomRates());
                 List<Room> oldRooms = managedRoomType.getRooms();
 
@@ -246,7 +246,7 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
             managedRoomType.setCapacity(roomType.getCapacity());
             managedRoomType.setAmenities(roomType.getAmenities());
             managedRoomType.setStatusType(roomType.getStatusType());
-
+            managedRoomType.setParentRoomType(roomType.getParentRoomType());
             managedRoomType.setRoomRates(roomType.getRoomRates());
             List<Room> oldRooms = managedRoomType.getRooms();
 

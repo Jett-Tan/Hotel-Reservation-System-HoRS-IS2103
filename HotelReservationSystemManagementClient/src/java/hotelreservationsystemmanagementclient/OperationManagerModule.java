@@ -27,8 +27,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.validation.Validator;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -265,39 +263,39 @@ public class OperationManagerModule {
             }
         } while(true);
         List<Date> bookedDates = new ArrayList<>();
-        do{
-            System.out.println("Booked date : ");
-            System.out.print("Enter (dd-MM--yyyy) (Leave blank to skip) >> ");
-            input = scanner.nextLine().trim();
-            if(!"".equals(input)){
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-                try {
-                    bookedDates.add(sdf.parse(input));
-                } catch (ParseException ex) {
-                    System.out.println("Invalid date format!");
-                }
-            }
-            if("".equals(input)) {
+//        do{
+//            System.out.println("Booked date : ");
+//            System.out.print("Enter (dd-MM--yyyy) (Leave blank to skip) >> ");
+//            input = scanner.nextLine().trim();
+//            if(!"".equals(input)){
+//                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+//                try {
+//                    bookedDates.add(sdf.parse(input));
+//                } catch (ParseException ex) {
+//                    System.out.println("Invalid date format!");
+//                }
+//            }
+//            if("".equals(input)) {
                 room.setBookedDates(bookedDates);
-                break;
-            }
-        } while(true);
-        do{
-            System.out.println("Currently checked in : ");
-            System.out.print("Enter (T/F) >> ");
-            input = scanner.nextLine().trim();
-            if(!"".equals(input)) {
-                if(input.toUpperCase().equals("T")){
-                    room.setIsCheckedIn(true);
-                    break;
-                } else if (input.toUpperCase().equals("F")) {
+//                break;
+//            }
+//        } while(true);
+//        do{
+//            System.out.println("Currently checked in : ");
+//            System.out.print("Enter (T/F) >> ");
+//            input = scanner.nextLine().trim();
+//            if(!"".equals(input)) {
+//                if(input.toUpperCase().equals("T")){
+//                    room.setIsCheckedIn(true);
+//                    break;
+//                } else if (input.toUpperCase().equals("F")) {
                     room.setIsCheckedIn(false);
-                    break;
-                } else {
-                    System.out.println("Wrong input");
-                }
-            }
-        }while(true);
+//                    break;
+//                } else {
+//                    System.out.println("Wrong input");
+//                }
+//            }
+//        }while(true);
         do{
             System.out.println("Room Status: ");
             System.out.println("1. Available");
@@ -481,18 +479,19 @@ public class OperationManagerModule {
             System.out.println("Error with loading room type !");
             return;
         }
-        System.out.println("Name        : " +  roomType.getName());
-        System.out.println("Bed         : " +  roomType.getBed());
-        System.out.println("Capacity    : " +  roomType.getCapacity());
-        System.out.println("Size        : " +  roomType.getSize());
-        System.out.println("StatusType  : " +  roomType.getStatusType().toString());
-        System.out.println("Description : " +  roomType.getDescription());
-        System.out.println("Amenitities: ");
+        System.out.println("Name             : " +  roomType.getName());
+        System.out.println("Bed              : " +  roomType.getBed());
+        System.out.println("Capacity         : " +  roomType.getCapacity());
+        System.out.println("Size             : " +  roomType.getSize());
+        System.out.println("StatusType       : " +  roomType.getStatusType().toString());
+        System.out.println("Description      : " +  roomType.getDescription());
+        System.out.println("Parent Room Type : " + (roomType.getParentRoomType() == null ? "NONE" : roomType.getParentRoomType().getName()));
+        System.out.println("Amenitities      : ");
         int i = 1;
         for(String amenity : roomType.getAmenities()) {// need to decide what to print
             System.out.println(String.format("%d.%20s", i++ , amenity));
         }
-        System.out.println("Room Rate: ");
+        System.out.println("Room Rate        : ");
         i = 1;
         for(RoomRate roomRate : roomType.getRoomRates()) {// need to decide what to print
             System.out.println(String.format("%d.%20s",i++ ,roomRate.getName()));
@@ -679,7 +678,46 @@ public class OperationManagerModule {
                 break;
             }
         } while (true);
+        do {
+            System.out.println("===============================================================");
+            System.out.println("Parent Room Type : " + (roomType.getParentRoomType() == null ? "NONE" : roomType.getParentRoomType().getName()));
+            System.out.println("===============================================================");
+            System.out.println("1. "+(roomType.getParentRoomType() == null ? "Add" : "Change"));
+            System.out.println("2. Remove");
+            System.out.println("3. Skip");
+            System.out.print("Enter >> ");
+            inputInt = scanner.nextInt();
+            scanner.nextLine();
+            if (inputInt == 1) {
+                try {
+                    List<RoomType> newRoomTypes = roomTypeSessionBeanRemote.getRoomTypes();
+                    newRoomTypes.remove(roomType);
+                    int i = 0;
+                    for(RoomType RoomType : newRoomTypes) {
+                        System.out.println(++i +". "+ RoomType.getName());
+                    }
+                    do{
+                        System.out.print("Enter Room rate number >> ");
+                        inputInt = scanner.nextInt();
+                        scanner.nextLine();
+
+                        if (inputInt > 0 && inputInt < newRoomTypes.size() + 1) {
+                            roomType.setParentRoomType(newRoomTypes.get(inputInt - 1));
+                            break;
+                        }
+                    }while (true);
+                } catch (RoomTypeNotFoundException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            } else if (inputInt == 2) {
+                roomType.setParentRoomType(null);
+            } else if (inputInt == 3) {
+                
+                break;
+            }
+        } while (true);
         
+        System.out.println("");
         Set<ConstraintViolation<RoomType>> errorList = this.validator.validate(roomType);
         if (errorList.isEmpty()) {
             System.out.println("");
@@ -748,7 +786,7 @@ public class OperationManagerModule {
                 }
             } while(true);
         } catch (RoomTypeNotFoundException | RoomNotFoundException | RoomTypeNameAlreadyExistException | RoomRateNotFoundException ex) {
-            Logger.getLogger(OperationManagerModule.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex.getMessage());
         }
             
     }
@@ -824,71 +862,71 @@ public class OperationManagerModule {
                 break;
             }
         } while (true);
-        List<Date> bookedDates = room.getBookedDates();
-        do {
-            
-            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-            System.out.println("BookedDates: ");
-            int i = 0;
-            for(Date date : bookedDates) {
-                System.out.println(++i + "." + date);
-            }
-            System.out.println("1. Add date");
-            System.out.println("2. Update date");
-            System.out.println("3. Remove date");
-            System.out.println("4. Skip");
-            System.out.print("Enter >> ");
-            inputInt = scanner.nextInt();
-            scanner.nextLine();
-            if(inputInt == 1) {
-                do {
-                    System.out.print("Enter date (dd-MM-yyyy) >> ");
-                    input = scanner.nextLine();
-                    if(!"".equals(input)) {
-                        try {
-                            bookedDates.add(sdf.parse(input));
-                            break;
-                        } catch (ParseException ex) {
-                            System.out.println("Wrong date format!");
-                        }
-                    }
-                } while (true);
-            } else if(inputInt == 2) {
-                do {
-                    System.out.print("Enter date number >> ");
-                    inputInt = scanner.nextInt();
-                    scanner.nextLine();
-                    if(inputInt > 0 && inputInt < bookedDates.size() + 1) {
-                        do {
-                            System.out.print("Enter new date (yyyy-MM-dd) >> ");
-                            input = scanner.nextLine().trim();
-                            if(!"".equals(input)) {
-                                try {
-                                    bookedDates.set(inputInt - 1,sdf.parse(input));
-                                    break;
-                                } catch (ParseException ex) {
-                                    System.out.println("Wrong date format!");
-                                }
-                            }
-                        } while (true);
-                        break;
-                    }
-                } while (true);
-            } else if(inputInt == 3) {
-                do {
-                    System.out.print("Enter date number >> ");
-                    inputInt = scanner.nextInt();
-                    scanner.nextLine();
-                    if(inputInt > 0 && inputInt < bookedDates.size() + 1) {
-                        bookedDates.remove(inputInt - 1);
-                        break;
-                    }
-                } while (true);
-            } else if(inputInt == 4) {
-                room.setBookedDates(bookedDates);
-                break;
-            }
-        } while (true);
+//        List<Date> bookedDates = room.getBookedDates();
+//        do {
+//            
+//            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+//            System.out.println("BookedDates: ");
+//            int i = 0;
+//            for(Date date : bookedDates) {
+//                System.out.println(++i + "." + date);
+//            }
+//            System.out.println("1. Add date");
+//            System.out.println("2. Update date");
+//            System.out.println("3. Remove date");
+//            System.out.println("4. Skip");
+//            System.out.print("Enter >> ");
+//            inputInt = scanner.nextInt();
+//            scanner.nextLine();
+//            if(inputInt == 1) {
+//                do {
+//                    System.out.print("Enter date (dd-MM-yyyy) >> ");
+//                    input = scanner.nextLine();
+//                    if(!"".equals(input)) {
+//                        try {
+//                            bookedDates.add(sdf.parse(input));
+//                            break;
+//                        } catch (ParseException ex) {
+//                            System.out.println("Wrong date format!");
+//                        }
+//                    }
+//                } while (true);
+//            } else if(inputInt == 2) {
+//                do {
+//                    System.out.print("Enter date number >> ");
+//                    inputInt = scanner.nextInt();
+//                    scanner.nextLine();
+//                    if(inputInt > 0 && inputInt < bookedDates.size() + 1) {
+//                        do {
+//                            System.out.print("Enter new date (yyyy-MM-dd) >> ");
+//                            input = scanner.nextLine().trim();
+//                            if(!"".equals(input)) {
+//                                try {
+//                                    bookedDates.set(inputInt - 1,sdf.parse(input));
+//                                    break;
+//                                } catch (ParseException ex) {
+//                                    System.out.println("Wrong date format!");
+//                                }
+//                            }
+//                        } while (true);
+//                        break;
+//                    }
+//                } while (true);
+//            } else if(inputInt == 3) {
+//                do {
+//                    System.out.print("Enter date number >> ");
+//                    inputInt = scanner.nextInt();
+//                    scanner.nextLine();
+//                    if(inputInt > 0 && inputInt < bookedDates.size() + 1) {
+//                        bookedDates.remove(inputInt - 1);
+//                        break;
+//                    }
+//                } while (true);
+//            } else if(inputInt == 4) {
+//                room.setBookedDates(bookedDates);
+//                break;
+//            }
+//        } while (true);
         
         
         Set<ConstraintViolation<Room>> errorList = this.validator.validate(room);

@@ -35,7 +35,7 @@ public class Room implements Serializable {
     
     @Column(nullable = false,unique = true)
     @NotNull
-    @Size(min = 1, max = 6)
+    @Size(min = 1, max = 10)
     private String roomNumber;
     
     private List<Date> bookedDates;

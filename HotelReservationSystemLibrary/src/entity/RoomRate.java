@@ -40,7 +40,7 @@ public class RoomRate implements Serializable {
     
     @Column(nullable = false)
     @NotNull
-    @Size(min = 1, max = 20)
+    @Size(min = 1, max = 64)
     private String name;
     
     @Column(nullable = false, scale = 2)

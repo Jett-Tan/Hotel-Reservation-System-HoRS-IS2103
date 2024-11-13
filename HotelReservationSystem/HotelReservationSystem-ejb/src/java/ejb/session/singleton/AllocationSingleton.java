@@ -55,7 +55,20 @@ public class AllocationSingleton implements AllocationSingletonRemote, Allocatio
     @Override
     @Schedule(hour = "2")
     public void allocateRoom() {
+        Date today = new Date();
+        allocateRoom(today);
+    }
+    
+    @Override
+    public void allocateRoom(Date currentDate) {
+        Date today = currentDate;
+        System.out.println("Allocating Room reservation for "  + today);
         List<Reservation> reservations = reservationSessionBeanLocal.retrieveAllReseravtions();
+        reservations.removeIf(x ->!(x.getStartDate().getDate() == today.getDate() &&
+                            x.getStartDate().getYear() == today.getYear()&& 
+                            x.getStartDate().getMonth()== today.getMonth()));
+        System.out.println("Allocating Room for Reservations ");
+        reservations.forEach(x -> System.out.println(x));
         reservations.forEach(x -> {
             if(x.getAllocated()) {
                 try {
@@ -191,7 +204,7 @@ public class AllocationSingleton implements AllocationSingletonRemote, Allocatio
                 Date temp = checkIndate;
                 while(temp.before(checkOutDate) || temp.equals(checkOutDate)){
                     room.getBookedDates().add(temp);
-                    room.setIsCheckedIn(true);
+//                    room.setIsCheckedIn(true);
                     temp = searchRoomSessionBeanLocal.addDays(temp, 1);
                 }
             }

@@ -151,7 +151,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
                 distinctRooms.add(room);
             }            
         }
-        
+        System.out.println("SearchRoomSessionBean distinctRooms before filter: " + distinctRooms);
         distinctRooms.removeIf(x -> {
             try {
                 return !(getNumberOfAvailableRoom(checkInDate,checkOutDate,x.getRoomRmType()) > 0);
@@ -159,7 +159,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
                 return true;
             }
         });
-        
+        System.out.println("SearchRoomSessionBean distinctRooms after filter: " + distinctRooms);
         for(Room room : distinctRooms) {
             Reservation current = new Reservation();
             current.setStartDate(checkInDate);
@@ -169,12 +169,15 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
             current.setReservationType(ReservationTypeEnum.WALK_IN);
             current.setRoomType(room.getRoomRmType());
             List<RoomRate> roomRates = room.getRoomRmType().getRoomRates();
+            System.out.println("SearchRoomSessionBean roomRates before filter for " +room.getRoomRmType().getName()+ " | "+ roomRates);
+
             roomRates.removeIf(x -> !x.getRoomRateType().equals(RoomRateTypeEnum.PUBLISHED));
+            System.out.println("SearchRoomSessionBean roomRates  after filter for " +room.getRoomRmType().getName()+ " | "+ roomRates);
             BigDecimal totalAmount = BigDecimal.ZERO;
             long diffInMillies = Math.abs(checkInDate.getTime() - checkOutDate.getTime());
             long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
             BigDecimal numOfDays = new BigDecimal(diff);
-            System.out.println(numOfDays);
+//            System.out.println(numOfDays);
             for(RoomRate x : roomRates) {
                 totalAmount = totalAmount.add(x.getRate().multiply(numOfDays));
             }
@@ -222,6 +225,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
             }            
         }
         
+        System.out.println("SearchRoomSessionBean distinctRooms before filter: " + distinctRooms);
         distinctRooms.removeIf(x -> {
             try {
                 return !(getNumberOfAvailableRoom(checkInDate,checkOutDate,x.getRoomRmType()) > 0);
@@ -229,7 +233,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
                 return true;
             }
         });
-        
+        System.out.println("SearchRoomSessionBean distinctRooms after filter: " + distinctRooms);
         for(Room room : distinctRooms) {
             Reservation current = new Reservation();
             current.setStartDate(checkInDate);
@@ -242,7 +246,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
             roomRates.removeIf(x -> x.getRoomRateType().equals(RoomRateTypeEnum.PUBLISHED));
             BigDecimal totalAmount = BigDecimal.ZERO;
             Date tempDate = checkInDate;
-            System.out.println(roomRates);
+            System.out.println("SearchRoomSessionBean roomRates for " +room.getRoomRmType().getName()+ " | "+ roomRates);
             do {
 //                System.out.println("Looking at " + tempDate);
                 RoomRate selectedRoomRate;
@@ -279,7 +283,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
                                 } 
                         }
                     }
-                    System.out.println(selectedRoomRate);
+                    System.out.println("SearchRoomSessionBean Selected Room Rate: " + selectedRoomRate.getName());
                     totalAmount = totalAmount.add(selectedRoomRate.getRate());
                 }
                 tempDate = addDays(tempDate,1);

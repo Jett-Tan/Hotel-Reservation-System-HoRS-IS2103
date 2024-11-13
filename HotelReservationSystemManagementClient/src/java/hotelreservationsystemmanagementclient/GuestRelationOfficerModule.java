@@ -129,6 +129,7 @@ public class GuestRelationOfficerModule {
         System.out.println("====                      Search Room                      ====");
         System.out.println("===============================================================");
         Date today = new Date();
+        Boolean after2Am = today.getHours() >= 2;
         do {
             System.out.print("Enter check in date (dd-MM-yyyy) >> ");
             try {
@@ -178,17 +179,21 @@ public class GuestRelationOfficerModule {
                     if (inputInt > 0 && inputInt < reservations.size()+1) {
                         do{
                             Reservation reservation = reservations.get(inputInt - 1);
-                            System.out.println("1. Create check in");
-                            System.out.println("2. Create reservation");
+//                            System.out.println("1. Create check in");
+                            System.out.println("1. Create reservation");
                             System.out.print("Enter >> ");
                             inputInt = scanner.nextInt();
                             scanner.nextLine();
                             if (inputInt == 1) {
-                                doCheckInRn(reservation);
-                                break;
-                            }else if (inputInt == 2) {
+                                if(after2Am) {
+                                    doReserveAndAllocate(reservation);
+                                    break;
+                                }
                                 doReserve(reservation);
                                 break;
+                            }else if (inputInt == 2) {
+//                                doReserve(reservation);
+//                                break;
                             }
 
                         } while(true);
@@ -221,8 +226,12 @@ public class GuestRelationOfficerModule {
         passportNumber = scanner.nextLine().trim();
         try {
             guest = guestSessionBeanRemote.getGuestByPassportNumber(passportNumber);
-            List<Reservation> reservations = reservationSessionBeanRemote.retrieveAllMyReservations(guest);
+            List<Reservation> reservations = guest.getReservationList();
             room = roomSessionBeanRemote.getRoomByNumber(roomNumber);
+            final Room tempRoom = room;
+            reservations.removeIf(x -> !x.getEndDate().equals(today));
+            reservations.removeIf(x -> !x.getRoomList().contains(tempRoom));
+            
             room.setIsCheckedIn(false);
             room = roomSessionBeanRemote.updateRoom(room);
             System.out.println("===============================================================");
@@ -291,7 +300,7 @@ public class GuestRelationOfficerModule {
              
     }
 
-    private void doCheckInRn(Reservation reservation) {
+    private void doReserveAndAllocate(Reservation reservation) {
         int inputInt;
         String input;
         System.out.println("===============================================================");
@@ -380,6 +389,7 @@ public class GuestRelationOfficerModule {
                             System.out.println("Successfully create reservation!");
                             System.out.println("===============================================================");
                             reservation = allocationSingletonRemote.manualAllocateRooms(reservation);
+                            System.out.println("Rooms allocated successfully!");
                             if(reservation.getAllocated()) {
                                 reservation.getRoomList().forEach(x -> {
                                     try {
@@ -445,7 +455,7 @@ public class GuestRelationOfficerModule {
                 try {
                     guest = guestSessionBeanRemote.loginGuest(username, password);
                     continueOn = true;
-                    break;
+//                    break;
                 } catch (InvalidLoginCredentialsException ex) {
                     System.out.println("Invalid Credentials");
                 } catch (GuestNotFoundException ex) {
@@ -501,9 +511,7 @@ public class GuestRelationOfficerModule {
                         try {
                             guest = guestSessionBeanRemote.addReservation(guest, reservation);
                             System.out.println("Successfully create reservation!");
-                        } catch (GuestNotFoundException  ex) {
-                            System.out.println(ex.getMessage());
-                        } catch (ReservationNotFoundException  ex) {
+                        } catch (GuestNotFoundException | ReservationNotFoundException  ex) {
                             System.out.println(ex.getMessage());
                         } 
                         break;

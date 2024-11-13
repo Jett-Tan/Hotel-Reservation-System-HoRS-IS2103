@@ -95,93 +95,98 @@ public class SalesManagerModule {
     }
 
     private void doCreateNewRoomRate() {
-        System.out.println("===============================================================");
-        System.out.println("====              System Administration Module             ====");        
-        System.out.println("====                 Create New Room Rate                  ====");
-        System.out.println("===============================================================");
-        RoomRate newRoomRate = new RoomRate();
-        String name;
-        BigDecimal rate;
-        Date startDate = new Date(Long.MIN_VALUE);
-        Date endDate = new Date(Long.MAX_VALUE);
-        RoomStatusEnum rateStatus;
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        System.out.print("Enter name >> ");
-        newRoomRate.setName(scanner.nextLine());
-        System.out.print("Enter rate >> ");    
-        newRoomRate.setRate(new BigDecimal(scanner.nextLine().trim()));
-        
-        int option = 0;
-        do{
-            System.out.println("Select Rate Status");
-            System.out.println("1. Available");
-            System.out.println("2. Unavailable");
-            System.out.print("Enter room status (1 - 2) >> ");
-            option = scanner.nextInt();
-            scanner.nextLine();
-            if(option == 1) {
-                newRoomRate.setRateStatus(RoomStatusEnum.AVAILABLE);
-            } else if (option == 2) {
-                newRoomRate.setRateStatus(RoomStatusEnum.UNAVAILABLE);
-            }
-        }while (option > 2 || option < 1);
-        do{
-            System.out.println("Select Rate Type");
-            System.out.println("1. Published");
-            System.out.println("2. Normal");
-            System.out.println("3. Peak");
-            System.out.println("4. Promotion");
-            System.out.print("Enter >> ");
-            option = scanner.nextInt();
-            scanner.nextLine();
-            if(option == 1) {
-                newRoomRate.setRoomRateType(RoomRateTypeEnum.PUBLISHED);
-            } else if (option == 2) {
-                newRoomRate.setRoomRateType(RoomRateTypeEnum.NORMAL);
-            } else if (option == 3) {
-                newRoomRate.setRoomRateType(RoomRateTypeEnum.PEAK);
-            } else if (option == 4) {
-                newRoomRate.setRoomRateType(RoomRateTypeEnum.PROMOTION);
-            }
-        }while(option > 4 || option < 1);
-        if(newRoomRate.getRoomRateType().equals(RoomRateTypeEnum.PROMOTION) || newRoomRate.getRoomRateType().equals(RoomRateTypeEnum.PEAK) ) {
-            do {
-                System.out.print("Enter start date (dd-mm-yyyy)>> ");
-                try {
-                    newRoomRate.setStartDate(sdf.parse(scanner.nextLine().trim()));
-                    break;
-                } catch (ParseException ex) {
-                    System.out.println("Wrong date format");
-                }            
-            } while(true);
-            do {
-                System.out.print("Enter end date (dd-mm-yyyy)>> ");  
-                try {
-                    newRoomRate.setEndDate(sdf.parse(scanner.nextLine().trim()));
-                    break;
-                } catch (ParseException ex) {
-                    System.out.println("Wrong date format!");
+        try {
+            System.out.println("===============================================================");
+            System.out.println("====              System Administration Module             ====");
+            System.out.println("====                 Create New Room Rate                  ====");
+            System.out.println("===============================================================");
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+            RoomRate newRoomRate = new RoomRate();
+            String name;
+            BigDecimal rate;
+            Date startDate = sdf.parse("01-01-1970");
+            Date endDate = sdf.parse("01-01-2999");
+            RoomStatusEnum rateStatus;
+            System.out.print("Enter name >> ");
+            newRoomRate.setName(scanner.nextLine());
+            System.out.print("Enter rate >> ");
+            newRoomRate.setRate(new BigDecimal(scanner.nextLine().trim()));
+            
+            int option = 0;
+            do{
+                System.out.println("Select Rate Status");
+                System.out.println("1. Available");
+                System.out.println("2. Unavailable");
+                System.out.print("Enter room status (1 - 2) >> ");
+                option = scanner.nextInt();
+                scanner.nextLine();
+                if(option == 1) {
+                    newRoomRate.setRateStatus(RoomStatusEnum.AVAILABLE);
+                } else if (option == 2) {
+                    newRoomRate.setRateStatus(RoomStatusEnum.UNAVAILABLE);
                 }
-            } while(true);
-        } else {
-            newRoomRate.setStartDate(startDate);
-            newRoomRate.setEndDate(endDate);
-        }
-        Set<ConstraintViolation<RoomRate>> errorList = this.validator.validate(newRoomRate);
-        if (errorList.isEmpty()) {
-            System.out.println("");
-            try {
-                newRoomRate = roomRateSessionBeanRemote.createNewRoomRate(newRoomRate);
-                System.out.println("New Room Rate created with name of " + newRoomRate.getName());
-            } catch (RoomRateNameAlreadyExistException ex) {
-                System.out.println(ex.getMessage());
+            }while (option > 2 || option < 1);
+            do{
+                System.out.println("Select Rate Type");
+                System.out.println("1. Published");
+                System.out.println("2. Normal");
+                System.out.println("3. Peak");
+                System.out.println("4. Promotion");
+                System.out.print("Enter >> ");
+                option = scanner.nextInt();
+                scanner.nextLine();
+                if(option == 1) {
+                    newRoomRate.setRoomRateType(RoomRateTypeEnum.PUBLISHED);
+                } else if (option == 2) {
+                    newRoomRate.setRoomRateType(RoomRateTypeEnum.NORMAL);
+                } else if (option == 3) {
+                    newRoomRate.setRoomRateType(RoomRateTypeEnum.PEAK);
+                } else if (option == 4) {
+                    newRoomRate.setRoomRateType(RoomRateTypeEnum.PROMOTION);
+                }
+            }while(option > 4 || option < 1);
+            if(newRoomRate.getRoomRateType().equals(RoomRateTypeEnum.PROMOTION) || newRoomRate.getRoomRateType().equals(RoomRateTypeEnum.PEAK) ) {
+                do {
+                    System.out.print("Enter start date (dd-mm-yyyy)>> ");
+                    try {
+                        newRoomRate.setStartDate(sdf.parse(scanner.nextLine().trim()));
+                        break;
+                    } catch (ParseException ex) {
+                        System.out.println("Wrong date format");
+                    }
+                } while(true);
+                do {
+                    System.out.print("Enter end date (dd-mm-yyyy)>> ");
+                    try {
+                        newRoomRate.setEndDate(sdf.parse(scanner.nextLine().trim()));
+                        break;
+                    } catch (ParseException ex) {
+                        System.out.println("Wrong date format!");
+                    }
+                } while(true);
+            } else {
+                newRoomRate.setStartDate(startDate);
+                newRoomRate.setEndDate(endDate);
             }
-        } else {
-            System.out.println("");
-            System.out.println("===============================================================");
-            System.out.println("====             Error Creating New Room Rate              ====");
-            errorList.forEach(x -> System.out.println(x.getPropertyPath() + " : " + x.getMessage().replace("size","input") + " length"));
-            System.out.println("===============================================================");
+            Set<ConstraintViolation<RoomRate>> errorList = this.validator.validate(newRoomRate);
+            if (errorList.isEmpty()) {
+                System.out.println("");
+                try {
+                    newRoomRate = roomRateSessionBeanRemote.createNewRoomRate(newRoomRate);
+                    System.out.println("New Room Rate created with name of " + newRoomRate.getName());
+                } catch (RoomRateNameAlreadyExistException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            } else {
+                System.out.println("");
+                System.out.println("===============================================================");
+                System.out.println("====             Error Creating New Room Rate              ====");
+                errorList.forEach(x -> System.out.println(x.getPropertyPath() + " : " + x.getMessage().replace("size","input") + " length"));
+                System.out.println("===============================================================");
+            }
+        } catch (ParseException ex) {
+            System.out.println(ex.getMessage());
+            return;
         }
     }
 

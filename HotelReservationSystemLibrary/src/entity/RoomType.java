@@ -37,7 +37,8 @@ public class RoomType implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomTypeId;
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false,unique = true,length = 64)
+    @Size(min = 1, max = 64)
     @NotNull
     private String name;
 
@@ -50,9 +51,9 @@ public class RoomType implements Serializable {
     @DecimalMax("1000.000")
     private BigDecimal size;
 
-    @Column(nullable = false)
+    @Column(nullable = false,length = 255)
     @NotNull
-    @Size(min = 1, max = 32)
+    @Size(min = 1, max = 255)
     private String bed;
 
     @Column(nullable = false)
@@ -61,7 +62,7 @@ public class RoomType implements Serializable {
     @Digits(integer = 1, fraction = 0)
     private BigDecimal capacity;
 
-    private List<@Size(min = 1, max = 30) String> amenities;
+    private List<@Size(min = 1, max = 255) String> amenities;
 
     @Enumerated(EnumType.STRING)
     @NotNull

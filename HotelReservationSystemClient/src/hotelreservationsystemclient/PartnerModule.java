@@ -198,26 +198,29 @@ public class PartnerModule {
             System.out.println();
             return;
         }
-         
-        viewAllMyReservation();
-        
-        System.out.print("Select the reservation id > ");
-        int reservationId = scanner.nextInt();
-        scanner.nextLine();
+        do {
+            viewAllMyReservation();
+            System.out.print("Select the reservation id > ");
+            int reservationId = scanner.nextInt();
+            scanner.nextLine();
 
-        Reservation reservation = reservationList.get(reservationId - 1);
-        System.out.println("================================================================");
-        System.out.println("====        Welcome to Hotel Reservation System Client      ====");
-        System.out.println("====                  View My Reservation                   ====");
-        System.out.println("================================================================");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
-        System.out.println("Reservation Id: " + reservation.getReservationId());
-        System.out.println("Reservation Type: " + reservation.getReservationType().name());
-        System.out.println("Room Type: " + reservation.getRoomType().getName());
-        System.out.println("Number of Rooms: " + reservation.getNumOfRooms());
-        System.out.println("Start Date: " + dateFormat.format(reservation.getStartDate().toGregorianCalendar().getTime()));
-        System.out.println("End Date: " + dateFormat.format(reservation.getEndDate().toGregorianCalendar().getTime()));
-        System.out.println("Total Amount: " + reservation.getAmountPerRoom().multiply(reservation.getNumOfRooms()));
+            if(reservationId > 0 && reservationId < reservationList.size() +1){ 
+                Reservation reservation = reservationList.get(reservationId - 1);
+                System.out.println("================================================================");
+                System.out.println("====        Welcome to Hotel Reservation System Client      ====");
+                System.out.println("====                  View My Reservation                   ====");
+                System.out.println("================================================================");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
+                System.out.println("Reservation Id: " + reservation.getReservationId());
+                System.out.println("Reservation Type: " + reservation.getReservationType().name());
+                System.out.println("Room Type: " + reservation.getRoomType().getName());
+                System.out.println("Number of Rooms: " + reservation.getNumOfRooms());
+                System.out.println("Start Date: " + dateFormat.format(reservation.getStartDate().toGregorianCalendar().getTime()));
+                System.out.println("End Date: " + dateFormat.format(reservation.getEndDate().toGregorianCalendar().getTime()));
+                System.out.println("Total Amount: " + reservation.getAmountPerRoom().multiply(reservation.getNumOfRooms()));
+                break;
+            }
+        }while(true);
     }
 
     private void viewAllMyReservation() {
@@ -235,7 +238,7 @@ public class PartnerModule {
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
 
-        System.out.println("Id    Reservation Start Date   Reservation End Date    Total Amount");
+        System.out.println("Id    Reservation Start Date   Reservation End Date   Amount Per Room");
         int i = 1;
         for (Reservation reservation : reservationList) {
             System.out.println(i++ + "      "

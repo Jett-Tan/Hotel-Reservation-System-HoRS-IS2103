@@ -212,7 +212,7 @@ public class GuestRelationOfficerModule {
         int inputInt;
         String input;
         Date today = new Date();
-        Room room = null;
+        Room chkOutRoom = null;
         Guest guest = null;
         String roomNumber,passportNumber;
         System.out.print("Enter room number >> ");
@@ -221,12 +221,20 @@ public class GuestRelationOfficerModule {
         passportNumber = scanner.nextLine().trim();
         try {
             guest = guestSessionBeanRemote.getGuestByPassportNumber(passportNumber);
-            List<Reservation> reservations = reservationSessionBeanRemote.retrieveAllMyReservations(guest);
-            room = roomSessionBeanRemote.getRoomByNumber(roomNumber);
-            room.setIsCheckedIn(false);
-            room = roomSessionBeanRemote.updateRoom(room);
+            List<Reservation> reservations = guest.getReservationList();
+            for (Reservation reservation : reservations) {
+                List<Room> rooms = reservation.getRoomList();
+                for (Room room : rooms) {
+                    room.setIsCheckedIn(false);
+                    chkOutRoom = roomSessionBeanRemote.updateRoom(room);
+                }
+            }
+            
+//            room = roomSessionBeanRemote.getRoomByNumber(roomNumber);
+//            room.setIsCheckedIn(false);
+//            room = roomSessionBeanRemote.updateRoom(room);
             System.out.println("===============================================================");
-            System.out.println("Check out completed for room " + room.getRoomNumber());
+            System.out.println("Check out completed for room " + chkOutRoom.getRoomNumber());
             System.out.println("===============================================================");
         } catch (RoomNotFoundException | RoomTypeNotFoundException | RoomNumberAlreadyExistException | GuestNotFoundException ex) {
             System.out.println(ex.getMessage());

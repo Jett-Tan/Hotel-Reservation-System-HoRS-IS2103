@@ -27,6 +27,8 @@ import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -47,6 +49,8 @@ public class AllocationSingleton implements AllocationSingletonRemote, Allocatio
 
     @EJB(name = "RoomSessionBeanLocal")
     private RoomSessionBeanLocal roomSessionBeanLocal;
+    @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
+    private EntityManager em;
 
     @EJB(name = "ReservationSessionBeanLocal")
     private ReservationSessionBeanLocal reservationSessionBeanLocal;
@@ -64,6 +68,7 @@ public class AllocationSingleton implements AllocationSingletonRemote, Allocatio
         Date today = currentDate;
         System.out.println("Allocating Room reservation for "  + today);
         List<Reservation> reservations = reservationSessionBeanLocal.retrieveAllReseravtions();
+        reservations.forEach(x -> em.detach(x));
         reservations.removeIf(x ->!(x.getStartDate().getDate() == today.getDate() &&
                             x.getStartDate().getYear() == today.getYear()&& 
                             x.getStartDate().getMonth()== today.getMonth()));
@@ -95,16 +100,18 @@ public class AllocationSingleton implements AllocationSingletonRemote, Allocatio
                                 numOfRooms = numOfRooms.subtract(BigDecimal.ONE);
                             }
                             if (numOfRooms.intValue() > 0) {
-                                availableRooms = searchRoomSessionBeanLocal.searchRooms(checkIndate, checkOutDate, parentRoomType);
-                                while (numOfRooms.intValue() > 0 && availableRooms.size() > 0) {
-                                    Room room = availableRooms.get(0);
-                                    availableRooms.remove(0);
-                                    reservationRooms.add(room);
-                                    numOfRooms = numOfRooms.subtract(BigDecimal.ONE);
+                                if(parentRoomType != null){
+                                    availableRooms = searchRoomSessionBeanLocal.searchRooms(checkIndate, checkOutDate, parentRoomType);
+                                    while (numOfRooms.intValue() > 0 && availableRooms.size() > 0) {
+                                        Room room = availableRooms.get(0);
+                                        availableRooms.remove(0);
+                                        reservationRooms.add(room);
+                                        numOfRooms = numOfRooms.subtract(BigDecimal.ONE);
+                                    }
+                                    allocationReport.setType(AllocationTypeEnum.UPGRADED);
+                                    needToCreateAllocationReport = true;
+                                    System.out.println("AllocationSingleton Allocation Upgraded");
                                 }
-                                allocationReport.setType(AllocationTypeEnum.UPGRADED);
-                                needToCreateAllocationReport = true;
-                                System.out.println("AllocationSingleton Allocation Upgraded");
                             }
                             if (numOfRooms.intValue() > 0) {
                                 allocationReport.setType(AllocationTypeEnum.NO_UPGRADE);
@@ -299,5 +306,9 @@ public class AllocationSingleton implements AllocationSingletonRemote, Allocatio
         }
         managedReservation.getRoomList().size();
         return managedReservation;
+    }
+
+    public void persist(Object object) {
+        em.persist(object);
     }
 }

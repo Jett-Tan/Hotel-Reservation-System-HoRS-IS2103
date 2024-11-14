@@ -19,7 +19,7 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 public class AllocationReport implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,18 +27,17 @@ public class AllocationReport implements Serializable {
 
     @NotNull
     private AllocationTypeEnum type;
-    
+
     @OneToOne
     private Reservation reservation;
-    
+
     @NotNull
-    private boolean isSettled; 
-    
+    private boolean isSettled;
+
     public AllocationReport() {
     }
 
-    public AllocationReport(Long allocationReportId, AllocationTypeEnum type, Reservation reservation, boolean isSettled) {
-        this.allocationReportId = allocationReportId;
+    public AllocationReport(AllocationTypeEnum type, Reservation reservation, boolean isSettled) {
         this.type = type;
         this.reservation = reservation;
         this.isSettled = isSettled;
@@ -52,10 +51,6 @@ public class AllocationReport implements Serializable {
         this.isSettled = isSettled;
     }
 
-    
-
-    
-    
     public AllocationTypeEnum getType() {
         return type;
     }
@@ -72,12 +67,9 @@ public class AllocationReport implements Serializable {
         this.reservation = reservation;
     }
 
-    
-    
     public Long getAllocationReportId() {
         return allocationReportId;
     }
-
 
     @Override
     public int hashCode() {
@@ -88,12 +80,14 @@ public class AllocationReport implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the allocationReportId fields are not set
+        // TODO: Warning - this method won't work in the case the allocationReportId
+        // fields are not set
         if (!(object instanceof AllocationReport)) {
             return false;
         }
         AllocationReport other = (AllocationReport) object;
-        if ((this.allocationReportId == null && other.allocationReportId != null) || (this.allocationReportId != null && !this.allocationReportId.equals(other.allocationReportId))) {
+        if ((this.allocationReportId == null && other.allocationReportId != null)
+                || (this.allocationReportId != null && !this.allocationReportId.equals(other.allocationReportId))) {
             return false;
         }
         return true;
@@ -103,5 +97,5 @@ public class AllocationReport implements Serializable {
     public String toString() {
         return "entity.AllocationReport[ id=" + allocationReportId + " ]";
     }
-    
+
 }

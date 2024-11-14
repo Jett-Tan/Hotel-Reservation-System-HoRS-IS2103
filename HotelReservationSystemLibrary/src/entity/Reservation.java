@@ -58,14 +58,14 @@ public class Reservation implements Serializable {
     @Column(nullable = false)
     private Boolean allocated;
     // private List<Room> room;
-    
+
     @ManyToOne
     @JoinColumn()
     private RoomType roomType;
-    
-//    @ManyToOne(optional = true, cascade = {}, fetch = FetchType.LAZY)
-//    private Guest guest;
-    
+
+    // @ManyToOne(optional = true, cascade = {}, fetch = FetchType.LAZY)
+    // private Guest guest;
+
     public Long getReservationId() {
         return reservationId;
     }
@@ -73,8 +73,9 @@ public class Reservation implements Serializable {
     public Reservation() {
     }
 
-    public Reservation(BigDecimal totalAmount, Date startDate, Date endDate, BigDecimal numOfRooms, ReservationTypeEnum reservationType, List<Room> roomList, Boolean allocated, RoomType roomType) {
-        this.amountPerRoom = totalAmount;
+    public Reservation(BigDecimal amountPerRoom, Date startDate, Date endDate, BigDecimal numOfRooms,
+            ReservationTypeEnum reservationType, List<Room> roomList, Boolean allocated, RoomType roomType) {
+        this.amountPerRoom = amountPerRoom;
         this.startDate = startDate;
         this.endDate = endDate;
         this.numOfRooms = numOfRooms;
@@ -191,7 +192,7 @@ public class Reservation implements Serializable {
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
-    
+
     /**
      * @return the numOfRooms
      */
@@ -205,6 +206,5 @@ public class Reservation implements Serializable {
     public void setNumOfRooms(BigDecimal numOfRooms) {
         this.numOfRooms = numOfRooms;
     }
-
 
 }

@@ -56,6 +56,7 @@ public class SearchRoomSessionBean implements SearchRoomSessionBeanRemote, Searc
     @Override
     public List<Room> searchRooms(Date checkIndate, Date checkOutDate, RoomType roomType) throws RoomNotFoundException, RoomTypeNotFoundException {
         List<Room> rooms = roomSessionBeanLocal.getRooms();
+        rooms.forEach(x -> em.detach(x));
         rooms.removeIf(x -> x.getRoomStatus().equals(RoomStatusEnum.UNAVAILABLE));
         rooms.removeIf(x -> {
             boolean free = false;

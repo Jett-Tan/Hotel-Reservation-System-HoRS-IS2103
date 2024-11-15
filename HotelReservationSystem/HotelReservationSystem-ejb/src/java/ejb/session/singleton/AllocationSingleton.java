@@ -85,12 +85,12 @@ public class AllocationSingleton implements AllocationSingletonRemote, Allocatio
                     RoomType roomType = managedReservation.getRoomType();
                     RoomType parentRoomType = roomType.getParentRoomType();
                     List<Room> availableRooms = new ArrayList<>();
-                    AllocationReport allocationReport = new AllocationReport();
-                    allocationReport.setReservation(managedReservation);
+//                    AllocationReport allocationReport = new AllocationReport();
+//                    allocationReport.setReservation(managedReservation);
                     if (!managedReservation.getAllocated()) {
                         try {
-                            boolean needToCreateAllocationReport = false;
-                            boolean needToHaltAllocation = false;
+//                            boolean needToCreateAllocationReport = false;
+//                            boolean needToHaltAllocation = false;
                             
                             availableRooms = searchRoomSessionBeanLocal.searchRooms(checkIndate, checkOutDate, roomType);
                             while (numOfRooms.intValue() > 0 && availableRooms.size() > 0) {
@@ -107,26 +107,43 @@ public class AllocationSingleton implements AllocationSingletonRemote, Allocatio
                                         availableRooms.remove(0);
                                         reservationRooms.add(room);
                                         numOfRooms = numOfRooms.subtract(BigDecimal.ONE);
+                                        
+                                        AllocationReport allocationReport = new AllocationReport();
+                                        allocationReport.setReservation(managedReservation);
+                                        allocationReport.setType(AllocationTypeEnum.UPGRADED);
+                                        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+                                        Validator validator = validatorFactory.getValidator();
+                                        Set<ConstraintViolation<AllocationReport>> errorList = validator.validate(allocationReport);
+                                        if (errorList.isEmpty()) {
+                                            allocationReport = allocationReportSessionBeanLocal.createNewAllocationReport(allocationReport);
+                                        }
                                     }
-                                    allocationReport.setType(AllocationTypeEnum.UPGRADED);
-                                    needToCreateAllocationReport = true;
+//                                    needToCreateAllocationReport = true;
                                     System.out.println("AllocationSingleton Allocation Upgraded");
                                 }
                             }
                             if (numOfRooms.intValue() > 0) {
+                                AllocationReport allocationReport = new AllocationReport();
+                                allocationReport.setReservation(managedReservation);
                                 allocationReport.setType(AllocationTypeEnum.NO_UPGRADE);
-                                needToCreateAllocationReport = true;
-                                needToHaltAllocation = true;
-                                System.out.println("AllocationSingleton Halt Allocation");
-                            }
-                            if (needToCreateAllocationReport) {
                                 ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
                                 Validator validator = validatorFactory.getValidator();
                                 Set<ConstraintViolation<AllocationReport>> errorList = validator.validate(allocationReport);
                                 if (errorList.isEmpty()) {
                                     allocationReport = allocationReportSessionBeanLocal.createNewAllocationReport(allocationReport);
                                 }
+//                                needToCreateAllocationReport = true;
+//                                needToHaltAllocation = true;
+                                System.out.println("AllocationSingleton Halt Allocation");
                             }
+//                            if (needToCreateAllocationReport) {
+//                                ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+//                                Validator validator = validatorFactory.getValidator();
+//                                Set<ConstraintViolation<AllocationReport>> errorList = validator.validate(allocationReport);
+//                                if (errorList.isEmpty()) {
+//                                    allocationReport = allocationReportSessionBeanLocal.createNewAllocationReport(allocationReport);
+//                                }
+//                            }
                         } catch (RoomNotFoundException | RoomTypeNotFoundException ex) {
                             System.out.println(ex.getMessage());
                         }
@@ -164,12 +181,12 @@ public class AllocationSingleton implements AllocationSingletonRemote, Allocatio
         RoomType roomType = managedReservation.getRoomType();
         RoomType parentRoomType = roomType.getParentRoomType();
         List<Room> availableRooms = new ArrayList<>();
-        AllocationReport allocationReport = new AllocationReport();
-        allocationReport.setReservation(managedReservation);
+//        AllocationReport allocationReport = new AllocationReport();
+//        allocationReport.setReservation(managedReservation);
         if(!managedReservation.getAllocated()){
             try {
-                boolean needToCreateAllocationReport = false;
-                boolean needToHaltAllocation = false;
+//                boolean needToCreateAllocationReport = false;
+//                boolean needToHaltAllocation = false;
 
                 availableRooms = searchRoomSessionBeanLocal.searchRooms(checkIndate, checkOutDate, roomType);
                 while(numOfRooms.intValue() > 0 && availableRooms.size() > 0){
@@ -185,26 +202,41 @@ public class AllocationSingleton implements AllocationSingletonRemote, Allocatio
                         availableRooms.remove(0);
                         reservationRooms.add(room);
                         numOfRooms = numOfRooms.subtract(BigDecimal.ONE);
+                        AllocationReport allocationReport = new AllocationReport();
+                        allocationReport.setReservation(managedReservation);
+                        allocationReport.setType(AllocationTypeEnum.UPGRADED);
+                        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+                        Validator validator = validatorFactory.getValidator();
+                        Set<ConstraintViolation<AllocationReport>> errorList = validator.validate(allocationReport);
+                        if (errorList.isEmpty()) {
+                            allocationReport = allocationReportSessionBeanLocal.createNewAllocationReport(allocationReport);
+                        }
                     }
-                    allocationReport.setType(AllocationTypeEnum.UPGRADED);
-                    needToCreateAllocationReport = true;
+//                    allocationReport.setType(AllocationTypeEnum.UPGRADED);
+//                    needToCreateAllocationReport = true;
                 }
                 if(numOfRooms.intValue() > 0) {
+                    AllocationReport allocationReport = new AllocationReport();
+                    allocationReport.setReservation(managedReservation);
                     allocationReport.setType(AllocationTypeEnum.NO_UPGRADE);
-                    needToCreateAllocationReport = true;
-                    needToHaltAllocation = true;
-                }
-                if(needToCreateAllocationReport) {
                     ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
                     Validator validator = validatorFactory.getValidator();
                     Set<ConstraintViolation<AllocationReport>> errorList = validator.validate(allocationReport);
-                    if(errorList.isEmpty()){
+                    if (errorList.isEmpty()) {
                         allocationReport = allocationReportSessionBeanLocal.createNewAllocationReport(allocationReport);
                     }
-                    if(needToHaltAllocation) {
-                        throw new AllocationException("Error allocating rooms");
-                    }
                 }
+//                if(needToCreateAllocationReport) {
+//                    ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+//                    Validator validator = validatorFactory.getValidator();
+//                    Set<ConstraintViolation<AllocationReport>> errorList = validator.validate(allocationReport);
+//                    if(errorList.isEmpty()){
+//                        allocationReport = allocationReportSessionBeanLocal.createNewAllocationReport(allocationReport);
+//                    }
+//                    if(needToHaltAllocation) {
+//                        throw new AllocationException("Error allocating rooms");
+//                    }
+//                }
             } catch (RoomNotFoundException | RoomTypeNotFoundException ex) {
                 System.out.println(ex.getMessage());
             }
